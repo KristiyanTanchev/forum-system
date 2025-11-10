@@ -24,10 +24,10 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Post findById(int id){
+    public Post findById(int id) {
         Post result = em.find(Post.class, id);
-        if (result == null){
-            throw new EntityNotFoundException("Post", "id", String.valueOf(id));
+        if (result == null) {
+            throw new EntityNotFoundException("Post", id);
         }
         return result;
     }
@@ -46,8 +46,8 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public void deleteById(int id) {
         Post result = em.find(Post.class, id);
-        if (result == null){
-            throw new EntityNotFoundException("Post", "id", String.valueOf(id));
+        if (result == null) {
+            throw new EntityNotFoundException("Post", id);
         }
         em.remove(result);
     }

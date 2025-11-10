@@ -9,42 +9,51 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository{
+public class UserRepositoryImpl implements UserRepository {
 
     @PersistenceContext
     private EntityManager em;
 
     @Override
     public User save(User entity) {
-        return null;
+        if (entity.getId() == 0) {
+            em.persist(entity);
+            return entity;
+        }
+        return em.merge(entity);
     }
 
     @Override
     public User findById(int id) {
-        User result = em.find(User.class, id);
-        if (result == null){
-            throw new EntityNotFoundException("User", "id", String.valueOf(id));
+        User user = em.find(User.class, id);
+        if (user == null) {
+            throw new EntityNotFoundException("User", id);
         }
-        return result;
+        return user;
     }
 
     @Override
     public boolean existsById(int id) {
-        return false;
+        User user = em.find(User.class, id);
+        return user != null;
     }
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        return em.createQuery("from User", User.class).getResultList();
     }
 
     @Override
     public void deleteById(int id) {
-
+        User user = em.find(User.class, id);
+        if (user == null) {
+            throw new EntityNotFoundException("User", id);
+        }
+        em.remove(user);
     }
 
     @Override
     public void delete(User entity) {
-
+        em.remove(em.contains(entity) ? entity : em.merge(entity));
     }
 }
