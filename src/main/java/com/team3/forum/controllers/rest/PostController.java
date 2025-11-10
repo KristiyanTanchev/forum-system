@@ -2,10 +2,13 @@ package com.team3.forum.controllers.rest;
 
 import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Post;
-import com.team3.forum.models.dtos.PostCreationDto;
+import com.team3.forum.models.postDtos.PostCreationDto;
+import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.services.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,29 +26,40 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> getAll() {
-        return postService.findAll();
+    public ResponseEntity<List<PostResponseDto>> getAll() {
+        List<PostResponseDto> response = postService.findAll().stream()
+                .map(postMapper::toResponseDto)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public Post create(@RequestBody @Valid PostCreationDto postCreationDto) {
+    public ResponseEntity<PostResponseDto> create(@RequestBody @Valid PostCreationDto postCreationDto) {
         Post post = postMapper.toEntity(postCreationDto);
-        return postService.create(post);
+        Post detached = postService.create(post);
+        PostResponseDto response = postMapper.toResponseDto(detached);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/{postId}")
-    public Post getPost(@PathVariable int postId) {
-        return postService.findById(postId);
+    public ResponseEntity<PostResponseDto> getPost(@PathVariable int postId) {
+        Post detached = postService.findById(postId);
+        PostResponseDto response = postMapper.toResponseDto(detached);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{postId}")
-    public Post updatePost(@RequestBody @Valid PostCreationDto postCreationDto, @PathVariable int postId){
+    public ResponseEntity<PostResponseDto> updatePost(@RequestBody @Valid PostCreationDto postCreationDto,
+                                                      @PathVariable int postId) {
         Post post = postMapper.toEntity(postCreationDto, postId);
-        return postService.update(post);
+        Post detached = postService.update(post);
+        PostResponseDto response = postMapper.toResponseDto(detached);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable int postId) {
+    public ResponseEntity<Void> deletePost(@PathVariable int postId) {
         postService.deleteById(postId);
+        return ResponseEntity.noContent().build();
     }
 }

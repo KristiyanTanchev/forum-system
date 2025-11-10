@@ -37,13 +37,11 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public Post create(Post post) {
-        postRepository.save(post);
-        return post;
+        return postRepository.save(post);
     }
 
     @Override
     public Post update(Post post) {
-        postRepository.save(post);
-        return post;
+        return postRepository.save(post);
     }
 }
