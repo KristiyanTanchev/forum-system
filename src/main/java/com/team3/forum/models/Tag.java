@@ -25,13 +25,8 @@ public class Tag {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "tags")
     @JsonIgnore
-    @JoinTable(
-            name = "tags_posts",
-            joinColumns = @JoinColumn(name = "tag_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id")
-    )
     private Set<Post> posts = new HashSet<>();
 
 }

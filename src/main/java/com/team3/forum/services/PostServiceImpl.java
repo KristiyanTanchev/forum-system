@@ -1,7 +1,13 @@
 package com.team3.forum.services;
 
+import com.team3.forum.exceptions.AuthorizationException;
+import com.team3.forum.exceptions.DuplicateEntityException;
+import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.models.Post;
+import com.team3.forum.models.User;
+import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.repositories.PostRepository;
+import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,11 +17,18 @@ import java.util.List;
 @Service
 @Transactional
 public class PostServiceImpl implements PostService{
+    public static final String ALREADY_LIKED_ERROR = "This post is already liked by this user.";
+    public static final String NOT_LIKED_ERROR = "This post is not liked by this user.";
+    public static final String EDIT_AUTHORIZATION_ERROR = "You cannot edit this post.";
+    public static final String DELETE_AUTHORIZATION_ERROR = "You cannot delete this post.";
+
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -31,7 +44,11 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteById(int id, User requester) {
+        Post persistent = postRepository.findById(id);
+        if (!requester.isAdmin() && persistent.getUser().getId() != requester.getId()) {
+            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
+        }
         postRepository.deleteById(id);
     }
 
@@ -41,7 +58,51 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Post update(Post post) {
-        return postRepository.save(post);
+    public Post update(int postId, PostUpdateDto postUpdateDto, User requester) {
+        Post persistent = postRepository.findById(postId);
+        if (!requester.isAdmin() && persistent.getUser().getId() != requester.getId()) {
+            throw new AuthorizationException(EDIT_AUTHORIZATION_ERROR);
+        }
+        persistent.setTitle(postUpdateDto.getTitle());
+        persistent.setContent(postUpdateDto.getContent());
+
+        return postRepository.save(persistent);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getLikes(int postId) {
+        Post post = postRepository.findById(postId);
+        return post.getLikedBy().size();
+    }
+
+    @Override
+    public void likePost(int postId, int userId) {
+        Post post = postRepository.findById(postId);
+        User user = userRepository.findById(userId);
+
+        if (post.getLikedBy().contains(user)){
+            throw new DuplicateEntityException(ALREADY_LIKED_ERROR);
+        }
+
+        post.getLikedBy().add(user);
+        user.getLikedPosts().add(post);
+
+        postRepository.save(post);
+    }
+
+    @Override
+    public void unlikePost(int postId, int userId) {
+        Post post = postRepository.findById(postId);
+        User user = userRepository.findById(userId);
+
+        if (!post.getLikedBy().contains(user)){
+            throw new EntityNotFoundException(NOT_LIKED_ERROR);
+        }
+
+        post.getLikedBy().remove(user);
+        user.getLikedPosts().remove(post);
+
+        postRepository.save(post);
     }
 }

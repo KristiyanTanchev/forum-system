@@ -49,13 +49,8 @@ public class User {
     @JsonIgnore
     Set<Comment> comments = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "likedBy")
     @JsonIgnore
-    @JoinTable(
-            name = "likes",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id")
-    )
     Set<Post> likedPosts = new HashSet<>();
 
 

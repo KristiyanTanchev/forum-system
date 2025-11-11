@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostCreationDto {
+public class PostUpdateDto {
     @NotNull
     @Size(min = 16, max = 64)
     private String title;
