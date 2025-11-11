@@ -7,6 +7,7 @@ import com.team3.forum.models.User;
 import com.team3.forum.models.likeDtos.LikeCountDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
+import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.services.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +44,10 @@ public class PostRestController {
 
     @PostMapping
     public ResponseEntity<PostResponseDto> create(
+            @RequestHeader HttpHeaders headers,
             @RequestBody @Valid PostCreationDto postCreationDto) {
-        Post post = postMapper.toEntity(postCreationDto);
+        User requester = authenticationHelper.tryGetUser(headers);
+        Post post = postMapper.toEntity(postCreationDto, requester);
         Post detached = postService.create(post);
         PostResponseDto response = postMapper.toResponseDto(detached);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -58,17 +61,22 @@ public class PostRestController {
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> updatePost(@RequestBody @Valid PostCreationDto postCreationDto,
-                                                      @PathVariable int postId) {
-        Post post = postMapper.toEntity(postCreationDto, postId);
-        Post detached = postService.update(post);
+    public ResponseEntity<PostResponseDto> updatePost(
+            @RequestHeader HttpHeaders headers,
+            @RequestBody @Valid PostUpdateDto postUpdateDto,
+            @PathVariable int postId) {
+        User requester = authenticationHelper.tryGetUser(headers);
+        Post detached = postService.update(postId, postUpdateDto, requester);
         PostResponseDto response = postMapper.toResponseDto(detached);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable int postId) {
-        postService.deleteById(postId);
+    public ResponseEntity<Void> deletePost(
+            @RequestHeader HttpHeaders headers,
+            @PathVariable int postId) {
+        User requester = authenticationHelper.tryGetUser(headers);
+        postService.deleteById(postId, requester);
         return ResponseEntity.noContent().build();
     }
 
