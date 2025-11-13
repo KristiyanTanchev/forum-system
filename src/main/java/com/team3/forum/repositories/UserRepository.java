@@ -11,4 +11,6 @@ public interface UserRepository {
     List<User> findAll();
     void deleteById(int id);
     void delete(User entity);
+    User findByUsername(String username);
+    boolean existsByUsername(String username);
 }

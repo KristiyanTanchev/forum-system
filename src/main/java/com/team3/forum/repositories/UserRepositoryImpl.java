@@ -56,4 +56,14 @@ public class UserRepositoryImpl implements UserRepository {
     public void delete(User entity) {
         em.remove(em.contains(entity) ? entity : em.merge(entity));
     }
+
+    @Override
+    public User findByUsername(String username) {
+      return em.createQuery("from User u where u.username=:username", User.class).setParameter("username",username).getSingleResult();
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return false;
+    }
 }
