@@ -43,15 +43,26 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    Set<Post> posts = new HashSet<>();
+    private Set<Post> posts = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    Set<Comment> comments = new HashSet<>();
+    private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany(mappedBy = "likedBy")
     @JsonIgnore
-    Set<Post> likedPosts = new HashSet<>();
+    private Set<Post> likedPosts = new HashSet<>();
+
+    private String phone;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "is_blocked")
+    private boolean isBlocked;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted;
 
 
 }
