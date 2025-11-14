@@ -1,5 +1,6 @@
 package com.team3.forum.services;
 
+import com.team3.forum.exceptions.DuplicateEntityException;
 import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.models.Tag;
 import com.team3.forum.repositories.TagRepository;
@@ -23,8 +24,13 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public Tag createTag(Tag tag) {
-        // Normalize tag name to lowercase as required
         tag.setName(tag.getName().toLowerCase().trim());
+
+        if (tagRepository.findAll().stream()
+                .anyMatch(t -> t.getName().equals(tag.getName()))) {
+            throw new DuplicateEntityException("Tag with this name already exists");
+        }
+
         return tagRepository.save(tag);
     }
 
