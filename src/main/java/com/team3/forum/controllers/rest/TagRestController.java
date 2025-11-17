@@ -8,11 +8,13 @@ import com.team3.forum.models.tagDtos.TagCreationDto;
 import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.models.tagDtos.TagUpdateDto;
 import com.team3.forum.services.TagService;
+import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +24,13 @@ import java.util.List;
 public class TagRestController {
 
     private final TagService tagService;
-    private final TempAuthenticationHelper authenticationHelper;
+    private final UserService userService;
 
     @Autowired
     public TagRestController(TagService tagService,
-                             TempAuthenticationHelper authenticationHelper) {
+                             UserService userService) {
         this.tagService = tagService;
-        this.authenticationHelper = authenticationHelper;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -48,9 +50,10 @@ public class TagRestController {
 
     @PostMapping
     public ResponseEntity<TagResponseDto> createTag(
-            @RequestHeader HttpHeaders headers,
-            @Valid @RequestBody TagCreationDto dto) {
-        User requester = authenticationHelper.tryGetUser(headers);
+            @Valid @RequestBody TagCreationDto dto,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
         if (!requester.isAdmin()) {
             throw new AuthorizationException("Only administrators can create tags");
         }
@@ -64,10 +67,11 @@ public class TagRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TagResponseDto> updateTag(
-            @RequestHeader HttpHeaders headers,
             @PathVariable int id,
-            @Valid @RequestBody TagUpdateDto dto) {
-        User requester = authenticationHelper.tryGetUser(headers);
+            @Valid @RequestBody TagUpdateDto dto,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
         if (!requester.isAdmin()) {
             throw new AuthorizationException("Only administrators can update tags");
         }
@@ -81,9 +85,10 @@ public class TagRestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(
-            @RequestHeader HttpHeaders headers,
-            @PathVariable int id) {
-        User requester = authenticationHelper.tryGetUser(headers);
+            @PathVariable int id,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
         if (!requester.isAdmin()) {
             throw new AuthorizationException("Only administrators can delete tags");
         }
