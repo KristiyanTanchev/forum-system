@@ -1,7 +1,5 @@
 package com.team3.forum.controllers.rest;
 
-import com.team3.forum.exceptions.AuthorizationException;
-import com.team3.forum.helpers.TempAuthenticationHelper;
 import com.team3.forum.models.Tag;
 import com.team3.forum.models.User;
 import com.team3.forum.models.tagDtos.TagCreationDto;
@@ -11,7 +9,6 @@ import com.team3.forum.services.TagService;
 import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,8 +24,7 @@ public class TagRestController {
     private final UserService userService;
 
     @Autowired
-    public TagRestController(TagService tagService,
-                             UserService userService) {
+    public TagRestController(TagService tagService, UserService userService) {
         this.tagService = tagService;
         this.userService = userService;
     }
@@ -54,13 +50,11 @@ public class TagRestController {
             Authentication authentication) {
         String currentUsername = authentication.getName();
         User requester = userService.findByUsername(currentUsername);
-        if (!requester.isAdmin()) {
-            throw new AuthorizationException("Only administrators can create tags");
-        }
 
         Tag tag = new Tag();
         tag.setName(dto.getName());
-        Tag created = tagService.createTag(tag);
+
+        Tag created = tagService.createTag(tag, requester);
         TagResponseDto response = new TagResponseDto(created.getId(), created.getName());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -72,13 +66,11 @@ public class TagRestController {
             Authentication authentication) {
         String currentUsername = authentication.getName();
         User requester = userService.findByUsername(currentUsername);
-        if (!requester.isAdmin()) {
-            throw new AuthorizationException("Only administrators can update tags");
-        }
 
         Tag tag = new Tag();
         tag.setName(dto.getName());
-        Tag updated = tagService.updateTag(id, tag);
+
+        Tag updated = tagService.updateTag(id, tag, requester);
         TagResponseDto response = new TagResponseDto(updated.getId(), updated.getName());
         return ResponseEntity.ok(response);
     }
@@ -89,11 +81,8 @@ public class TagRestController {
             Authentication authentication) {
         String currentUsername = authentication.getName();
         User requester = userService.findByUsername(currentUsername);
-        if (!requester.isAdmin()) {
-            throw new AuthorizationException("Only administrators can delete tags");
-        }
 
-        tagService.deleteById(id);
+        tagService.deleteById(id, requester);
         return ResponseEntity.noContent().build();
     }
 }

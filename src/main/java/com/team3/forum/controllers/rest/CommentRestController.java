@@ -8,7 +8,7 @@ import com.team3.forum.models.commentDtos.CommentUpdateDto;
 import com.team3.forum.services.CommentService;
 import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +51,6 @@ public class CommentRestController {
         String username = authentication.getName();
         User user = userService.findByUsername(username);
 
-        // ✅ Подаваш user към service
         Comment comment = commentService.createComment(commentCreationDto, postId, user);
 
         CommentResponseDto response = CommentResponseDto.builder()
