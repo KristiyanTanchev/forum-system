@@ -14,10 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/comments")
-public class CommentRestController {
+import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
+@RestController
+@RequestMapping("/api/posts/{postId}/comments")
+public class CommentRestController {
     private final CommentService commentService;
     private final TempAuthenticationHelper authenticationHelper;
 
@@ -28,19 +31,33 @@ public class CommentRestController {
         this.authenticationHelper = authenticationHelper;
     }
 
-    @PostMapping("/post/{postId}")
+    @GetMapping
+    public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable int postId) {
+        List<Comment> comments = commentService.findAllByPostId(postId);
+        List<CommentResponseDto> response = comments.stream()
+                .map(comment -> CommentResponseDto.builder()
+                        .id(comment.getId())
+                        .postId(comment.getPost().getId())
+                        .userId(comment.getUser().getId())
+                        .content(comment.getContent())
+                        .build())
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
             @RequestHeader HttpHeaders headers,
             @PathVariable int postId,
-            @Valid @RequestBody CommentCreationDto dto) {
+            @Valid @RequestBody CommentCreationDto commentCreationDto) {
         User user = authenticationHelper.tryGetUser(headers);
-        Comment created = commentService.createComment(dto, postId, user.getId());
+        Comment comment = commentService.createComment(commentCreationDto, postId, user.getId());
 
         CommentResponseDto response = CommentResponseDto.builder()
-                .id(created.getId())
-                .postId(created.getPost().getId())
-                .userId(created.getUser().getId())
-                .content(created.getContent())
+                .id(comment.getId())
+                .postId(comment.getPost().getId())
+                .userId(comment.getUser().getId())
+                .content(comment.getContent())
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -49,10 +66,11 @@ public class CommentRestController {
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(
             @RequestHeader HttpHeaders headers,
+            @PathVariable int postId,
             @PathVariable int commentId,
-            @Valid @RequestBody CommentUpdateDto dto) {
+            @Valid @RequestBody CommentUpdateDto commentUpdateDto) {
         User user = authenticationHelper.tryGetUser(headers);
-        Comment updated = commentService.updateComment(commentId, dto, user.getId());
+        Comment updated = commentService.updateComment(commentId, commentUpdateDto, user.getId());
 
         CommentResponseDto response = CommentResponseDto.builder()
                 .id(updated.getId())
@@ -67,6 +85,7 @@ public class CommentRestController {
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @RequestHeader HttpHeaders headers,
+            @PathVariable int postId,
             @PathVariable int commentId) {
         User user = authenticationHelper.tryGetUser(headers);
         commentService.deleteById(commentId, user.getId());
