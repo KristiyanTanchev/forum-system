@@ -76,10 +76,21 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByUsername(String username) {
         Long count = em.createQuery(
-                        "SELECT COUNT(u) FROM User u WHERE u.username = :username",
+                        "select count(u) from User u where u.username = :username",
                         Long.class)
                 .setParameter("username", username)
                 .getSingleResult();
         return count > 0;
+    }
+
+    @Override
+    public List<User> searchUsers(String searchTerm) {
+        String searchPattern = "%" + searchTerm.toLowerCase() + "%";
+        return em.createQuery("from User u where" +
+                        " u.username like :search" +
+                        " or u.email like :search " +
+                        "or u.firstName like :search ", User.class)
+                .setParameter("search", searchPattern)
+                .getResultList();
     }
 }

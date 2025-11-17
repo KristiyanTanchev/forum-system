@@ -13,4 +13,5 @@ public interface UserRepository {
     void delete(User entity);
     User findByUsername(String username);
     boolean existsByUsername(String username);
+    List<User> searchUsers(String searchTerm);
 }

@@ -79,4 +79,31 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    @Override
+    public User blockUser(int id) {
+        User user = userRepository.findById(id);
+        user.setBlocked(true);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User unblockUser(int id) {
+        User user = userRepository.findById(id);
+        user.setBlocked(false);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User promoteToAdmin(int id) {
+        User user = userRepository.findById(id);
+        user.setAdmin(true);
+        return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> searchUser(String query) {
+        return userRepository.searchUsers(query);
+    }
 }

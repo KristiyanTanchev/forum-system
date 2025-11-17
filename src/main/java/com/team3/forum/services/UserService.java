@@ -15,4 +15,8 @@ public interface UserService {
     void deleteById(int id);
     void delete(User entity);
     User findByUsername(String username);
+    User blockUser(int id);
+    User unblockUser(int id);
+    User promoteToAdmin(int id);
+    public List<User> searchUser(String query);
 }

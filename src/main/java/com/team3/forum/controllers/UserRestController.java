@@ -37,7 +37,7 @@ public class UserRestController {
         String currentUsername = authentication.getName();
         User currentUser = userService.findByUsername(currentUsername);
 
-        if (currentUser.getId()!=id && !currentUser.isAdmin()) {
+        if (currentUser.getId() != id && !currentUser.isAdmin()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         User updatedUser = userService.updateUser(id, userUpdateDto);
@@ -59,9 +59,11 @@ public class UserRestController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        userService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> getCurrentUserProfile(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        UserResponseDto userResponseDto = userMapper.toResponseDto(user);
+        return ResponseEntity.ok(userResponseDto);
     }
 }
