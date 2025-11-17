@@ -49,11 +49,16 @@ public class AdminRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        userService.deleteById(id);
+    public ResponseEntity<Void> softDeleteUser(@PathVariable int id) {
+        userService.softDeleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/users/{id}/restore")
+    public ResponseEntity<Void> restoreUser(@PathVariable int id) {
+        userService.restoreById(id);
+        return ResponseEntity.noContent().build();
+    }
     //ToDo Admin must be able to delete any post
     //ToDo Admin must be able to filter and sort posts
 }

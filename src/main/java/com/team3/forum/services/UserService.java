@@ -12,11 +12,11 @@ public interface UserService {
     User findById(int id);
     boolean existsById(int id);
     List<User> findAll();
-    void deleteById(int id);
-    void delete(User entity);
     User findByUsername(String username);
     User blockUser(int id);
     User unblockUser(int id);
     User promoteToAdmin(int id);
     public List<User> searchUser(String query);
+    void softDeleteById(int id);
+    void restoreById(int id);
 }

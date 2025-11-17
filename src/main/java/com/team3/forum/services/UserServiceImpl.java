@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,20 +31,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(UserCreateDto dto) {
+
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new DuplicateEntityException("User", "username", dto.getUsername());
         }
+
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new DuplicateEntityException("User", "email", dto.getEmail());
+        }
+
         User user = userMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setAdmin(false);
-       return userRepository.save(user);
+        user.setBlocked(false);
+        user.setDeleted(false);
+        user.setCreatedAt(LocalDateTime.now());
+        return userRepository.save(user);
     }
 
     @Override
     public User updateUser(int id, UserUpdateDto dto) {
-       User existingUser = userRepository.findById(id);
-       userMapper.updateEntityFromDto(dto,existingUser);
-       return userRepository.save(existingUser);
+        User existingUser = userRepository.findById(id);
+        if (!existingUser.getEmail().equals(dto.getEmail())) {
+
+        }
+        userMapper.updateEntityFromDto(dto, existingUser);
+        return userRepository.save(existingUser);
     }
 
     @Override
@@ -62,16 +75,6 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
-    }
-
-    @Override
-    public void deleteById(int id) {
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    public void delete(User entity) {
-        userRepository.delete(entity);
     }
 
     @Override
@@ -105,5 +108,15 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<User> searchUser(String query) {
         return userRepository.searchUsers(query);
+    }
+
+    @Override
+    public void softDeleteById(int id) {
+        userRepository.softDeleteById(id);
+    }
+
+    @Override
+    public void restoreById(int id) {
+        userRepository.restoreById(id);
     }
 }

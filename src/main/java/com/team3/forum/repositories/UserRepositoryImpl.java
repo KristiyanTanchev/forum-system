@@ -49,17 +49,23 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteById(int id) {
+    public void softDeleteById(int id) {
         User user = em.find(User.class, id);
         if (user == null) {
             throw new EntityNotFoundException("User", id);
         }
-        em.remove(user);
+        user.setDeleted(true);
+        em.merge(user);
     }
 
     @Override
-    public void delete(User entity) {
-        em.remove(em.contains(entity) ? entity : em.merge(entity));
+    public void restoreById(int id) {
+        User user = em.find(User.class, id);
+        if (user == null) {
+            throw new EntityNotFoundException("User", id);
+        }
+        user.setDeleted(false);
+        em.merge(user);
     }
 
     @Override
@@ -70,6 +76,27 @@ public class UserRepositoryImpl implements UserRepository {
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new EntityNotFoundException("User", "username", username);
+        }
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        Long count = em.createQuery(
+                        "select count(u) from User u where u.email = :email",
+                        Long.class)
+                .setParameter("email", email)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        try {
+            return em.createQuery("from User u where u.email=:email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new EntityNotFoundException("User", "email", email);
         }
     }
 
