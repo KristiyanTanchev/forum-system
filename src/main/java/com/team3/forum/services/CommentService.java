@@ -14,6 +14,8 @@ public interface CommentService {
 
     Comment findById(int commentId);
 
+    List<Comment> findAllByPostId(int postId);
+
     boolean existsById(int commentId);
 
     void deleteById(int commentId, int userId);

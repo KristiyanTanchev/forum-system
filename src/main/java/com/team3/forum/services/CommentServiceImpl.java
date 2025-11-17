@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class CommentServiceImpl implements CommentService {
@@ -60,6 +63,15 @@ public class CommentServiceImpl implements CommentService {
 
         comment.setContent(dto.getContent());
         return commentRepository.save(comment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Comment> findAllByPostId(int postId) {
+        List<Comment> allComments = commentRepository.findAll();
+        return allComments.stream()
+                .filter(comment -> comment.getPost().getId() == postId)
+                .collect(Collectors.toList());
     }
 
     @Override
