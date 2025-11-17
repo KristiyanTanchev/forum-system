@@ -9,11 +9,13 @@ import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.services.PostService;
+import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,15 +25,15 @@ import java.util.List;
 public class PostRestController {
     private final PostService postService;
     private final PostMapper postMapper;
-    private final TempAuthenticationHelper authenticationHelper;
+    private final UserService userService;
 
     @Autowired
     public PostRestController(PostService postService,
                               PostMapper postMapper,
-                              TempAuthenticationHelper authenticationHelper) {
+                              UserService userService) {
         this.postService = postService;
         this.postMapper = postMapper;
-        this.authenticationHelper = authenticationHelper;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -44,9 +46,10 @@ public class PostRestController {
 
     @PostMapping
     public ResponseEntity<PostResponseDto> create(
-            @RequestHeader HttpHeaders headers,
-            @RequestBody @Valid PostCreationDto postCreationDto) {
-        User requester = authenticationHelper.tryGetUser(headers);
+            @RequestBody @Valid PostCreationDto postCreationDto,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
         Post post = postMapper.toEntity(postCreationDto, requester);
         Post detached = postService.create(post);
         PostResponseDto response = postMapper.toResponseDto(detached);
@@ -62,10 +65,11 @@ public class PostRestController {
 
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(
-            @RequestHeader HttpHeaders headers,
             @RequestBody @Valid PostUpdateDto postUpdateDto,
-            @PathVariable int postId) {
-        User requester = authenticationHelper.tryGetUser(headers);
+            @PathVariable int postId,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
         Post detached = postService.update(postId, postUpdateDto, requester);
         PostResponseDto response = postMapper.toResponseDto(detached);
         return ResponseEntity.ok(response);
@@ -73,9 +77,10 @@ public class PostRestController {
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(
-            @RequestHeader HttpHeaders headers,
-            @PathVariable int postId) {
-        User requester = authenticationHelper.tryGetUser(headers);
+            @PathVariable int postId,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
         postService.deleteById(postId, requester);
         return ResponseEntity.noContent().build();
     }
@@ -89,10 +94,12 @@ public class PostRestController {
 
     @PostMapping("/{postId}/likes")
     public ResponseEntity<LikeCountDto> likePost(
-            @RequestHeader HttpHeaders headers,
-            @PathVariable int postId) {
-        User user = authenticationHelper.tryGetUser(headers);
-        postService.likePost(postId, user.getId());
+            @PathVariable int postId,
+            Authentication authentication) {
+
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
+        postService.likePost(postId, requester.getId());
 
         int likes = postService.getLikes(postId);
         LikeCountDto response = new LikeCountDto(postId, likes);
@@ -101,13 +108,15 @@ public class PostRestController {
 
     @DeleteMapping("/{postId}/likes")
     public ResponseEntity<LikeCountDto> unlikePost(
-            @RequestHeader HttpHeaders headers,
-            @PathVariable int postId) {
-        User user = authenticationHelper.tryGetUser(headers);
-        postService.unlikePost(postId, user.getId());
+            @PathVariable int postId,
+            Authentication authentication) {
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
+        postService.unlikePost(postId, requester.getId());
 
         int likes = postService.getLikes(postId);
         LikeCountDto response = new LikeCountDto(postId, likes);
         return ResponseEntity.ok(response);
     }
+
 }
