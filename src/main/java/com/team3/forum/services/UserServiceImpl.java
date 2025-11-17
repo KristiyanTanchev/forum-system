@@ -52,8 +52,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(int id, UserUpdateDto dto) {
         User existingUser = userRepository.findById(id);
-        if (!existingUser.getEmail().equals(dto.getEmail())) {
 
+        if (!existingUser.getEmail().equals(dto.getEmail())) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw new DuplicateEntityException("User", "email", dto.getEmail());
+            }
         }
         userMapper.updateEntityFromDto(dto, existingUser);
         return userRepository.save(existingUser);

@@ -3,6 +3,7 @@ package com.team3.forum.models.userDtos;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +15,7 @@ public class UserResponseDto {
     private String lastName;
     private String username;
     private String email;
+    private String avatarUrl;
     private boolean isAdmin;
     private LocalDateTime createdAt;
-
 }
