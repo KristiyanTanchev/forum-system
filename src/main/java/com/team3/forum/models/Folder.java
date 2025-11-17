@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "folders")
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
 public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +24,12 @@ public class Folder {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Folder parentFolder;
+
+    @OneToMany(mappedBy = "parentFolder")
+    private List<Folder> childFolders;
+
+    @OneToMany(mappedBy = "folder")
+    private List<Post> posts;
 
     private String name;
 
