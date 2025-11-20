@@ -17,6 +17,7 @@ public class UserMapper {
                 .lastName(user.getLastName())
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .avatarUrl(user.getAvatarUrl())
                 .isAdmin(user.isAdmin())
                 .createdAt(user.getCreatedAt())
                 .build();
@@ -29,7 +30,6 @@ public class UserMapper {
                 .username(dto.getUsername())
                 .email(dto.getEmail())
                 .password(dto.getPassword())
-                .isAdmin(false)
                 .build();
     }
 

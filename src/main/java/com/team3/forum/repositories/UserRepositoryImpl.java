@@ -26,17 +26,21 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(int id) {
-        User user = em.find(User.class, id);
-        if (user == null) {
+        try {
+            return em.createQuery(
+                            "from User u where u.id = :id and u.isDeleted = false",
+                            User.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (NoResultException e) {
             throw new EntityNotFoundException("User", id);
         }
-        return user;
     }
 
     @Override
     public boolean existsById(int id) {
         Long count = em.createQuery(
-                        "SELECT COUNT(u) FROM User u WHERE u.id = :id",
+                        "SELECT COUNT(u) FROM User u WHERE u.id = :id and u.isDeleted = false",
                         Long.class)
                 .setParameter("id", id)
                 .getSingleResult();
@@ -45,7 +49,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return em.createQuery("from User", User.class).getResultList();
+        return em.createQuery("from User u where u.isDeleted = false", User.class).getResultList();
     }
 
     @Override
@@ -71,7 +75,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         try {
-            return em.createQuery("from User u where u.username=:username", User.class)
+            return em.createQuery("from User u where u.username=:username and u.isDeleted = false", User.class)
                     .setParameter("username", username)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -82,7 +86,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByEmail(String email) {
         Long count = em.createQuery(
-                        "select count(u) from User u where u.email = :email",
+                        "select count(u) from User u where u.email = :email and u.isDeleted = false",
                         Long.class)
                 .setParameter("email", email)
                 .getSingleResult();
@@ -92,7 +96,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByEmail(String email) {
         try {
-            return em.createQuery("from User u where u.email=:email", User.class)
+            return em.createQuery("from User u where u.email=:email and u.isDeleted = false", User.class)
                     .setParameter("email", email)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -103,7 +107,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByUsername(String username) {
         Long count = em.createQuery(
-                        "select count(u) from User u where u.username = :username",
+                        "select count(u) from User u where u.username = :username and u.isDeleted = false",
                         Long.class)
                 .setParameter("username", username)
                 .getSingleResult();
@@ -113,10 +117,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> searchUsers(String searchTerm) {
         String searchPattern = "%" + searchTerm.toLowerCase() + "%";
-        return em.createQuery("from User u where" +
+        return em.createQuery("from User u where u.isDeleted = false and (" +
                         " u.username like :search" +
                         " or u.email like :search " +
-                        "or u.firstName like :search ", User.class)
+                        "or u.firstName like :search) ", User.class)
                 .setParameter("search", searchPattern)
                 .getResultList();
     }

@@ -35,12 +35,7 @@ public class UserRestController {
                                                       @Valid @RequestBody UserUpdateDto userUpdateDto,
                                                       Authentication authentication) {
         String currentUsername = authentication.getName();
-        User currentUser = userService.findByUsername(currentUsername);
-
-        if (currentUser.getId() != id && !currentUser.isAdmin()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        User updatedUser = userService.updateUser(id, userUpdateDto);
+        User updatedUser = userService.updateUser(id, userUpdateDto, currentUsername);
         UserResponseDto userResponseDto = userMapper.toResponseDto(updatedUser);
         return ResponseEntity.ok(userResponseDto);
     }

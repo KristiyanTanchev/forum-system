@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -25,7 +24,7 @@ public class AdminRestController {
 
     @GetMapping("/users/search")
     public ResponseEntity<List<UserResponseDto>> searchUsers(@RequestParam String query) {
-        List<User> users = userService.searchUser(query);
+        List<User> users = userService.searchUsers(query);
         List<UserResponseDto> response = users.stream().map(userMapper::toResponseDto).toList();
         return ResponseEntity.ok(response);
     }
@@ -48,7 +47,7 @@ public class AdminRestController {
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> softDeleteUser(@PathVariable int id) {
         userService.softDeleteById(id);
         return ResponseEntity.noContent().build();
