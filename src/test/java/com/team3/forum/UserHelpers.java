@@ -19,4 +19,5 @@ public class UserHelpers {
         user.setCreatedAt(LocalDateTime.now());
         return user;
     }
+
 }
