@@ -2,6 +2,7 @@ package com.team3.forum.services;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.exceptions.FolderNotEmptyException;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
@@ -60,6 +61,13 @@ public class FolderServiceImpl implements FolderService{
         if (!requester.isAdmin()) {
             throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
         }
+        Folder parent = folder.getParentFolder();
+        List<String> siblingsSlugs = parent.getChildFolders().stream()
+                .map(Folder::getSlug)
+                .toList();
+        if (siblingsSlugs.contains(folder.getSlug())){
+            throw new EntityUpdateConflictException("The slug must be unique for the subfolder");
+        }
         return folderRepository.save(folder);
     }
 
@@ -82,15 +90,6 @@ public class FolderServiceImpl implements FolderService{
         Folder persistent = folderRepository.findById(folder.getId())
                 .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
         return persistent.getPosts();
-    }
-
-    @Override
-    public Folder getFolderBySlug(String slug){
-        Folder folder = folderRepository.findBySlug(slug);
-        if (folder == null){
-            throw new EntityNotFoundException("folder", "slug", slug);
-        }
-        return folder;
     }
 
     @Override
