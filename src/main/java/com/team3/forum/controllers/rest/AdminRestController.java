@@ -47,7 +47,7 @@ public class AdminRestController {
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> softDeleteUser(@PathVariable int id) {
         userService.softDeleteById(id);
         return ResponseEntity.noContent().build();
