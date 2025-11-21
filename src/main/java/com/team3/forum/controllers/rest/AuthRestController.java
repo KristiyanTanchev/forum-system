@@ -6,6 +6,7 @@ import com.team3.forum.models.loginDtos.LoginRequestDto;
 import com.team3.forum.models.loginDtos.LoginResponseDto;
 import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.models.userDtos.UserResponseDto;
+import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.security.JwtTokenProvider;
 import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
@@ -55,15 +56,15 @@ public class AuthRestController {
 
         String jwt = jwtTokenProvider.generateToken(authentication);
 
-        User user = userService.findByUsername(loginRequest.getUsername());
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
         LoginResponseDto response = LoginResponseDto.builder()
                 .token(jwt)
                 .type("Bearer")
-                .userId(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .isAdmin(user.isAdmin())
+                .userId(userDetails.getId())
+                .username(userDetails.getUsername())
+                .email(userDetails.getEmail())
+                .isAdmin(userDetails.isAdmin())
                 .build();
 
         return ResponseEntity.ok(response);

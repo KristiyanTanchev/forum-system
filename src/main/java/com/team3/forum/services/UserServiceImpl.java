@@ -2,6 +2,8 @@ package com.team3.forum.services;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
+import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
 import com.team3.forum.models.userDtos.UserCreateDto;
@@ -18,6 +20,13 @@ import java.util.List;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
+    public static final String UPDATE_AUTHORIZATION_ERROR = "You are not authorized to update this user.";
+    public static final String ALREADY_BLOCKED_ERROR = "User is already blocked.";
+    public static final String NOT_BLOCKED_ERROR = "User is not blocked.";
+    public static final String ALREADY_ADMIN_ERROR = "User is already an admin.";
+    public static final String BLOCKED_USER_ERROR = "Cannot perform this action on a blocked user.";
+    public static final String DELETED_USER_ERROR = "Cannot perform this action on a deleted user.";
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -51,24 +60,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(int id, UserUpdateDto dto, String currentUsername) {
+    public User updateUser(int id, UserUpdateDto dto, int requesterId) {
         User existingUser = userRepository.findById(id);
-        User currentUser = userRepository.findByUsername(currentUsername);
+        User requester = userRepository.findById(requesterId);
 
-        if (currentUser == null) {
-            throw new AuthorizationException("Current user not found");
+        if (existingUser == null) {
+            throw new EntityNotFoundException("User", id);
         }
 
-        if (currentUser.getId() != id && !currentUser.isAdmin()) {
-            throw new AuthorizationException("You are not authorized to update this user");
+        if (requester == null) {
+            throw new EntityNotFoundException("User", requesterId);
+        }
+
+        if (requester.getId() != id && !requester.isAdmin()) {
+            throw new AuthorizationException(UPDATE_AUTHORIZATION_ERROR);
         }
 
         if (existingUser.isBlocked()) {
-            throw new AuthorizationException("Cannot update a blocked user");
+            throw new EntityUpdateConflictException(BLOCKED_USER_ERROR);
         }
 
         if (existingUser.isDeleted()) {
-            throw new AuthorizationException("Cannot update a deleted user");
+            throw new EntityUpdateConflictException(DELETED_USER_ERROR);
         }
 
         if (!existingUser.getEmail().equals(dto.getEmail())) {
@@ -107,15 +120,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User blockUser(int id) {
         User user = userRepository.findById(id);
-
+        if (user == null) {
+            throw new EntityNotFoundException("User", id);
+        }
         if (user.isBlocked()) {
-            throw new IllegalStateException("User is already blocked");
+            throw new EntityUpdateConflictException(ALREADY_BLOCKED_ERROR);
         }
-
         if (user.isDeleted()) {
-            throw new IllegalStateException("Cannot block a deleted user");
+            throw new EntityUpdateConflictException(DELETED_USER_ERROR);
         }
-
         user.setBlocked(true);
         return userRepository.save(user);
     }
@@ -123,15 +136,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User unblockUser(int id) {
         User user = userRepository.findById(id);
-
+        if (user == null) {
+            throw new EntityNotFoundException("User", id);
+        }
         if (!user.isBlocked()) {
-            throw new IllegalStateException("User is not blocked");
+            throw new EntityUpdateConflictException(NOT_BLOCKED_ERROR);
         }
-
         if (user.isDeleted()) {
-            throw new IllegalStateException("Cannot unblock a deleted user");
+            throw new EntityUpdateConflictException(DELETED_USER_ERROR);
         }
-
         user.setBlocked(false);
         return userRepository.save(user);
     }
@@ -139,19 +152,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public User promoteToAdmin(int id) {
         User user = userRepository.findById(id);
-
+        if (user == null) {
+            throw new EntityNotFoundException("User", id);
+        }
         if (user.isAdmin()) {
-            throw new IllegalStateException("User is already an admin");
+            throw new EntityUpdateConflictException(ALREADY_ADMIN_ERROR);
         }
-
         if (user.isBlocked()) {
-            throw new IllegalStateException("Cannot promote a blocked user to admin");
+            throw new EntityUpdateConflictException(BLOCKED_USER_ERROR);
         }
-
         if (user.isDeleted()) {
-            throw new IllegalStateException("Cannot promote a deleted user to admin");
+            throw new EntityUpdateConflictException(DELETED_USER_ERROR);
         }
-
         user.setAdmin(true);
         return userRepository.save(user);
     }

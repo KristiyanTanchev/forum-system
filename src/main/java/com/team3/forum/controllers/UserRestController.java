@@ -6,12 +6,14 @@ import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.models.userDtos.UserResponseDto;
 import com.team3.forum.models.userDtos.UserSummaryDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
+import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,9 +35,8 @@ public class UserRestController {
     @PostMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable int id,
                                                       @Valid @RequestBody UserUpdateDto userUpdateDto,
-                                                      Authentication authentication) {
-        String currentUsername = authentication.getName();
-        User updatedUser = userService.updateUser(id, userUpdateDto, currentUsername);
+                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User updatedUser = userService.updateUser(id, userUpdateDto,userDetails.getId());
         UserResponseDto userResponseDto = userMapper.toResponseDto(updatedUser);
         return ResponseEntity.ok(userResponseDto);
     }
@@ -55,9 +56,8 @@ public class UserRestController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getCurrentUserProfile(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
+    public ResponseEntity<UserResponseDto> getCurrentUserProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userService.findById(userDetails.getId());
         UserResponseDto userResponseDto = userMapper.toResponseDto(user);
         return ResponseEntity.ok(userResponseDto);
     }

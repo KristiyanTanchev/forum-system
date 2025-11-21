@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
     User createUser(UserCreateDto dto);
-    User updateUser(int id, UserUpdateDto dto, String currentUsername);
+    User updateUser(int id, UserUpdateDto dto, int requesterId);
     User findById(int id);
     boolean existsById(int id);
     List<User> findAll();

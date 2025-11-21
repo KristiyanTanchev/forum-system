@@ -9,6 +9,9 @@ import java.util.Collection;
 
 @Getter @Setter
 public class CustomUserDetails extends User {
+    private int id;
+    private String email;
+    private boolean isAdmin;
     public CustomUserDetails(String username,
                              String password,
                              boolean enabled,
@@ -16,11 +19,13 @@ public class CustomUserDetails extends User {
                              boolean credentialsNonExpired,
                              boolean accountNonLocked,
                              Collection<? extends GrantedAuthority> authorities,
-                             int userId) {
+                             int userId,
+                             String email,
+                             boolean isAdmin) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-        this.setId(userId);
+        this.id = userId;
+        this.email = email;
+        this.isAdmin = isAdmin;
     }
-
-    private int id;
 }
 
