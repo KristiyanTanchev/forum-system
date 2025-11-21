@@ -7,6 +7,7 @@ import com.team3.forum.models.User;
 import com.team3.forum.models.folderDtos.FolderContentsDto;
 import com.team3.forum.models.folderDtos.FolderCreateDto;
 import com.team3.forum.models.folderDtos.FolderResponseDto;
+import com.team3.forum.models.folderDtos.FolderUpdateDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.services.FolderService;
 import com.team3.forum.services.UserService;
@@ -97,5 +98,38 @@ public class FolderRestController {
         FolderResponseDto response = folderMapper.toResponseDto(created);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{*path}")
+    public ResponseEntity<FolderResponseDto> updateFolder(
+            @PathVariable("path") String path,
+            @RequestBody @Valid FolderUpdateDto folderUpdateDto,
+            Authentication authentication) {
+
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
+
+        List<String> slugs = List.of(path.substring(1).split("/"));
+        Folder folder = folderService.getFolderByPath(slugs);
+
+        Folder updated = folderService.update(folder, folderUpdateDto, requester);
+
+        FolderResponseDto response = folderMapper.toResponseDto(updated);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{*path}")
+    public ResponseEntity<Void> deleteFolder(
+            @PathVariable("path") String path,
+            Authentication authentication) {
+
+        String currentUsername = authentication.getName();
+        User requester = userService.findByUsername(currentUsername);
+
+        List<String> slugs = List.of(path.substring(1).split("/"));
+        Folder folder = folderService.getFolderByPath(slugs);
+
+        folderService.deleteById(folder.getId(), requester);
+        return ResponseEntity.noContent().build();
     }
 }

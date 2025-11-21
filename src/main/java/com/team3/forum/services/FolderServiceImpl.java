@@ -2,6 +2,8 @@ package com.team3.forum.services;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.exceptions.EntityUpdateConflictException;
+import com.team3.forum.exceptions.FolderNotEmptyException;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
@@ -42,30 +44,42 @@ public class FolderServiceImpl implements FolderService{
 
     @Override
     public void deleteById(int id, User requester) {
-        Folder persistent = folderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("folder", id));
         if (!requester.isAdmin()) {
             throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
         }
-        folderRepository.deleteById(id);
+        Folder persistent = folderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("folder", id));
+        if (!persistent.getPosts().isEmpty()
+                || !persistent.getChildFolders().isEmpty()){
+            throw new FolderNotEmptyException(id);
+        }
+        folderRepository.delete(persistent);
     }
 
     @Override
     public Folder create(Folder folder, User requester) {
-        //TODO: Validate admin rights
+        if (!requester.isAdmin()) {
+            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
+        }
+        Folder parent = folder.getParentFolder();
+        List<String> siblingsSlugs = parent.getChildFolders().stream()
+                .map(Folder::getSlug)
+                .toList();
+        if (siblingsSlugs.contains(folder.getSlug())){
+            throw new EntityUpdateConflictException("The slug must be unique for the subfolder");
+        }
         return folderRepository.save(folder);
     }
 
     @Override
-    public Folder update(int folderId, FolderUpdateDto folderUpdateDto, User requester) {
-        Folder persistent = folderRepository.findById(folderId)
-                .orElseThrow(() -> new EntityNotFoundException("folder", folderId));
+    public Folder update(Folder folder, FolderUpdateDto folderUpdateDto, User requester) {
         if (!requester.isAdmin()) {
             throw new AuthorizationException(EDIT_AUTHORIZATION_ERROR);
         }
+        Folder persistent = folderRepository.findById(folder.getId())
+                .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
         persistent.setName(folderUpdateDto.getName());
         persistent.setSlug(folderUpdateDto.getSlug());
-        persistent.setParentFolder(folderUpdateDto.getParentFolder());
 
         return folderRepository.save(persistent);
     }
@@ -76,15 +90,6 @@ public class FolderServiceImpl implements FolderService{
         Folder persistent = folderRepository.findById(folder.getId())
                 .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
         return persistent.getPosts();
-    }
-
-    @Override
-    public Folder getFolderBySlug(String slug){
-        Folder folder = folderRepository.findBySlug(slug);
-        if (folder == null){
-            throw new EntityNotFoundException("folder", "slug", slug);
-        }
-        return folder;
     }
 
     @Override

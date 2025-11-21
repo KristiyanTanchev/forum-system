@@ -25,22 +25,23 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public Post findById(int id) {
-        Post result = em.find(Post.class, id);
-        if (result == null) {
-            throw new EntityNotFoundException("Post", id);
-        }
-        return result;
+        return em.createQuery("from Post p where p.isDeleted = false and p.id = :id", Post.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Post", id));
     }
 
     @Override
     public boolean existsById(int id) {
-        Post post = em.find(Post.class, id);
-        return post != null;
+        return em.createQuery("select count(p) from Post p where p.isDeleted = false and p.id = :id", Long.class)
+                .setParameter("id", id)
+                .getSingleResult() > 0;
     }
 
     @Override
     public List<Post> findAll() {
-        return em.createQuery("from Post", Post.class).getResultList();
+        return em.createQuery("from Post p where p.isDeleted = false", Post.class).getResultList();
     }
 
     @Override

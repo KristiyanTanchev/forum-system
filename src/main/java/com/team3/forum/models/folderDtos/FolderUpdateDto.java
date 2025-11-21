@@ -13,9 +13,6 @@ import lombok.*;
 @Builder
 public class FolderUpdateDto {
     @NotNull
-    private Folder parentFolder;
-
-    @NotNull
     @Size(min = 1, max = 32)
     private String name;
 

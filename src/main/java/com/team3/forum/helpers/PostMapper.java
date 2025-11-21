@@ -1,19 +1,27 @@
 package com.team3.forum.helpers;
 
 import com.team3.forum.models.Post;
-import com.team3.forum.models.User;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
+import com.team3.forum.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PostMapper {
+    private final UserService userService;
 
-    public Post toEntity(PostCreationDto dto, User creator) {
+    @Autowired
+    public PostMapper(UserService userService) {
+        this.userService = userService;
+    }
+
+
+    public Post toEntity(PostCreationDto dto, int creatorId) {
         return Post.builder()
                 .content(dto.getContent())
                 .title(dto.getTitle())
-                .user(creator)
+                .user(userService.findById(creatorId))
                 .build();
     }
 
