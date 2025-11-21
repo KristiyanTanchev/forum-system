@@ -3,6 +3,7 @@ package com.team3.forum.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -33,12 +34,14 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @Column(name = "is_admin")
     private boolean isAdmin;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user")
@@ -66,5 +69,4 @@ public class User {
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
-
 }
