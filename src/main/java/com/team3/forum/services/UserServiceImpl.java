@@ -64,14 +64,6 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(id);
         User requester = userRepository.findById(requesterId);
 
-        if (existingUser == null) {
-            throw new EntityNotFoundException("User", id);
-        }
-
-        if (requester == null) {
-            throw new EntityNotFoundException("User", requesterId);
-        }
-
         if (requester.getId() != id && !requester.isAdmin()) {
             throw new AuthorizationException(UPDATE_AUTHORIZATION_ERROR);
         }
@@ -120,9 +112,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User blockUser(int id) {
         User user = userRepository.findById(id);
-        if (user == null) {
-            throw new EntityNotFoundException("User", id);
-        }
+
         if (user.isBlocked()) {
             throw new EntityUpdateConflictException(ALREADY_BLOCKED_ERROR);
         }
@@ -136,9 +126,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User unblockUser(int id) {
         User user = userRepository.findById(id);
-        if (user == null) {
-            throw new EntityNotFoundException("User", id);
-        }
+
         if (!user.isBlocked()) {
             throw new EntityUpdateConflictException(NOT_BLOCKED_ERROR);
         }
@@ -152,9 +140,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User promoteToAdmin(int id) {
         User user = userRepository.findById(id);
-        if (user == null) {
-            throw new EntityNotFoundException("User", id);
-        }
+
         if (user.isAdmin()) {
             throw new EntityUpdateConflictException(ALREADY_ADMIN_ERROR);
         }
