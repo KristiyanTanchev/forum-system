@@ -33,6 +33,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     @JsonIgnore
+    @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany
@@ -42,6 +43,7 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private Set<User> likedBy = new HashSet<>();
 
     @ManyToMany
@@ -51,6 +53,7 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne

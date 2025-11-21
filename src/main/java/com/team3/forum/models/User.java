@@ -43,14 +43,17 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
+    @Builder.Default
     private Set<Post> posts = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
+    @Builder.Default
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany(mappedBy = "likedBy")
     @JsonIgnore
+    @Builder.Default
     private Set<Post> likedPosts = new HashSet<>();
 
     private String phone;
