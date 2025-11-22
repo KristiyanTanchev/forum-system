@@ -42,7 +42,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 true, // credentialsNonExpired
                 !user.isBlocked(), // accountNonLocked
                 getAuthorities(user),
-                user.getId()
+                user.getId(),
+                user.getEmail(),
+                user.isAdmin()
         );
     }
 
