@@ -8,8 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class LoginResponseDto {
-
     private String token;
+    @Builder.Default
     private String type = "Bearer";
     private Integer userId;
     private String username;
