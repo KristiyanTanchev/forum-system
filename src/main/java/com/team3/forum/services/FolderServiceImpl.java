@@ -9,24 +9,32 @@ import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.folderDtos.FolderUpdateDto;
 import com.team3.forum.repositories.FolderRepository;
+import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
-public class FolderServiceImpl implements FolderService{
+public class FolderServiceImpl implements FolderService {
+    public static final String CREATE_NO_SLUGS_ERROR = "You cannot create a folder on root level.";
+    public static final String EDIT_NO_SLUGS_ERROR = "You cannot edit a folder on root level.";
+    public static final String CREATE_AUTHORIZATION_ERROR = "Only admins can create folders.";
     public static final String EDIT_AUTHORIZATION_ERROR = "You cannot edit this folder.";
     public static final String DELETE_AUTHORIZATION_ERROR = "You cannot delete this folder.";
+    public static final String CREATE_UNIQUE_SLUG_ERROR = "The slug must be unique for the subfolder";
 
 
     private final FolderRepository folderRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public FolderServiceImpl(FolderRepository folderRepository) {
+    public FolderServiceImpl(FolderRepository folderRepository, UserRepository userRepository) {
         this.folderRepository = folderRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -43,57 +51,68 @@ public class FolderServiceImpl implements FolderService{
     }
 
     @Override
-    public void deleteById(int id, User requester) {
+    public void deleteById(int id, int requesterId) {
+        User requester = userRepository.findById(requesterId);
         if (!requester.isAdmin()) {
             throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
         }
         Folder persistent = folderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("folder", id));
         if (!persistent.getPosts().isEmpty()
-                || !persistent.getChildFolders().isEmpty()){
+                || !persistent.getChildFolders().isEmpty()) {
             throw new FolderNotEmptyException(id);
         }
         folderRepository.delete(persistent);
     }
 
     @Override
-    public Folder create(Folder folder, User requester) {
+    public Folder create(Folder folder, List<String> slugs, int requesterId) {
+        if (slugs.isEmpty()) {
+            throw new EntityUpdateConflictException(CREATE_NO_SLUGS_ERROR);
+        }
+        User requester = userRepository.findById(requesterId);
         if (!requester.isAdmin()) {
-            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
+            throw new AuthorizationException(CREATE_AUTHORIZATION_ERROR);
         }
-        Folder parent = folder.getParentFolder();
-        List<String> siblingsSlugs = parent.getChildFolders().stream()
-                .map(Folder::getSlug)
-                .toList();
-        if (siblingsSlugs.contains(folder.getSlug())){
-            throw new EntityUpdateConflictException("The slug must be unique for the subfolder");
-        }
+
+        Folder parent = getFolderByPath(slugs);
+        folder.setParentFolder(parent);
+
+        validateUniqueSlug(parent, folder);
+
         return folderRepository.save(folder);
     }
 
     @Override
-    public Folder update(Folder folder, FolderUpdateDto folderUpdateDto, User requester) {
+    public Folder update(List<String> slugs, FolderUpdateDto folderUpdateDto, int requesterId) {
+        if (slugs.isEmpty()) {
+            throw new EntityUpdateConflictException(EDIT_NO_SLUGS_ERROR);
+        }
+        Folder folder = getFolderByPath(slugs);
+        User requester = userRepository.findById(requesterId);
+
         if (!requester.isAdmin()) {
             throw new AuthorizationException(EDIT_AUTHORIZATION_ERROR);
         }
-        Folder persistent = folderRepository.findById(folder.getId())
-                .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
-        persistent.setName(folderUpdateDto.getName());
-        persistent.setSlug(folderUpdateDto.getSlug());
 
-        return folderRepository.save(persistent);
+        folder.setName(folderUpdateDto.getName());
+        folder.setSlug(folderUpdateDto.getSlug());
+
+        validateUniqueSlug(folder.getParentFolder(), folder);
+
+        return folderRepository.save(folder);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> getPostsInFolder(Folder folder){
+    public List<Post> getPostsInFolder(Folder folder) {
         Folder persistent = folderRepository.findById(folder.getId())
                 .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
         return persistent.getPosts();
     }
 
     @Override
-    public List<Folder> findHomeFolders(){
+    public List<Folder> findHomeFolders() {
         return folderRepository.getFoldersByParentFolder(null);
     }
 
@@ -105,7 +124,7 @@ public class FolderServiceImpl implements FolderService{
 
         Folder current = folderRepository
                 .findBySlug(slugs.get(0));
-        if (current == null){
+        if (current == null) {
             throw new EntityNotFoundException("folder", "slug", slugs.get(0));
         }
 
@@ -117,6 +136,18 @@ public class FolderServiceImpl implements FolderService{
         }
 
         return current;
+    }
+
+    private void validateUniqueSlug(Folder parent, Folder child) {
+        boolean hasSiblingWithTheSameSlug = parent.getChildFolders().stream()
+                .anyMatch(f ->
+                        Objects.equals(f.getSlug(), child.getSlug()) &&
+                                !Objects.equals(f.getId(), child.getId())
+                );
+
+        if (hasSiblingWithTheSameSlug) {
+            throw new EntityUpdateConflictException(CREATE_UNIQUE_SLUG_ERROR);
+        }
     }
 
 }

@@ -12,11 +12,11 @@ public interface FolderService {
 
     Folder findById(int id);
 
-    void deleteById(int id, User requester);
+    void deleteById(int id, int requesterId);
 
-    Folder create(Folder folder, User requester);
+    Folder create(Folder folder, List<String> slugs, int requesterId);
 
-    Folder update(Folder folder, FolderUpdateDto folderUpdateDto, User requester);
+    Folder update(List<String> slugs, FolderUpdateDto folderUpdateDto, int requesterId);
 
     List<Post> getPostsInFolder(Folder folder);
 

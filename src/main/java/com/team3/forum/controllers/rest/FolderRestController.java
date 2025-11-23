@@ -3,20 +3,20 @@ package com.team3.forum.controllers.rest;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Folder;
-import com.team3.forum.models.User;
 import com.team3.forum.models.folderDtos.FolderContentsDto;
 import com.team3.forum.models.folderDtos.FolderCreateDto;
 import com.team3.forum.models.folderDtos.FolderResponseDto;
 import com.team3.forum.models.folderDtos.FolderUpdateDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
+import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.services.FolderService;
-import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,13 +24,11 @@ import java.util.List;
 public class FolderRestController {
     private final FolderService folderService;
     private final FolderMapper folderMapper;
-    private final UserService userService;
     private final PostMapper postMapper;
 
-    public FolderRestController(FolderService folderService, FolderMapper folderMapper, UserService userService, PostMapper postMapper) {
+    public FolderRestController(FolderService folderService, FolderMapper folderMapper, PostMapper postMapper) {
         this.folderService = folderService;
         this.folderMapper = folderMapper;
-        this.userService = userService;
         this.postMapper = postMapper;
     }
 
@@ -45,14 +43,11 @@ public class FolderRestController {
     @PostMapping
     public ResponseEntity<FolderResponseDto> create(
             @RequestBody @Valid FolderCreateDto folderCreateDto,
-            Authentication authentication) {
-
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
-
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        //TODO: This one has some issues when slugs is empty. TBD if we will even allow folder creation on root level
         Folder folder = folderMapper.toEntity(folderCreateDto);
 
-        Folder detached = folderService.create(folder, requester);
+        Folder detached = folderService.create(folder, new ArrayList<>(), userDetails.getId());
         FolderResponseDto response = folderMapper.toResponseDto(detached);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -83,18 +78,13 @@ public class FolderRestController {
     public ResponseEntity<FolderResponseDto> createChild(
             @PathVariable("path") String path,
             @RequestBody @Valid FolderCreateDto folderCreateDto,
-            Authentication authentication) {
-
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         List<String> slugs = List.of(path.substring(1).split("/"));
-        Folder parent = folderService.getFolderByPath(slugs);
 
         Folder folder = folderMapper.toEntity(folderCreateDto);
-        folder.setParentFolder(parent);
 
-        Folder created = folderService.create(folder, requester);
+        Folder created = folderService.create(folder, slugs, userDetails.getId());
         FolderResponseDto response = folderMapper.toResponseDto(created);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -104,15 +94,11 @@ public class FolderRestController {
     public ResponseEntity<FolderResponseDto> updateFolder(
             @PathVariable("path") String path,
             @RequestBody @Valid FolderUpdateDto folderUpdateDto,
-            Authentication authentication) {
-
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         List<String> slugs = List.of(path.substring(1).split("/"));
-        Folder folder = folderService.getFolderByPath(slugs);
 
-        Folder updated = folderService.update(folder, folderUpdateDto, requester);
+        Folder updated = folderService.update(slugs, folderUpdateDto, userDetails.getId());
 
         FolderResponseDto response = folderMapper.toResponseDto(updated);
         return ResponseEntity.ok(response);
@@ -121,15 +107,12 @@ public class FolderRestController {
     @DeleteMapping("/{*path}")
     public ResponseEntity<Void> deleteFolder(
             @PathVariable("path") String path,
-            Authentication authentication) {
-
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         List<String> slugs = List.of(path.substring(1).split("/"));
         Folder folder = folderService.getFolderByPath(slugs);
 
-        folderService.deleteById(folder.getId(), requester);
+        folderService.deleteById(folder.getId(), userDetails.getId());
         return ResponseEntity.noContent().build();
     }
 }
