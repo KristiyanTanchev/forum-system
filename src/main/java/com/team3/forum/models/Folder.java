@@ -29,9 +29,11 @@ public class Folder {
     private Folder parentFolder;
 
     @OneToMany(mappedBy = "parentFolder")
+    @Builder.Default
     private Set<Folder> childFolders = new HashSet<>();
 
     @OneToMany(mappedBy = "folder")
+    @Builder.Default
     private Set<Post> posts = new HashSet<>();
 
     private String name;

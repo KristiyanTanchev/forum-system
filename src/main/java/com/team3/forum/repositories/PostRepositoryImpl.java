@@ -57,4 +57,13 @@ public class PostRepositoryImpl implements PostRepository {
     public void delete(Post entity) {
         em.remove(em.contains(entity) ? entity : em.merge(entity));
     }
+
+    @Override
+    public Post findByAndIsDeleted(int id) {
+        return em.createQuery("from Post p where p.isDeleted = true and p.id = :id", Post.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Post", id));
+    }
 }

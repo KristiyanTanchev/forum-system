@@ -59,7 +59,7 @@ public class Post {
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name ="folder_id")
+    @JoinColumn(name = "folder_id")
     private Folder folder;
 
     @Column(name = "created_at")

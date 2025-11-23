@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public class FolderServiceImpl implements FolderService {
     public static final String CREATE_AUTHORIZATION_ERROR = "Only admins can create folders.";
     public static final String EDIT_AUTHORIZATION_ERROR = "You cannot edit this folder.";
     public static final String DELETE_AUTHORIZATION_ERROR = "You cannot delete this folder.";
-    public static final String CREATE_UNIQUE_SLUG_ERROR = "The slug must be unique for the subfolder";
+    public static final String CREATE_UNIQUE_SLUG_ERROR = "The slug must be unique among sibling folders.";
 
 
     private final FolderRepository folderRepository;
@@ -88,7 +89,11 @@ public class FolderServiceImpl implements FolderService {
         if (slugs.isEmpty()) {
             throw new EntityUpdateConflictException(EDIT_NO_SLUGS_ERROR);
         }
+
         Folder folder = getFolderByPath(slugs);
+        if (folder.getParentFolder() == null) {
+            throw new EntityUpdateConflictException(EDIT_NO_SLUGS_ERROR);
+        }
         User requester = userRepository.findById(requesterId);
 
         if (!requester.isAdmin()) {
@@ -108,15 +113,17 @@ public class FolderServiceImpl implements FolderService {
     public List<Post> getPostsInFolder(Folder folder) {
         Folder persistent = folderRepository.findById(folder.getId())
                 .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
-        return persistent.getPosts();
+        return new ArrayList<>(persistent.getPosts());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Folder> findHomeFolders() {
         return folderRepository.getFoldersByParentFolder(null);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Folder getFolderByPath(List<String> slugs) {
         if (slugs.isEmpty()) {
             throw new IllegalArgumentException("Empty path");
