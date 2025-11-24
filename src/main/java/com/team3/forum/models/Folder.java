@@ -6,7 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "folders")
@@ -28,10 +29,12 @@ public class Folder {
     private Folder parentFolder;
 
     @OneToMany(mappedBy = "parentFolder")
-    private List<Folder> childFolders;
+    @Builder.Default
+    private Set<Folder> childFolders = new HashSet<>();
 
     @OneToMany(mappedBy = "folder")
-    private List<Post> posts;
+    @Builder.Default
+    private Set<Post> posts = new HashSet<>();
 
     private String name;
 

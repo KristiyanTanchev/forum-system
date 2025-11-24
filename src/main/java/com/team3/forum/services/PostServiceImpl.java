@@ -2,7 +2,6 @@ package com.team3.forum.services;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
-import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
@@ -18,11 +17,12 @@ import java.util.List;
 
 @Service
 @Transactional
-public class PostServiceImpl implements PostService{
+public class PostServiceImpl implements PostService {
     public static final String ALREADY_LIKED_ERROR = "This post is already liked by this user.";
     public static final String NOT_LIKED_ERROR = "This post is not liked by this user.";
     public static final String EDIT_AUTHORIZATION_ERROR = "You cannot edit this post.";
     public static final String DELETE_AUTHORIZATION_ERROR = "You cannot delete this post.";
+    public static final String RESTORE_AUTHORIZATION_ERROR = "You cannot restore this post.";
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -52,30 +52,26 @@ public class PostServiceImpl implements PostService{
         if (persistent == null) {
             throw new EntityNotFoundException("Post", id);
         }
-        if (!requester.isAdmin() && persistent.getUser().getId() != requester.getId()) {
-            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
-        }
-        if (persistent.isDeleted()) {
-            throw new EntityUpdateConflictException(String.format("Post with id %d is already deleted.", id));
-        }
+        verifyAdminOrOwner(persistent,
+                requester,
+                new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
         persistent.setDeleted(true);
         persistent.setDeletedAt(LocalDateTime.now());
         postRepository.save(persistent);
     }
 
     @Override
-    public Post restoreById(int id, int requesterId){
+    public Post restoreById(int id, int requesterId) {
         User requester = userRepository.findById(requesterId);
-        Post persistent = postRepository.findById(id);
+        Post persistent = postRepository.findByAndIsDeleted(id);
         if (persistent == null) {
             throw new EntityNotFoundException("Post", id);
         }
-        if (!requester.isAdmin() && persistent.getUser().getId() != requester.getId()) {
-            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
-        }
-        if (!persistent.isDeleted()) {
-            throw new EntityUpdateConflictException(String.format("Post with id %d is not deleted.", id));
-        }
+
+        verifyAdminOrOwner(persistent,
+                requester,
+                new AuthorizationException(RESTORE_AUTHORIZATION_ERROR));
+
         persistent.setDeleted(false);
         persistent.setDeletedAt(null);
         return postRepository.save(persistent);
@@ -90,9 +86,11 @@ public class PostServiceImpl implements PostService{
     public Post update(int postId, PostUpdateDto postUpdateDto, int requesterId) {
         User requester = userRepository.findById(requesterId);
         Post persistent = postRepository.findById(postId);
-        if (!requester.isAdmin() && persistent.getUser().getId() != requester.getId()) {
-            throw new AuthorizationException(EDIT_AUTHORIZATION_ERROR);
-        }
+
+        verifyAdminOrOwner(persistent,
+                requester,
+                new AuthorizationException(EDIT_AUTHORIZATION_ERROR));
+
         persistent.setTitle(postUpdateDto.getTitle());
         persistent.setContent(postUpdateDto.getContent());
 
@@ -111,7 +109,7 @@ public class PostServiceImpl implements PostService{
         Post post = postRepository.findById(postId);
         User user = userRepository.findById(userId);
 
-        if (post.getLikedBy().contains(user)){
+        if (post.getLikedBy().contains(user)) {
             throw new DuplicateEntityException(ALREADY_LIKED_ERROR);
         }
 
@@ -126,7 +124,7 @@ public class PostServiceImpl implements PostService{
         Post post = postRepository.findById(postId);
         User user = userRepository.findById(userId);
 
-        if (!post.getLikedBy().contains(user)){
+        if (!post.getLikedBy().contains(user)) {
             throw new EntityNotFoundException(NOT_LIKED_ERROR);
         }
 
@@ -134,5 +132,11 @@ public class PostServiceImpl implements PostService{
         user.getLikedPosts().remove(post);
 
         postRepository.save(post);
+    }
+
+    private void verifyAdminOrOwner(Post post, User requester, RuntimeException error) {
+        if (!requester.isAdmin() && post.getUser().getId() != requester.getId()) {
+            throw error;
+        }
     }
 }
