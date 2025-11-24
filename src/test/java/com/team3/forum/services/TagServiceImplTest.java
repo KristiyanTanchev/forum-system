@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static com.team3.forum.UserHelpers.createMockUser;
+import static helpers.UserHelpers.createMockUser;
 
 @ExtendWith(MockitoExtension.class)
 public class TagServiceImplTest {

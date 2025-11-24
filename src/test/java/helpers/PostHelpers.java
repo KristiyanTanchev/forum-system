@@ -5,7 +5,7 @@ import com.team3.forum.models.Post;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 
-import static com.team3.forum.UserHelpers.createMockUser;
+import static helpers.UserHelpers.createMockUser;
 import static helpers.FolderHelpers.createMockFolder;
 
 public class PostHelpers {
