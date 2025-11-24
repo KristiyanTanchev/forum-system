@@ -1,13 +1,13 @@
 package com.team3.forum.services;
 
 import com.team3.forum.models.Tag;
-import com.team3.forum.models.User;
+
 import java.util.List;
 
 public interface TagService {
-    Tag createTag(Tag tag, User requester);
-    Tag updateTag(int id, Tag tag, User requester);
+    Tag createTag(String name, int userId);
+    Tag updateTag(int id, String name, int userId);
     Tag findById(int id);
     List<Tag> findAll();
-    void deleteById(int id, User requester);
+    void deleteById(int id, int userId);
 }
