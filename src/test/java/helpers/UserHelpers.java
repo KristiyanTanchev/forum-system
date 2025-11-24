@@ -1,4 +1,4 @@
-package com.team3.forum;
+package helpers;
 
 import com.team3.forum.models.User;
 import com.team3.forum.models.userDtos.UserCreateDto;
