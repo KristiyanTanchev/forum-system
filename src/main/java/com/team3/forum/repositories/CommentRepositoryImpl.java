@@ -52,4 +52,12 @@ public class CommentRepositoryImpl implements CommentRepository {
     public void delete(Comment entity) {
         em.remove(em.contains(entity) ? entity : em.merge(entity));
     }
+
+    @Override
+    public List<Comment> findByPostId(int postId) {
+        return em.createQuery(
+                        "SELECT c FROM Comment c WHERE c.post.id = :postId", Comment.class)
+                .setParameter("postId", postId)
+                .getResultList();
+    }
 }

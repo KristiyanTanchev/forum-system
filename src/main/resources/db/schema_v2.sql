@@ -181,3 +181,12 @@ CREATE INDEX idx_tags_posts_post        ON tags_posts (post_id);
 CREATE INDEX idx_folders_parent         ON folders (parent_id);
 CREATE INDEX idx_posts_folder_created   ON posts (folder_id, created_at);
 
+
+-- Adding Likes for Comments
+CREATE TABLE comment_likes (
+                               comment_id INT NOT NULL,
+                               user_id INT NOT NULL,
+                               PRIMARY KEY (comment_id, user_id),
+                               FOREIGN KEY (comment_id) REFERENCES comments(comment_id),
+                               FOREIGN KEY (user_id) REFERENCES users(user_id)
+);

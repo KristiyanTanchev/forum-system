@@ -259,4 +259,29 @@ FROM users u, posts p
 WHERE u.username IN ('chloe_fox','chloefox')
   AND p.title='How to Start a Film Club in Your City';
 
+-- ========= COMMENT LIKES (idempotent via IGNORE) =========
+INSERT IGNORE INTO comment_likes (comment_id, user_id)
+SELECT c.comment_id, u.user_id
+FROM comments c, users u
+WHERE u.username IN ('alice_admin', 'marco01')
+  AND c.content = 'The docking sequence in IMAX still gives me goosebumps. Great write-up!';
+
+INSERT IGNORE INTO comment_likes (comment_id, user_id)
+SELECT c.comment_id, u.user_id
+FROM comments c, users u
+WHERE u.username IN ('chloe_fox', 'ethanr')
+  AND c.content = 'Love the point about time dilation as character drama, not just sci-fi dressing.';
+
+INSERT IGNORE INTO comment_likes (comment_id, user_id)
+SELECT c.comment_id, u.user_id
+FROM comments c, users u
+WHERE u.username IN ('alice_admin', 'marco01', 'chloe_fox')
+  AND c.content = 'Curious which indie picks survive the campaign season—marketing budgets matter.';
+
+INSERT IGNORE INTO comment_likes (comment_id, user_id)
+SELECT c.comment_id, u.user_id
+FROM comments c, users u
+WHERE u.username IN ('alice_admin', 'ethanr')
+  AND c.content = 'It''s wild how much suspense he gets from blocking and eyelines alone.';
+
 COMMIT;

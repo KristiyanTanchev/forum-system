@@ -22,4 +22,14 @@ public interface CommentService {
     void deleteById(int commentId, User requester);
 
     void delete(Comment comment);
+
+    Comment restoreById(int commentId, User requester);
+
+    int getLikes(int commentId);
+
+    void likeComment(int commentId, User user);
+
+    void unlikeComment(int commentId, User user);
+
+    List<Comment> findAllByPostIdWithOrdering(int postId, String orderBy, String direction);
 }
