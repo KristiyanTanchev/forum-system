@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class TagCreationDto {
 
-    @NotBlank(message = "Tag name cannot be blank.")
-    @Size(max = 50, message = "Tag name must be up to 50 characters.")
+    @NotBlank(message = "Tag name is required.")
+    @Size(min = 2,max = 50, message = "Tag name must be between 2 and 50 character")
     private String name;
 }

@@ -2,8 +2,8 @@ package com.team3.forum.services;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
-import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.models.Comment;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
@@ -44,7 +44,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment createComment(CommentCreationDto dto, int postId, User requester) {
+    public Comment createComment(CommentCreationDto dto, int postId, int userId) {
+        User user = userRepository.findById(userId);
         Post post = postRepository.findById(postId);
         if (post == null) {
             throw new EntityNotFoundException("Post", postId);
@@ -52,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = new Comment();
         comment.setPost(post);
-        comment.setUser(requester);
+        comment.setUser(user);
         comment.setContent(dto.getContent());
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
@@ -63,16 +64,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment updateComment(int commentId, CommentUpdateDto dto, User requester) {
+    public Comment updateComment(int commentId, CommentUpdateDto dto, int userId) {
+        User user = userRepository.findById(userId);
         Comment comment = commentRepository.findById(commentId);
         if (comment == null || comment.isDeleted()) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-
-        if (!requester.isAdmin() && comment.getUser().getId() != requester.getId()) {
-            throw new AuthorizationException(EDIT_AUTHORIZATION_ERROR);
-        }
-
+        verifyAdminOrOwner(comment, user, new AuthorizationException(EDIT_AUTHORIZATION_ERROR));
         comment.setContent(dto.getContent());
         comment.setUpdatedAt(LocalDateTime.now());
         return commentRepository.save(comment);
@@ -82,7 +80,6 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public List<Comment> findAllByPostId(int postId) {
         return commentRepository.findByPostId(postId).stream()
-                .filter(comment -> !comment.isDeleted())
                 .sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
                 .collect(Collectors.toList());
     }
@@ -106,21 +103,16 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void deleteById(int commentId, User requester) {
+    public void deleteById(int commentId, int userId) {
+        User user = userRepository.findById(userId);
         Comment comment = commentRepository.findById(commentId);
         if (comment == null) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-
         if (comment.isDeleted()) {
             throw new EntityUpdateConflictException(String.format("Comment with id %d is already deleted.", commentId));
         }
-
-        if (!requester.isAdmin() && comment.getUser().getId() != requester.getId()) {
-            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
-        }
-
-        // Soft delete
+        verifyAdminOrOwner(comment, user, new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
         comment.setDeleted(true);
         comment.setDeletedAt(LocalDateTime.now());
         commentRepository.save(comment);
@@ -134,20 +126,16 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment restoreById(int commentId, User requester) {
+    public Comment restoreById(int commentId, int userId) {
+        User user = userRepository.findById(userId);
         Comment comment = commentRepository.findById(commentId);
         if (comment == null) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-
-        if (!requester.isAdmin() && comment.getUser().getId() != requester.getId()) {
-            throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
-        }
-
+        verifyAdminOrOwner(comment, user, new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
         if (!comment.isDeleted()) {
             throw new EntityUpdateConflictException(String.format("Comment with id %d is not deleted.", commentId));
         }
-
         comment.setDeleted(false);
         comment.setDeletedAt(null);
         return commentRepository.save(comment);
@@ -165,32 +153,30 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void likeComment(int commentId, User user) {
+    public void likeComment(int commentId, int userId) {
+        User user = userRepository.findById(userId);
         Comment comment = commentRepository.findById(commentId);
         if (comment == null || comment.isDeleted()) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-
         if (comment.getLikedBy().contains(user)) {
             throw new DuplicateEntityException(ALREADY_LIKED_ERROR);
         }
-
         comment.getLikedBy().add(user);
         commentRepository.save(comment);
     }
 
     @Override
     @Transactional
-    public void unlikeComment(int commentId, User user) {
+    public void unlikeComment(int commentId, int userId) {
+        User user = userRepository.findById(userId);
         Comment comment = commentRepository.findById(commentId);
         if (comment == null || comment.isDeleted()) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-
         if (!comment.getLikedBy().contains(user)) {
             throw new EntityNotFoundException(NOT_LIKED_ERROR);
         }
-
         comment.getLikedBy().remove(user);
         commentRepository.save(comment);
     }
@@ -198,10 +184,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<Comment> findAllByPostIdWithOrdering(int postId, String orderBy, String direction) {
-        List<Comment> comments = commentRepository.findByPostId(postId).stream()
-                .filter(comment -> !comment.isDeleted())
-                .collect(Collectors.toList());
-
+        List<Comment> comments = commentRepository.findByPostId(postId);
         Comparator<Comment> comparator;
         switch (orderBy.toLowerCase()) {
             case "likes":
@@ -212,13 +195,17 @@ public class CommentServiceImpl implements CommentService {
                 comparator = Comparator.comparing(Comment::getCreatedAt);
                 break;
         }
-
         if ("desc".equalsIgnoreCase(direction)) {
             comparator = comparator.reversed();
         }
-
         return comments.stream()
                 .sorted(comparator)
                 .collect(Collectors.toList());
+    }
+
+    private void verifyAdminOrOwner(Comment comment, User requester, RuntimeException error) {
+        if (!requester.isAdmin() && comment.getUser().getId() != requester.getId()) {
+            throw error;
+        }
     }
 }

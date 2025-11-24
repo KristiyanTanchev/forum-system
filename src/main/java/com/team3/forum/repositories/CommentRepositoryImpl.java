@@ -25,21 +25,23 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public Comment findById(int id) {
-        Comment result = em.find(Comment.class, id);
-        if (result == null) {
-            throw new EntityNotFoundException("Comment", id);
-        }
-        return result;
+        return em.createQuery("from Comment c where c.isDeleted = false and c.id = :id", Comment.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Comment", id));
     }
 
     @Override
     public boolean existsById(int id) {
-        return em.find(Comment.class, id) != null;
+        return em.createQuery("select count(c) from Comment c where c.isDeleted = false and c.id = :id", Long.class)
+                .setParameter("id", id)
+                .getSingleResult() > 0;
     }
 
     @Override
     public List<Comment> findAll() {
-        return em.createQuery("from Comment", Comment.class).getResultList();
+        return em.createQuery("from Comment c where c.isDeleted = false", Comment.class).getResultList();
     }
 
     @Override
@@ -56,8 +58,17 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public List<Comment> findByPostId(int postId) {
         return em.createQuery(
-                        "SELECT c FROM Comment c WHERE c.post.id = :postId", Comment.class)
+                        "SELECT c FROM Comment c WHERE c.post.id = :postId AND c.isDeleted = false", Comment.class)
                 .setParameter("postId", postId)
                 .getResultList();
+    }
+
+    @Override
+    public Comment findByIdIncludeDeleted(int id) {
+        Comment result = em.find(Comment.class, id);
+        if (result == null) {
+            throw new EntityNotFoundException("Comment", id);
+        }
+        return result;
     }
 }

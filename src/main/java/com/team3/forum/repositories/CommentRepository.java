@@ -12,4 +12,5 @@ public interface CommentRepository {
     void deleteById(int id);
     void delete(Comment entity);
     List<Comment> findByPostId(int postId);
+    Comment findByIdIncludeDeleted(int id);
 }

@@ -1,17 +1,16 @@
 package com.team3.forum.controllers.rest;
 
 import com.team3.forum.models.Tag;
-import com.team3.forum.models.User;
 import com.team3.forum.models.tagDtos.TagCreationDto;
 import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.models.tagDtos.TagUpdateDto;
 import com.team3.forum.services.TagService;
-import com.team3.forum.services.UserService;
+import com.team3.forum.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,14 +18,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tags")
 public class TagRestController {
-
     private final TagService tagService;
-    private final UserService userService;
 
     @Autowired
-    public TagRestController(TagService tagService, UserService userService) {
+    public TagRestController(TagService tagService) {
         this.tagService = tagService;
-        this.userService = userService;
     }
 
     @GetMapping
@@ -47,14 +43,8 @@ public class TagRestController {
     @PostMapping
     public ResponseEntity<TagResponseDto> createTag(
             @Valid @RequestBody TagCreationDto dto,
-            Authentication authentication) {
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
-
-        Tag tag = new Tag();
-        tag.setName(dto.getName());
-
-        Tag created = tagService.createTag(tag, requester);
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        Tag created = tagService.createTag(dto.getName(), principal.getId());
         TagResponseDto response = new TagResponseDto(created.getId(), created.getName());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -63,14 +53,8 @@ public class TagRestController {
     public ResponseEntity<TagResponseDto> updateTag(
             @PathVariable int id,
             @Valid @RequestBody TagUpdateDto dto,
-            Authentication authentication) {
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
-
-        Tag tag = new Tag();
-        tag.setName(dto.getName());
-
-        Tag updated = tagService.updateTag(id, tag, requester);
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        Tag updated = tagService.updateTag(id, dto.getName(), principal.getId());
         TagResponseDto response = new TagResponseDto(updated.getId(), updated.getName());
         return ResponseEntity.ok(response);
     }
@@ -78,11 +62,8 @@ public class TagRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(
             @PathVariable int id,
-            Authentication authentication) {
-        String currentUsername = authentication.getName();
-        User requester = userService.findByUsername(currentUsername);
-
-        tagService.deleteById(id, requester);
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        tagService.deleteById(id, principal.getId());
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,18 +1,17 @@
 package com.team3.forum.controllers.rest;
 
 import com.team3.forum.models.Comment;
-import com.team3.forum.models.User;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentResponseDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
 import com.team3.forum.models.likeDtos.LikeCountDto;
 import com.team3.forum.services.CommentService;
-import com.team3.forum.services.UserService;
+import com.team3.forum.security.CustomUserDetails;
 import jakarta.validation.Valid;
-import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,12 +20,10 @@ import java.util.List;
 @RequestMapping("/api/posts/{postId}/comments")
 public class CommentRestController {
     private final CommentService commentService;
-    private final UserService userService;
 
     @Autowired
-    public CommentRestController(CommentService commentService, UserService userService) {
+    public CommentRestController(CommentService commentService) {
         this.commentService = commentService;
-        this.userService = userService;
     }
 
     @GetMapping
@@ -62,13 +59,9 @@ public class CommentRestController {
     public ResponseEntity<CommentResponseDto> createComment(
             @PathVariable int postId,
             @Valid @RequestBody CommentCreationDto commentCreationDto,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-
-        Comment comment = commentService.createComment(commentCreationDto, postId, user);
-
+        Comment comment = commentService.createComment(commentCreationDto, postId, principal.getId());
         CommentResponseDto response = CommentResponseDto.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
@@ -80,7 +73,6 @@ public class CommentRestController {
                 .deletedAt(comment.getDeletedAt())
                 .likesCount(comment.getLikedBy().size())
                 .build();
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -89,13 +81,9 @@ public class CommentRestController {
             @PathVariable int postId,
             @PathVariable int commentId,
             @Valid @RequestBody CommentUpdateDto commentUpdateDto,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-
-        Comment updated = commentService.updateComment(commentId, commentUpdateDto, user);
-
+        Comment updated = commentService.updateComment(commentId, commentUpdateDto, principal.getId());
         CommentResponseDto response = CommentResponseDto.builder()
                 .id(updated.getId())
                 .postId(updated.getPost().getId())
@@ -107,22 +95,16 @@ public class CommentRestController {
                 .deletedAt(updated.getDeletedAt())
                 .likesCount(updated.getLikedBy().size())
                 .build();
-
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/{commentId}/restore")
     public ResponseEntity<CommentResponseDto> restoreComment(
             @PathVariable int postId,
             @PathVariable int commentId,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-
-        Comment restored = commentService.restoreById(commentId, user);
-
+        Comment restored = commentService.restoreById(commentId, principal.getId());
         CommentResponseDto response = CommentResponseDto.builder()
                 .id(restored.getId())
                 .postId(restored.getPost().getId())
@@ -134,7 +116,6 @@ public class CommentRestController {
                 .deletedAt(restored.getDeletedAt())
                 .likesCount(restored.getLikedBy().size())
                 .build();
-
         return ResponseEntity.ok(response);
     }
 
@@ -148,12 +129,9 @@ public class CommentRestController {
     @PostMapping("/{commentId}/likes")
     public ResponseEntity<LikeCountDto> likeComment(
             @PathVariable int commentId,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-
-        commentService.likeComment(commentId, user);
+        commentService.likeComment(commentId, principal.getId());
         int likes = commentService.getLikes(commentId);
         LikeCountDto response = new LikeCountDto(commentId, likes);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -162,12 +140,9 @@ public class CommentRestController {
     @DeleteMapping("/{commentId}/likes")
     public ResponseEntity<LikeCountDto> unlikeComment(
             @PathVariable int commentId,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-
-        commentService.unlikeComment(commentId, user);
+        commentService.unlikeComment(commentId, principal.getId());
         int likes = commentService.getLikes(commentId);
         LikeCountDto response = new LikeCountDto(commentId, likes);
         return ResponseEntity.ok(response);
@@ -177,12 +152,9 @@ public class CommentRestController {
     public ResponseEntity<Void> deleteComment(
             @PathVariable int postId,
             @PathVariable int commentId,
-            Authentication authentication) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        String username = authentication.getName();
-        User user = userService.findByUsername(username);
-
-        commentService.deleteById(commentId, user);
+        commentService.deleteById(commentId, principal.getId());
         return ResponseEntity.noContent().build();
     }
 }
