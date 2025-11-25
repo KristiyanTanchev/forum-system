@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="auth-page">
+        <div class="container">
+            <section class="card auth-card">
+                <div class="form-header">
+                    <h1 class="form-title">Log in</h1>
+                    <p class="form-subtitle">
+                        Welcome back. Enter your credentials to continue.
+                    </p>
+                </div>
+
+                <form>
+                    <div class="form-field">
+                        <label class="form-label" for="login-identifier">Username or email</label>
+                        <input class="form-input" id="login-identifier" name="identifier"
+                               placeholder="yourname or you@example.com"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="login-password">Password</label>
+                        <input class="form-input" id="login-password" name="password"
+                               placeholder="••••••••"
+                               type="password"/>
+                    </div>
+
+                    <div class="form-actions" style="justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:0.35rem;font-size:0.8rem;">
+                            <input id="remember" style="accent-color:#3b82f6;" type="checkbox"/>
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <a class="form-link" href="#">Forgot password?</a>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Log in</button>
+                        <span class="form-help">
+                        Don’t have an account?
+                        <a class="form-link" href="register.html">Register</a>
+                    </span>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="editor-page">
+        <div class="container">
+            <section class="card editor-card-wide">
+                <div class="form-header">
+                    <h1 class="form-title">Edit topic</h1>
+                    <p class="form-subtitle">
+                        Update your post. Major changes should be explained in a comment.
+                    </p>
+                </div>
+
+                <form>
+                    <!-- same fields as create post, but prefilled server-side -->
+                    <div class="form-field">
+                        <label class="form-label" for="edit-title">Title</label>
+                        <input class="form-input" id="edit-title" name="title"
+                               type="text"
+                               value="Is Andor the most mature Star Wars show?"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="edit-body">Content</label>
+                        <textarea class="form-textarea" id="edit-body"
+                                  name="content">Existing post body here…</textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Save changes</button>
+                        <button class="btn btn-ghost" type="button">Cancel</button>
+                        <!-- owner or admin only -->
+                        <button class="btn btn-danger btn-sm" type="button">Delete topic</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

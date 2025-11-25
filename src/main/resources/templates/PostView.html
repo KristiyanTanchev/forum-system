@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN CONTENT -->
+    <main class="post-page">
+        <div class="container">
+            <div class="post-layout">
+                <!-- MAIN COLUMN -->
+                <section class="card post-card">
+                    <header class="post-header">
+                        <div class="post-label-row">
+                            <span class="pill">Discussion</span>
+                            <span class="badge">Series · Spoiler Free</span>
+                        </div>
+                        <h1 class="post-title">
+                            Is *The Last Kingdom* better than *Vikings*?
+                        </h1>
+                        <div class="post-meta">
+                            <span>Started by <strong>martin</strong></span>
+                            <span>·</span>
+                            <span>Posted 2 hours ago</span>
+                            <span>·</span>
+                            <span>38 replies · 512 views</span>
+                        </div>
+                    </header>
+
+                    <article class="post-body">
+                        <p>
+                            I recently binged both shows and I'm still not sure which one I prefer.
+                            <strong>Vikings</strong> feels more raw and mythic, while
+                            <strong>The Last Kingdom</strong> has tighter storytelling and character growth.
+                        </p>
+                        <p>
+                            For people who watched both: which one do you think holds up better overall,
+                            and why? Try to keep it spoiler-free or at least tag major spoilers.
+                        </p>
+                    </article>
+
+                    <!-- SIMPLE POST ACTIONS (when logged in) -->
+                    <div class="post-actions">
+                        <button class="btn btn-primary" type="button">Reply</button>
+                        <button class="btn btn-ghost" type="button">Follow thread</button>
+                    </div>
+                </section>
+
+                <!-- COMMENTS SECTION -->
+                <section class="card comment-section">
+                    <header class="card-header">
+                        <div>
+                            <div class="card-title">Comments</div>
+                            <div class="card-subtitle">38 replies · sorted by newest</div>
+                        </div>
+                        <a class="link-small" href="#">Change sort</a>
+                    </header>
+
+                    <!-- COMMENT FORM (visible when logged in) -->
+                    <div class="comment-form">
+                        <div class="comment-form-header">
+                            <span class="comment-form-avatar">M</span>
+                            <div class="comment-form-meta">
+                                <div class="comment-form-user">You</div>
+                                <div class="comment-form-hint">Share your thoughts about this discussion.</div>
+                            </div>
+                        </div>
+                        <form>
+                            <textarea
+                                    class="comment-input"
+                                    name="content"
+                                    placeholder="Write a comment..."
+                                    rows="4"></textarea>
+                            <div class="comment-form-actions">
+                                <button class="btn btn-primary" type="submit">Post comment</button>
+                                <span class="comment-form-note">Markdown supported · Be respectful</span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- COMMENT LIST -->
+                    <div class="comment-list">
+                        <!-- Comment 1 -->
+                        <article class="comment">
+                            <header class="comment-header">
+                                <div class="comment-avatar">A</div>
+                                <div class="comment-header-main">
+                                    <div class="comment-author-row">
+                                        <span class="comment-author">ana</span>
+                                        <span class="comment-badge comment-badge-mod">Mod</span>
+                                    </div>
+                                    <div class="comment-meta">
+                                        <span>1 hour ago</span>
+                                        <span>·</span>
+                                        <span>Edited</span>
+                                    </div>
+                                </div>
+                            </header>
+                            <div class="comment-body">
+                                <p>
+                                    For me, <em>The Last Kingdom</em> wins overall. The pacing is better and
+                                    Uhtred has a more consistent arc than anyone in <em>Vikings</em>.
+                                </p>
+                                <p>
+                                    That said, the first 2–3 seasons of <em>Vikings</em> have some of the best
+                                    atmosphere and music in any historical show.
+                                </p>
+                            </div>
+                            <footer class="comment-footer">
+                                <button class="comment-action" type="button">Reply</button>
+                                <button class="comment-action" type="button">Like · 24</button>
+                                <button class="comment-action comment-action-soft" type="button">Report</button>
+                            </footer>
+                        </article>
+
+                        <!-- Comment 2 -->
+                        <article class="comment">
+                            <header class="comment-header">
+                                <div class="comment-avatar">G</div>
+                                <div class="comment-header-main">
+                                    <div class="comment-author-row">
+                                        <span class="comment-author">george</span>
+                                    </div>
+                                    <div class="comment-meta">
+                                        <span>47 minutes ago</span>
+                                    </div>
+                                </div>
+                            </header>
+                            <div class="comment-body">
+                                <p>
+                                    I’d say: if you want character-driven drama → <strong>The Last Kingdom</strong>.
+                                    If you want iconic moments and larger-than-life scenes → <strong>Vikings</strong>.
+                                </p>
+                            </div>
+                            <footer class="comment-footer">
+                                <button class="comment-action" type="button">Reply</button>
+                                <button class="comment-action" type="button">Like · 10</button>
+                            </footer>
+                        </article>
+
+                        <!-- Nested reply example (visual only) -->
+                        <article class="comment comment-nested">
+                            <header class="comment-header">
+                                <div class="comment-avatar">M</div>
+                                <div class="comment-header-main">
+                                    <div class="comment-author-row">
+                                        <span class="comment-author">martin</span>
+                                    </div>
+                                    <div class="comment-meta">
+                                        <span>32 minutes ago</span>
+                                        <span>· replying to george</span>
+                                    </div>
+                                </div>
+                            </header>
+                            <div class="comment-body">
+                                <p>
+                                    That’s a good way to frame it. I think I’ll rewatch the first season of
+                                    <em>Vikings</em> and then jump into the later seasons of
+                                    <em>The Last Kingdom</em>.
+                                </p>
+                            </div>
+                            <footer class="comment-footer">
+                                <button class="comment-action" type="button">Reply</button>
+                                <button class="comment-action" type="button">Like · 4</button>
+                            </footer>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

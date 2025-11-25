@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+    <!-- MAIN -->
+    <main class="folder-page">
+        <div class="container">
+            <!-- Breadcrumb & header -->
+            <div class="folder-breadcrumb">
+                <a href="#">All folders</a>
+                <span>›</span>
+                <a href="#">Movies</a>
+                <span>›</span>
+                <span class="folder-breadcrumb-current">TV Shows</span>
+            </div>
+
+            <div class="folder-header-row">
+                <div>
+                    <h1 class="folder-title">TV Shows</h1>
+                    <div class="folder-meta">
+                        <span>Subfolder of <strong>Movies</strong></span>
+                        <span>·</span>
+                        <span>21 topics · 184 posts</span>
+                        <span>·</span>
+                        <span>Last activity 12 minutes ago</span>
+                    </div>
+                </div>
+                <div class="folder-header-actions">
+                    <button class="btn btn-primary" type="button">New topic</button>
+                </div>
+            </div>
+
+            <div class="folder-layout">
+                <!-- LEFT: folder info + tree -->
+                <aside class="card folder-sidebar">
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">Folder details</div>
+                        <div class="card-subtitle">
+                            Use folders to group discussions by franchise, genre or format.
+                        </div>
+
+                        <div class="folder-stats">
+                            <div class="folder-stat-item">
+                                <span class="folder-stat-label">Topics</span>
+                                <span class="folder-stat-value">21</span>
+                            </div>
+                            <div class="folder-stat-item">
+                                <span class="folder-stat-label">Posts</span>
+                                <span class="folder-stat-value">184</span>
+                            </div>
+                            <div class="folder-stat-item">
+                                <span class="folder-stat-label">Subfolders</span>
+                                <span class="folder-stat-value">3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="folder-sidebar-section">
+                        <div class="card-title" style="margin-bottom:0.5rem;">Subfolders</div>
+
+                        <ul class="folder-tree">
+                            <li class="folder-node">
+                                <a href="#">
+                                    <span class="folder-node-icon">📂</span>
+                                    <span class="folder-node-name">Drama</span>
+                                    <span class="folder-node-count">8 topics</span>
+                                </a>
+                            </li>
+                            <li class="folder-node folder-node--active">
+                                <a href="#">
+                                    <span class="folder-node-icon">📂</span>
+                                    <span class="folder-node-name">Sci-Fi & Fantasy</span>
+                                    <span class="folder-node-count">9 topics</span>
+                                </a>
+                                <ul class="folder-node-children">
+                                    <li class="folder-node">
+                                        <a href="#">
+                                            <span class="folder-node-icon">📁</span>
+                                            <span class="folder-node-name">Star Wars</span>
+                                            <span class="folder-node-count">4</span>
+                                        </a>
+                                    </li>
+                                    <li class="folder-node">
+                                        <a href="#">
+                                            <span class="folder-node-icon">📁</span>
+                                            <span class="folder-node-name">Star Trek</span>
+                                            <span class="folder-node-count">3</span>
+                                        </a>
+                                    </li>
+                                    <li class="folder-node">
+                                        <a href="#">
+                                            <span class="folder-node-icon">📁</span>
+                                            <span class="folder-node-name">The Expanse</span>
+                                            <span class="folder-node-count">2</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="folder-node">
+                                <a href="#">
+                                    <span class="folder-node-icon">📂</span>
+                                    <span class="folder-node-name">Comedy</span>
+                                    <span class="folder-node-count">4 topics</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- RIGHT: posts list in this folder -->
+                <section class="card folder-posts">
+                    <div class="folder-toolbar">
+                        <div class="folder-toolbar-left">
+                            <span class="card-title">Topics in “TV Shows”</span>
+                            <span class="folder-toolbar-meta">Showing 1–10 of 21</span>
+                        </div>
+                        <div class="folder-toolbar-right">
+                            <select class="folder-select">
+                                <option>Sort by last activity</option>
+                                <option>Sort by newest</option>
+                                <option>Sort by most replies</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="topic-list">
+                        <!-- Topic item 1 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Best sci-fi series to start with after *The Expanse*?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>ana</strong></span>
+                                    <span>in <span class="badge">Sci-Fi & Fantasy</span></span>
+                                    <span>last reply 5 min ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>18 replies</div>
+                                <div>205 views</div>
+                            </div>
+                        </article>
+
+                        <!-- Topic item 2 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Is *Andor* the most mature Star Wars show?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>george</strong></span>
+                                    <span>in <span class="badge">Star Wars</span></span>
+                                    <span>last reply 24 min ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>32 replies</div>
+                                <div>471 views</div>
+                            </div>
+                        </article>
+
+                        <!-- Topic item 3 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Which *Star Trek* series is the best entry point for new fans?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>sara</strong></span>
+                                    <span>in <span class="badge">Star Trek</span></span>
+                                    <span>last reply 1 h ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>14 replies</div>
+                                <div>193 views</div>
+                            </div>
+                        </article>
+
+                        <!-- Topic item 4 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Non-US TV shows that deserve more hype?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>martin</strong></span>
+                                    <span>in <span class="badge">TV Shows</span></span>
+                                    <span>last reply 3 h ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>9 replies</div>
+                                <div>121 views</div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Simple pagination mockup -->
+                    <div class="folder-pagination">
+                        <button class="btn btn-ghost folder-page-btn" type="button">‹ Prev</button>
+                        <span class="folder-page-info">Page 1 of 3</span>
+                        <button class="btn btn-ghost folder-page-btn" type="button">Next ›</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="profile-page">
+        <div class="container">
+            <div class="profile-layout">
+                <!-- LEFT: summary -->
+                <section class="card profile-summary-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">M</div>
+                        <div>
+                            <div class="profile-username">martin</div>
+                            <div class="profile-role-badges">
+                                <!-- shown if user is admin -->
+                                <span class="profile-badge profile-badge-admin">Admin</span>
+                                <!-- shown if this is your own profile -->
+                                <span class="profile-badge profile-badge-owner">You</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-meta">
+                        Joined Jan 2025 · Last active 12 minutes ago
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="folder-stat-label">Topics</div>
+                            <div class="folder-stat-value">54</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="folder-stat-label">Replies</div>
+                            <div class="folder-stat-value">312</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="folder-stat-label">Likes received</div>
+                            <div class="folder-stat-value">842</div>
+                        </div>
+                    </div>
+
+                    <p class="form-help" style="margin-top:0.7rem;">
+                        Loves slow-burn sci-fi and character-driven dramas.
+                    </p>
+
+                    <div class="profile-actions">
+                        <!-- visible when you are viewing someone else -->
+                        <button class="btn btn-ghost btn-sm" type="button">Message</button>
+                        <button class="btn btn-primary btn-sm" type="button">Follow</button>
+
+                        <!-- visible when this is your own profile -->
+                        <button class="btn btn-ghost btn-sm" type="button">Edit profile</button>
+
+                        <!-- visible only for admins viewing other users -->
+                        <button class="btn-danger-outline" type="button">Block</button>
+                        <button class="btn-danger-outline" type="button">Ban user</button>
+                    </div>
+                </section>
+
+                <!-- RIGHT: activity -->
+                <section class="card profile-activity">
+                    <div class="profile-activity-tabs">
+                        <button class="profile-tab profile-tab--active" type="button">Topics</button>
+                        <button class="profile-tab" type="button">Replies</button>
+                        <button class="profile-tab" type="button">Likes</button>
+                    </div>
+
+                    <div class="topic-list">
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Ranking the best Star Trek series for new fans
+                                </div>
+                                <div class="topic-meta">
+                                    <span>in <span class="badge">Star Trek</span></span>
+                                    <span>· last reply 2 h ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>24 replies</div>
+                                <div>289 views</div>
+                            </div>
+                        </article>
+
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Non-English shows that feel like cinema
+                                </div>
+                                <div class="topic-meta">
+                                    <span>in <span class="badge">TV Shows</span></span>
+                                    <span>· last reply 1 d ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>17 replies</div>
+                                <div>198 views</div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

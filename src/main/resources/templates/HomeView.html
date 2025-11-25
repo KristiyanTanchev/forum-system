@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main>
+        <section class="hero">
+            <div class="container hero-content">
+                <div>
+                    <h1 class="hero-heading">
+                        Discuss, learn and build together in the
+                        <span class="hero-gradient">Team 3 Forum</span>.
+                    </h1>
+                    <p class="hero-subtitle">
+                        Ask questions, share knowledge and collaborate on the Forum App project.
+                        Explore threads, get feedback from other devs and keep your ideas organised in folders.
+                    </p>
+
+                    <div class="hero-tags">
+                        <span class="pill">Java & Spring</span>
+                        <span class="pill">Code Review</span>
+                        <span class="pill">Architecture</span>
+                    </div>
+                </div>
+
+                <aside aria-label="Forum snapshot" class="hero-card">
+                    <div class="hero-card-header">
+                        <span class="hero-card-title">This week on the forum</span>
+                        <span class="hero-card-badge">Live now</span>
+                    </div>
+
+                    <div class="hero-card-main-number">142 new posts</div>
+                    <div class="card-subtitle">19 open threads need answers.</div>
+
+                    <div class="hero-card-meta">
+                        <span>Avg. response time: 14 min</span>
+                        <span>Active members: 37</span>
+                    </div>
+
+                    <div class="hero-card-chip-row">
+                        <span class="chip">🔥 most activity: Backend</span>
+                        <span class="chip">✨ new: Frontend UX</span>
+                    </div>
+
+                    <div style="margin-top:0.8rem; display:flex; justify-content:flex-end;">
+                        <button class="btn btn-primary" type="button">
+                            Create new topic
+                        </button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container content-grid">
+                <!-- LEFT COLUMN: Trending / latest topics -->
+                <section class="card">
+                    <header class="card-header">
+                        <div>
+                            <div class="card-title">Trending topics</div>
+                            <div class="card-subtitle">
+                                Popular threads from the last 24 hours.
+                            </div>
+                        </div>
+                        <a class="link-small" href="#">View all</a>
+                    </header>
+
+                    <div class="topic-list">
+                        <!-- Topic item 1 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Should pagination belong in the service or repository layer?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>martin</strong></span>
+                                    <span>in <span class="badge">Architecture</span></span>
+                                    <span>last reply 8 min ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>23 replies</div>
+                                <div>314 views</div>
+                            </div>
+                        </article>
+
+                        <!-- Topic item 2 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Best way to validate unique slugs in nested folders?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>ana</strong></span>
+                                    <span>in <span class="badge">Backend</span></span>
+                                    <span>last reply 27 min ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>11 replies</div>
+                                <div>129 views</div>
+                            </div>
+                        </article>
+
+                        <!-- Topic item 3 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    Login vs @AuthenticationPrincipal – cleaner controller pattern?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>george</strong></span>
+                                    <span>in <span class="badge">Security</span></span>
+                                    <span>last reply 1 h ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>9 replies</div>
+                                <div>98 views</div>
+                            </div>
+                        </article>
+
+                        <!-- Topic item 4 -->
+                        <article class="topic">
+                            <div>
+                                <div class="topic-main-title">
+                                    How do you store created/updated/deleted timestamps in JPA?
+                                </div>
+                                <div class="topic-meta">
+                                    <span>by <strong>sara</strong></span>
+                                    <span>in <span class="badge">Database</span></span>
+                                    <span>last reply 3 h ago</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div>15 replies</div>
+                                <div>187 views</div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <!-- RIGHT COLUMN: Sidebar -->
+                <aside aria-label="Forum sidebar" class="card">
+                    <div class="sidebar-section">
+                        <header class="card-header" style="margin-bottom:0.5rem;">
+                            <div class="card-title">Browse by folder</div>
+                        </header>
+                        <div class="category-list">
+                            <div class="category-item">
+                                <span>📁 Root</span>
+                                <span class="category-count">12 topics</span>
+                            </div>
+                            <div class="category-item">
+                                <span>📁 Backend / Repositories</span>
+                                <span class="category-count">8 topics</span>
+                            </div>
+                            <div class="category-item">
+                                <span>📁 Backend / Services</span>
+                                <span class="category-count">9 topics</span>
+                            </div>
+                            <div class="category-item">
+                                <span>📁 Frontend / Design</span>
+                                <span class="category-count">5 topics</span>
+                            </div>
+                            <div class="category-item">
+                                <span>📁 DevOps / CI</span>
+                                <span class="category-count">4 topics</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <div class="cta-card">
+                            <div class="cta-title">New here?</div>
+                            <p class="cta-text">
+                                Create an account to bookmark threads, vote on answers and
+                                get notified when someone replies to your questions.
+                            </p>
+                            <button class="btn btn-primary" type="button">
+                                Register &amp; join the discussion
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <div class="card-subtitle">
+                            Tip: Use folders as your “knowledge tree” and posts as leaves.
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

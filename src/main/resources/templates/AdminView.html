@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="admin-page">
+        <div class="container">
+            <section class="card admin-card-wide">
+                <div class="form-header">
+                    <h1 class="form-title">Admin · Folders</h1>
+                    <p class="form-subtitle">
+                        Create and manage the folder structure for topics.
+                    </p>
+                </div>
+
+                <div class="admin-layout">
+                    <!-- LEFT: create / edit folder -->
+                    <section>
+                        <h2 class="admin-section-title">Create new folder</h2>
+                        <p class="admin-note">
+                            Folders organise topics by franchise, genre or format.
+                        </p>
+
+                        <form style="margin-top:0.8rem;">
+                            <div class="form-field">
+                                <label class="form-label" for="folder-name">Name</label>
+                                <input class="form-input" id="folder-name" name="name"
+                                       placeholder="e.g. Star Wars, Drama, Animated"
+                                       type="text"/>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="folder-slug">Slug</label>
+                                <input class="form-input" id="folder-slug" name="slug"
+                                       placeholder="e.g. star-wars"
+                                       type="text"/>
+                                <p class="form-help">
+                                    Used in URLs. Only lowercase letters, numbers and dashes.
+                                </p>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="folder-parent">Parent folder</label>
+                                <select class="form-select" id="folder-parent" name="parentId">
+                                    <option value="">(Root)</option>
+                                    <option>Movies</option>
+                                    <option>TV Shows</option>
+                                    <option>TV Shows / Sci-Fi & Fantasy</option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="folder-desc">Description</label>
+                                <textarea class="form-textarea" id="folder-desc"
+                                          name="description"
+                                          placeholder="Optional short description shown on the folder page."></textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn btn-primary" type="submit">Create folder</button>
+                                <button class="btn btn-ghost" type="button">Cancel</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- RIGHT: existing folders overview -->
+                    <section>
+                        <h2 class="admin-section-title">Folder tree</h2>
+                        <p class="admin-note">
+                            Click a folder to edit or remove it.
+                        </p>
+
+                        <div class="card" style="margin-top:0.7rem;">
+                            <div class="card-subtitle" style="margin-bottom:0.5rem;">
+                                Root
+                            </div>
+                            <ul class="folder-tree">
+                                <li class="folder-node">
+                                    <a href="#">
+                                        <span class="folder-node-icon">🎬</span>
+                                        <span class="folder-node-name">Movies</span>
+                                        <span class="folder-node-count">34 topics</span>
+                                    </a>
+                                </li>
+                                <li class="folder-node">
+                                    <a href="#">
+                                        <span class="folder-node-icon">📺</span>
+                                        <span class="folder-node-name">TV Shows</span>
+                                        <span class="folder-node-count">21 topics</span>
+                                    </a>
+                                    <ul class="folder-node-children">
+                                        <li class="folder-node">
+                                            <a href="#">
+                                                <span class="folder-node-icon">📁</span>
+                                                <span class="folder-node-name">Sci-Fi & Fantasy</span>
+                                                <span class="folder-node-count">9</span>
+                                            </a>
+                                        </li>
+                                        <li class="folder-node">
+                                            <a href="#">
+                                                <span class="folder-node-icon">📁</span>
+                                                <span class="folder-node-name">Drama</span>
+                                                <span class="folder-node-count">8</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="folder-node">
+                                    <a href="#">
+                                        <span class="folder-node-icon">⭐</span>
+                                        <span class="folder-node-name">Awards Season</span>
+                                        <span class="folder-node-count">5 topics</span>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <p class="admin-note" style="margin-top:0.7rem;">
+                                You can implement “click to edit/delete” behaviour in your backend / JS.
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

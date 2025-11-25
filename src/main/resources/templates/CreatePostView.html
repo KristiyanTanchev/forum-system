@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Forum App – Home</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="editor-page">
+        <div class="container">
+            <section class="card editor-card-wide">
+                <div class="form-header">
+                    <h1 class="form-title">Create new topic</h1>
+                    <p class="form-subtitle">
+                        Start a discussion in the selected folder.
+                    </p>
+                </div>
+
+                <form>
+                    <div class="form-row-split">
+                        <div class="form-field">
+                            <label class="form-label" for="post-folder">Folder</label>
+                            <select class="form-select" id="post-folder" name="folderId">
+                                <option>Movies / TV Shows</option>
+                                <option>Movies / Sci-Fi</option>
+                                <option>TV / Star Trek</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="post-type">Type <span>(optional)</span></label>
+                            <select class="form-select" id="post-type" name="type">
+                                <option>Discussion</option>
+                                <option>Review</option>
+                                <option>Question</option>
+                                <option>Recommendation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="post-title">Title</label>
+                        <input class="form-input" id="post-title" name="title"
+                               placeholder="e.g. Is Andor the best Star Wars series so far?"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="post-body">Content</label>
+                        <textarea class="form-textarea" id="post-body"
+                                  name="content"
+                                  placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."></textarea>
+                        <p class="form-help">
+                            Markdown supported. Be respectful and mark spoilers clearly.
+                        </p>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="post-tags">Tags <span>(optional)</span></label>
+                        <input class="form-input" id="post-tags" name="tags"
+                               placeholder="e.g. star wars, andor, tv show"
+                               type="text"/>
+                        <p class="form-help">
+                            Comma-separated tags help others find your topic.
+                        </p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Create topic</button>
+                        <button class="btn btn-ghost" type="button">Cancel</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>
