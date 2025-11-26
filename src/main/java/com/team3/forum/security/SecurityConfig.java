@@ -59,6 +59,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/forum**").permitAll()
                         .requestMatchers("/forum/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
