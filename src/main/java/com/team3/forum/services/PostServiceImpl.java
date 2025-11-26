@@ -7,11 +7,13 @@ import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.repositories.PostRepository;
+import com.team3.forum.repositories.PostViewRepository;
 import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,11 +28,13 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostViewRepository postViewRepository;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostViewRepository postViewRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.postViewRepository = postViewRepository;
     }
 
     @Override
@@ -138,5 +142,18 @@ public class PostServiceImpl implements PostService {
         if (!requester.isAdmin() && post.getUser().getId() != requester.getId()) {
             throw error;
         }
+    }
+
+    @Override
+    public void registerView(int postId, int userId) {
+        LocalDate now = LocalDateTime.now().toLocalDate();
+        if (!postViewRepository.existsForDate(postId, userId, now)) {
+            postViewRepository.registerView(postId, userId);
+        }
+    }
+
+    @Override
+    public long getPostViews(int postId) {
+        return postViewRepository.getTotalViewsForPost(postId);
     }
 }

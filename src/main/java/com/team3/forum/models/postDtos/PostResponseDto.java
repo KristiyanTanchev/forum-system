@@ -19,4 +19,6 @@ public class PostResponseDto {
 
     private int userId;
 
+    private long views;
+
 }

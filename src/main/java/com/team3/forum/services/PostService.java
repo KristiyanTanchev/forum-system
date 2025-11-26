@@ -23,4 +23,8 @@ public interface PostService {
     void likePost(int postId, int userId);
 
     void unlikePost(int postId, int userId);
+
+    void registerView(int postId, int userId);
+
+    long getPostViews(int postId);
 }

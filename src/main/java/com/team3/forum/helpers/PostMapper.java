@@ -3,6 +3,7 @@ package com.team3.forum.helpers;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
+import com.team3.forum.services.PostService;
 import com.team3.forum.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,10 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostMapper {
     private final UserService userService;
+    private final PostService postService;
 
     @Autowired
-    public PostMapper(UserService userService) {
+    public PostMapper(UserService userService, PostService postService) {
         this.userService = userService;
+        this.postService = postService;
     }
 
 
@@ -30,6 +33,7 @@ public class PostMapper {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .views(postService.getPostViews(post.getId()))
                 .userId(post.getUser().getId())
                 .build();
     }
