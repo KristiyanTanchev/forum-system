@@ -10,6 +10,7 @@ import com.team3.forum.models.folderDtos.FolderUpdateDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.services.FolderService;
+import com.team3.forum.services.PostService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +24,13 @@ import java.util.List;
 @RequestMapping("/api/forum")
 public class FolderRestController {
     private final FolderService folderService;
+    private final PostService postService;
     private final FolderMapper folderMapper;
     private final PostMapper postMapper;
 
-    public FolderRestController(FolderService folderService, FolderMapper folderMapper, PostMapper postMapper) {
+    public FolderRestController(FolderService folderService, PostService postService, FolderMapper folderMapper, PostMapper postMapper) {
         this.folderService = folderService;
+        this.postService = postService;
         this.folderMapper = folderMapper;
         this.postMapper = postMapper;
     }
@@ -52,7 +55,7 @@ public class FolderRestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{*path}")
+    @GetMapping("/path/{*path}")
     public ResponseEntity<FolderContentsDto> getFolderContents(
             @PathVariable("path") String path) {
 
@@ -74,7 +77,8 @@ public class FolderRestController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{*path}")
+
+    @PostMapping("/path/{*path}")
     public ResponseEntity<FolderResponseDto> createChild(
             @PathVariable("path") String path,
             @RequestBody @Valid FolderCreateDto folderCreateDto,
@@ -90,7 +94,7 @@ public class FolderRestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{*path}")
+    @PutMapping("/path/{*path}")
     public ResponseEntity<FolderResponseDto> updateFolder(
             @PathVariable("path") String path,
             @RequestBody @Valid FolderUpdateDto folderUpdateDto,
@@ -104,7 +108,7 @@ public class FolderRestController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{*path}")
+    @DeleteMapping("/path/{*path}")
     public ResponseEntity<Void> deleteFolder(
             @PathVariable("path") String path,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -114,5 +118,24 @@ public class FolderRestController {
 
         folderService.deleteById(folder.getId(), userDetails.getId());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/path/posts/{*path}")
+    public ResponseEntity<List<PostResponseDto>> getFolderPosts(
+            @PathVariable("path") String path,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "CREATED_AT") String orderBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+
+        List<String> slugs = List.of(path.substring(1).split("/"));
+
+        Folder folder = folderService.getFolderByPath(slugs);
+
+        List<PostResponseDto> posts = postService.getPostsInFolderPaginated(folder, page, orderBy, direction).stream()
+                .map(postMapper::toResponseDto)
+                .toList();
+
+        return ResponseEntity.ok(posts);
     }
 }

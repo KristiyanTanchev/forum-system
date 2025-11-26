@@ -1,7 +1,10 @@
 package com.team3.forum.repositories;
 
 import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
+import com.team3.forum.models.enums.PostSortField;
+import com.team3.forum.models.enums.SortDirection;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -65,5 +68,21 @@ public class PostRepositoryImpl implements PostRepository {
                 .getResultStream()
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Post", id));
+    }
+
+    public List<Post> findPostsInFolderPaginated(int page,
+                                                 int size,
+                                                 Folder parent,
+                                                 PostSortField orderBy,
+                                                 SortDirection direction) {
+        String query = "from Post p " +
+                "where p.isDeleted = false and p.folder = :parent " +
+                "order by " + orderBy.getJpqlField() + " " + direction.name();
+
+        return em.createQuery(query, Post.class)
+                .setParameter("parent", parent)
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
     }
 }
