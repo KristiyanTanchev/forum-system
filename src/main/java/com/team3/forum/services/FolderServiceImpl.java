@@ -47,8 +47,7 @@ public class FolderServiceImpl implements FolderService {
     @Override
     @Transactional(readOnly = true)
     public Folder findById(int id) {
-        return folderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("folder", id));
+        return folderRepository.findById(id);
     }
 
     @Override
@@ -57,8 +56,7 @@ public class FolderServiceImpl implements FolderService {
         if (!requester.isAdmin()) {
             throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
         }
-        Folder persistent = folderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("folder", id));
+        Folder persistent = folderRepository.findById(id);
         if (!persistent.getPosts().isEmpty()
                 || !persistent.getChildFolders().isEmpty()) {
             throw new FolderNotEmptyException(id);
@@ -111,8 +109,7 @@ public class FolderServiceImpl implements FolderService {
     @Override
     @Transactional(readOnly = true)
     public List<Post> getPostsInFolder(Folder folder) {
-        Folder persistent = folderRepository.findById(folder.getId())
-                .orElseThrow(() -> new EntityNotFoundException("folder", folder.getId()));
+        Folder persistent = folderRepository.findById(folder.getId());
         return new ArrayList<>(persistent.getPosts());
     }
 
@@ -129,17 +126,14 @@ public class FolderServiceImpl implements FolderService {
             throw new IllegalArgumentException("Empty path");
         }
 
-        Folder current = folderRepository
-                .findBySlug(slugs.get(0));
+        Folder current = folderRepository.findBySlug(slugs.get(0));
         if (current == null) {
             throw new EntityNotFoundException("folder", "slug", slugs.get(0));
         }
 
         for (int i = 1; i < slugs.size(); i++) {
             String slug = slugs.get(i);
-            current = folderRepository
-                    .findByParentFolderAndSlug(current, slug)
-                    .orElseThrow(() -> new EntityNotFoundException("Folder path not found"));
+            current = folderRepository.findByParentFolderAndSlug(current, slug);
         }
 
         return current;

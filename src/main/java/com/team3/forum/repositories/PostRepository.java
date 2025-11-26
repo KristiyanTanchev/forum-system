@@ -1,6 +1,9 @@
 package com.team3.forum.repositories;
 
+import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
+import com.team3.forum.models.enums.PostSortField;
+import com.team3.forum.models.enums.SortDirection;
 
 import java.util.List;
 
@@ -18,4 +21,6 @@ public interface PostRepository {
     void delete(Post entity);
 
     Post findByAndIsDeleted(int id);
+
+    List<Post> findPostsInFolderPaginated(int page, int size, Folder parent, PostSortField orderBy, SortDirection direction);
 }

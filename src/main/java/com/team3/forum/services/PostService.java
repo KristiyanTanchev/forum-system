@@ -1,5 +1,6 @@
 package com.team3.forum.services;
 
+import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 
@@ -23,4 +24,6 @@ public interface PostService {
     void likePost(int postId, int userId);
 
     void unlikePost(int postId, int userId);
+
+    List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction);
 }
