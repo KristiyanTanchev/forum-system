@@ -1,5 +1,6 @@
 package com.team3.forum.services;
 
+import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 
@@ -27,4 +28,5 @@ public interface PostService {
     void registerView(int postId, int userId);
 
     long getPostViews(int postId);
+    List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction);
 }

@@ -3,8 +3,11 @@ package com.team3.forum.services;
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
 import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
+import com.team3.forum.models.enums.PostSortField;
+import com.team3.forum.models.enums.SortDirection;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.repositories.PostRepository;
 import com.team3.forum.repositories.PostViewRepository;
@@ -25,6 +28,7 @@ public class PostServiceImpl implements PostService {
     public static final String EDIT_AUTHORIZATION_ERROR = "You cannot edit this post.";
     public static final String DELETE_AUTHORIZATION_ERROR = "You cannot delete this post.";
     public static final String RESTORE_AUTHORIZATION_ERROR = "You cannot restore this post.";
+    public static final int POSTS_PAGE_SIZE = 20;
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -138,6 +142,17 @@ public class PostServiceImpl implements PostService {
         postRepository.save(post);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction) {
+        PostSortField sortField = getSortField(orderBy);
+        SortDirection sortDirection = getSortDirection(direction);
+        if (page < 1) {
+            page = 1;
+        }
+        return postRepository.findPostsInFolderPaginated(page, POSTS_PAGE_SIZE, folder, sortField, sortDirection);
+    }
+
     private void verifyAdminOrOwner(Post post, User requester, RuntimeException error) {
         if (!requester.isAdmin() && post.getUser().getId() != requester.getId()) {
             throw error;
@@ -155,5 +170,19 @@ public class PostServiceImpl implements PostService {
     @Override
     public long getPostViews(int postId) {
         return postViewRepository.getTotalViewsForPost(postId);
+    private PostSortField getSortField(String orderBy) {
+        try {
+            return PostSortField.valueOf(orderBy.toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+            return PostSortField.CREATED_AT;
+        }
+    }
+
+    private SortDirection getSortDirection(String direction) {
+        try {
+            return SortDirection.valueOf(direction.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return SortDirection.DESC;
+        }
     }
 }
