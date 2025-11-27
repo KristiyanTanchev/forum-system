@@ -23,4 +23,6 @@ public interface PostRepository {
     Post findByAndIsDeleted(int id);
 
     List<Post> findPostsInFolderPaginated(int page, int size, Folder parent, PostSortField orderBy, SortDirection direction);
+
+    List<Post> findAllSortedByViewsLastDays(int limit, int days);
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -70,19 +71,56 @@ public class PostRepositoryImpl implements PostRepository {
                 .orElseThrow(() -> new EntityNotFoundException("Post", id));
     }
 
+    @Override
     public List<Post> findPostsInFolderPaginated(int page,
                                                  int size,
                                                  Folder parent,
                                                  PostSortField orderBy,
                                                  SortDirection direction) {
-        String query = "from Post p " +
-                "where p.isDeleted = false and p.folder = :parent " +
-                "order by " + orderBy.getJpqlField() + " " + direction.name();
 
-        return em.createQuery(query, Post.class)
-                .setParameter("parent", parent)
+        StringBuilder queryString = new StringBuilder("from Post p where p.isDeleted = false");
+
+        if (parent == null) {
+            queryString.append(" and p.folder is null");
+        } else {
+            queryString.append(" and p.folder = :parent");
+        }
+
+        queryString.append(" order by ")
+                .append(orderBy.getJpqlField())
+                .append(' ')
+                .append(direction.name());
+
+        var query = em.createQuery(queryString.toString(), Post.class);
+
+        if (parent != null) {
+            query.setParameter("parent", parent);
+        }
+
+        return query
                 .setFirstResult((page - 1) * size)
                 .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public List<Post> findAllSortedByViewsLastDays(int limit, int days) {
+        LocalDate since = LocalDate.now().minusDays(days);
+
+        String query = """
+                select p
+                from Post p
+                left join PostView pv
+                    on pv.post = p
+                    and pv.viewDate >= :since
+                where p.isDeleted = false
+                group by p
+                order by count(pv) desc
+                """;
+
+        return em.createQuery(query, Post.class)
+                .setParameter("since", since)
+                .setMaxResults(limit)
                 .getResultList();
     }
 }

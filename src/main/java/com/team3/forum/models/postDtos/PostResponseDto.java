@@ -2,6 +2,8 @@ package com.team3.forum.models.postDtos;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -17,8 +19,14 @@ public class PostResponseDto {
 
     private String content;
 
+    private String creator;
+
     private int userId;
 
+    private int commentsCount;
+
     private long views;
+
+    private LocalDateTime updatedAt;
 
 }

@@ -2,7 +2,6 @@ package com.team3.forum.services;
 
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
-import com.team3.forum.models.User;
 import com.team3.forum.models.folderDtos.FolderUpdateDto;
 
 import java.util.List;
@@ -23,4 +22,6 @@ public interface FolderService {
     List<Folder> findHomeFolders();
 
     Folder getFolderByPath(List<String> slugs);
+
+    List<Folder> getSiblingFolders(Folder folder);
 }

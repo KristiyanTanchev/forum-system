@@ -54,7 +54,11 @@ public class FolderRepositoryImpl implements FolderRepository {
 
     @Override
     public Folder findBySlug(String slug) {
-        return em.createQuery("from Folder f where f.slug = :slug", Folder.class)
+        return em.createQuery("""
+                        from Folder f 
+                            where f.slug = :slug
+                            order by f.name
+                        """, Folder.class)
                 .setParameter("slug", slug)
                 .getResultStream()
                 .findFirst()
@@ -63,14 +67,32 @@ public class FolderRepositoryImpl implements FolderRepository {
 
     @Override
     public List<Folder> getFoldersByParentFolder(Folder parentFolder) {
-        return em.createQuery("from Folder f where f.parentFolder = :parentFolder", Folder.class)
-                .setParameter("parentFolder", parentFolder)
-                .getResultList();
+        if (parentFolder == null) {
+            return em.createQuery("""
+                            from Folder f 
+                                where f.parentFolder is null 
+                                order by f.name
+                            """, Folder.class)
+                    .getResultList();
+        } else {
+            return em.createQuery("""
+                            from Folder f 
+                                where f.parentFolder = :parentFolder 
+                                order by f.name
+                            """, Folder.class)
+                    .setParameter("parentFolder", parentFolder)
+                    .getResultList();
+        }
     }
 
     @Override
     public Folder findByParentFolderAndSlug(Folder parentFolder, String slug) {
-        return em.createQuery("from Folder f where f.slug = :slug and f.parentFolder = :parentFolder"
+        return em.createQuery("""
+                                from Folder f 
+                                    where f.slug = :slug 
+                                        and f.parentFolder = :parentFolder
+                                    order by f.name
+                                """
                         , Folder.class)
                 .setParameter("slug", slug)
                 .setParameter("parentFolder", parentFolder)

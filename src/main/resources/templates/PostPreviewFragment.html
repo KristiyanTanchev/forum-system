@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*@thymesVar id="posts" type=""*/-->
+<a class="topic" th:each="post : ${posts}" th:fragment="post-preview" th:href="@{/forum/posts/{id}(id=${post.id})}">
+    <div>
+        <div class="topic-main-title" th:text="${post.title}"></div>
+        <div class="topic-meta">
+            <span>by <strong th:text="${post.creator}"></strong></span>
+            <span>in <span class="badge">TODO</span></span>
+            <span th:text="${post.updatedAt}">last reply 8 min ago (TODO)</span>
+        </div>
+    </div>
+    <div class="topic-stats">
+        <div th:text="${post.commentsCount} + ' replies'"></div>
+        <div th:text="${post.views} + ' views'"></div>
+    </div>
+</a>
+</body>
+</html>

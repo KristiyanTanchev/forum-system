@@ -28,5 +28,8 @@ public interface PostService {
     void registerView(int postId, int userId);
 
     long getPostViews(int postId);
+
     List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction);
+
+    List<Post> getTrendingPosts();
 }

@@ -15,22 +15,22 @@
         <div class="container">
             <!-- Breadcrumb & header -->
             <div class="folder-breadcrumb">
-                <a href="#">All folders</a>
-                <span>›</span>
-                <a href="#">Movies</a>
-                <span>›</span>
-                <span class="folder-breadcrumb-current">TV Shows</span>
+                <a th:href="@{/forum/root}">Root folder</a>
+
+                <span th:each="folder: ${folders}">›
+                    <a th:href="@{/forum/root/path(path=${folder.path})}">Folder name</a>
+                </span>
             </div>
 
             <div class="folder-header-row">
                 <div>
-                    <h1 class="folder-title">TV Shows</h1>
+                    <h1 class="folder-title" th:text="${folder.name}">TV Shows</h1>
                     <div class="folder-meta">
-                        <span>Subfolder of <strong>Movies</strong></span>
+                        <span th:if="${parent != null}">Subfolder of <strong th:text="${parent.name}"></strong></span>
+                        <span th:if="${parent != null}">·</span>
+                        <span th:text="${folder.folderCount} + ' topics · ' + ${folder.postCount} + ' posts'">21 topics · 184 posts</span>
                         <span>·</span>
-                        <span>21 topics · 184 posts</span>
-                        <span>·</span>
-                        <span>Last activity 12 minutes ago</span>
+                        <span>Last activity 12 minutes ago (TODO)</span>
                     </div>
                 </div>
                 <div class="folder-header-actions">
@@ -42,7 +42,7 @@
                 <!-- LEFT: folder info + tree -->
                 <aside class="card folder-sidebar">
                     <div class="folder-sidebar-section">
-                        <div class="card-title">Folder details</div>
+                        <div class="card-title">Folder details (TODO whole details section)</div>
                         <div class="card-subtitle">
                             Use folders to group discussions by franchise, genre or format.
                         </div>
@@ -63,63 +63,73 @@
                         </div>
                     </div>
 
-                    <div class="folder-sidebar-section">
-                        <div class="card-title" style="margin-bottom:0.5rem;">Subfolders</div>
+                    <!-- PARENT FOLDER (one level up) -->
+                    <div class="folder-sidebar-section" th:if="${parent != null}">
+                        <div class="card-title" style="margin-bottom:0.3rem;">Parent folder</div>
 
-                        <ul class="folder-tree">
-                            <li class="folder-node">
-                                <a href="#">
-                                    <span class="folder-node-icon">📂</span>
-                                    <span class="folder-node-name">Drama</span>
-                                    <span class="folder-node-count">8 topics</span>
-                                </a>
-                            </li>
+                        <div class="folder-parent">
+                            <a class="folder-parent-link"
+                               th:href="@{/forum/root/{path}(path=${parent.path})}">
+                                <span class="folder-node-icon">⬅</span>
+                                <span class="folder-node-name" th:text="${parent.name}">TV Shows</span>
+                            </a>
+                            <div class="folder-parent-meta"
+                                 th:text="${parent.postCount} + ' topics'">
+                                21 topics
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CURRENT FOLDER + SIBLINGS -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title" style="margin-bottom:0.3rem;">This level</div>
+                        <ul class="folder-tree folder-tree--siblings">
+                            <!-- Current folder -->
                             <li class="folder-node folder-node--active">
-                                <a href="#">
+                                <a th:href="@{/forum/root/{path}(path=${folder.path})}">
                                     <span class="folder-node-icon">📂</span>
-                                    <span class="folder-node-name">Sci-Fi & Fantasy</span>
-                                    <span class="folder-node-count">9 topics</span>
+                                    <span class="folder-node-name" th:text="${folder.name}">Sci-Fi &amp; Fantasy</span>
+                                    <span class="folder-node-count"
+                                          th:text="${folder.postCount} + ' topics'">9 topics</span>
                                 </a>
-                                <ul class="folder-node-children">
-                                    <li class="folder-node">
-                                        <a href="#">
-                                            <span class="folder-node-icon">📁</span>
-                                            <span class="folder-node-name">Star Wars</span>
-                                            <span class="folder-node-count">4</span>
-                                        </a>
-                                    </li>
-                                    <li class="folder-node">
-                                        <a href="#">
-                                            <span class="folder-node-icon">📁</span>
-                                            <span class="folder-node-name">Star Trek</span>
-                                            <span class="folder-node-count">3</span>
-                                        </a>
-                                    </li>
-                                    <li class="folder-node">
-                                        <a href="#">
-                                            <span class="folder-node-icon">📁</span>
-                                            <span class="folder-node-name">The Expanse</span>
-                                            <span class="folder-node-count">2</span>
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
-                            <li class="folder-node">
-                                <a href="#">
+
+                            <!-- Siblings (same parent) -->
+                            <li class="folder-node" th:each="sibling : ${siblingFolders}">
+                                <a th:href="@{/forum/root/{path}(path=${sibling.path})}">
                                     <span class="folder-node-icon">📂</span>
-                                    <span class="folder-node-name">Comedy</span>
-                                    <span class="folder-node-count">4 topics</span>
+                                    <span class="folder-node-name" th:text="${sibling.name}">Drama</span>
+                                    <span class="folder-node-count"
+                                          th:text="${sibling.postCount} + ' topics'">8 topics</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
+
+                    <!-- CHILDREN OF CURRENT FOLDER -->
+                    <div class="folder-sidebar-section"
+                         th:if="${childFolders != null and !#lists.isEmpty(childFolders)}">
+                        <div class="card-title" style="margin-bottom:0.3rem;">Subfolders</div>
+
+                        <ul class="folder-tree folder-tree--children">
+                            <li class="folder-node" th:each="child : ${childFolders}">
+                                <a th:href="@{/forum/root/{path}(path=${child.path})}">
+                                    <span class="folder-node-icon">📁</span>
+                                    <span class="folder-node-name" th:text="${child.name}">Star Wars</span>
+                                    <span class="folder-node-count"
+                                          th:text="${child.postCount} + ' topics'">4 topics</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                 </aside>
 
                 <!-- RIGHT: posts list in this folder -->
                 <section class="card folder-posts">
                     <div class="folder-toolbar">
                         <div class="folder-toolbar-left">
-                            <span class="card-title">Topics in “TV Shows”</span>
+                            <span class="card-title" th:text="'Topics in “' + ${folderName} + '“'"></span>
                             <span class="folder-toolbar-meta">Showing 1–10 of 21</span>
                         </div>
                         <div class="folder-toolbar-right">
@@ -132,77 +142,8 @@
                     </div>
 
                     <div class="topic-list">
-                        <!-- Topic item 1 -->
-                        <article class="topic">
-                            <div>
-                                <div class="topic-main-title">
-                                    Best sci-fi series to start with after *The Expanse*?
-                                </div>
-                                <div class="topic-meta">
-                                    <span>by <strong>ana</strong></span>
-                                    <span>in <span class="badge">Sci-Fi & Fantasy</span></span>
-                                    <span>last reply 5 min ago</span>
-                                </div>
-                            </div>
-                            <div class="topic-stats">
-                                <div>18 replies</div>
-                                <div>205 views</div>
-                            </div>
-                        </article>
-
-                        <!-- Topic item 2 -->
-                        <article class="topic">
-                            <div>
-                                <div class="topic-main-title">
-                                    Is *Andor* the most mature Star Wars show?
-                                </div>
-                                <div class="topic-meta">
-                                    <span>by <strong>george</strong></span>
-                                    <span>in <span class="badge">Star Wars</span></span>
-                                    <span>last reply 24 min ago</span>
-                                </div>
-                            </div>
-                            <div class="topic-stats">
-                                <div>32 replies</div>
-                                <div>471 views</div>
-                            </div>
-                        </article>
-
-                        <!-- Topic item 3 -->
-                        <article class="topic">
-                            <div>
-                                <div class="topic-main-title">
-                                    Which *Star Trek* series is the best entry point for new fans?
-                                </div>
-                                <div class="topic-meta">
-                                    <span>by <strong>sara</strong></span>
-                                    <span>in <span class="badge">Star Trek</span></span>
-                                    <span>last reply 1 h ago</span>
-                                </div>
-                            </div>
-                            <div class="topic-stats">
-                                <div>14 replies</div>
-                                <div>193 views</div>
-                            </div>
-                        </article>
-
-                        <!-- Topic item 4 -->
-                        <article class="topic">
-                            <div>
-                                <div class="topic-main-title">
-                                    Non-US TV shows that deserve more hype?
-                                </div>
-                                <div class="topic-meta">
-                                    <span>by <strong>martin</strong></span>
-                                    <span>in <span class="badge">TV Shows</span></span>
-                                    <span>last reply 3 h ago</span>
-                                </div>
-                            </div>
-                            <div class="topic-stats">
-                                <div>9 replies</div>
-                                <div>121 views</div>
-                            </div>
-                        </article>
+                        <!-- Topics -->
+                        <a th:replace="PostPreviewFragment:: post-preview"></a>
                     </div>
 
                     <!-- Simple pagination mockup -->

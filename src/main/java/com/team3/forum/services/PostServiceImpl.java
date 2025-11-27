@@ -153,6 +153,12 @@ public class PostServiceImpl implements PostService {
         return postRepository.findPostsInFolderPaginated(page, POSTS_PAGE_SIZE, folder, sortField, sortDirection);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Post> getTrendingPosts() {
+        return postRepository.findAllSortedByViewsLastDays(5, 7);
+    }
+
     private void verifyAdminOrOwner(Post post, User requester, RuntimeException error) {
         if (!requester.isAdmin() && post.getUser().getId() != requester.getId()) {
             throw error;
@@ -170,6 +176,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public long getPostViews(int postId) {
         return postViewRepository.getTotalViewsForPost(postId);
+
+    }
+
     private PostSortField getSortField(String orderBy) {
         try {
             return PostSortField.valueOf(orderBy.toUpperCase());

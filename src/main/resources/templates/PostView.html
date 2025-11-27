@@ -19,31 +19,24 @@
                 <section class="card post-card">
                     <header class="post-header">
                         <div class="post-label-row">
-                            <span class="pill">Discussion</span>
-                            <span class="badge">Series · Spoiler Free</span>
+                            <span class="pill">Discussion (TODO: tags go here)</span>
                         </div>
-                        <h1 class="post-title">
-                            Is *The Last Kingdom* better than *Vikings*?
-                        </h1>
+                        <h1 class="post-title" th:text="${post.title}"></h1>
                         <div class="post-meta">
-                            <span>Started by <strong>martin</strong></span>
+                            <span>Started by <strong th:text="${post.creator}"></strong></span>
                             <span>·</span>
-                            <span>Posted 2 hours ago</span>
+                            <span>Posted 2 hours ago (TODO)</span>
                             <span>·</span>
-                            <span>38 replies · 512 views</span>
+                            <span>
+                                <span th:text="${post.commentsCount}"></span>
+                                replies ·
+                                <span th:text="${post.views}"></span> views
+                            </span>
                         </div>
                     </header>
 
                     <article class="post-body">
-                        <p>
-                            I recently binged both shows and I'm still not sure which one I prefer.
-                            <strong>Vikings</strong> feels more raw and mythic, while
-                            <strong>The Last Kingdom</strong> has tighter storytelling and character growth.
-                        </p>
-                        <p>
-                            For people who watched both: which one do you think holds up better overall,
-                            and why? Try to keep it spoiler-free or at least tag major spoilers.
-                        </p>
+                        <p th:text="${post.content}"></p>
                     </article>
 
                     <!-- SIMPLE POST ACTIONS (when logged in) -->
@@ -57,7 +50,7 @@
                 <section class="card comment-section">
                     <header class="card-header">
                         <div>
-                            <div class="card-title">Comments</div>
+                            <div class="card-title">Comments (TODO whole section)</div>
                             <div class="card-subtitle">38 replies · sorted by newest</div>
                         </div>
                         <a class="link-small" href="#">Change sort</a>

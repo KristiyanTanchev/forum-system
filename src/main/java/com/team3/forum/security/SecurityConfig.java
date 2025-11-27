@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/forum**").permitAll()
                         .requestMatchers("/forum/**").permitAll()
+                        .requestMatchers("/testMvc/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()

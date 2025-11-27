@@ -123,20 +123,28 @@ public class FolderServiceImpl implements FolderService {
     @Transactional(readOnly = true)
     public Folder getFolderByPath(List<String> slugs) {
         if (slugs.isEmpty()) {
-            throw new IllegalArgumentException("Empty path");
+            throw new EntityNotFoundException("Empty path");
         }
 
         Folder current = folderRepository.findBySlug(slugs.get(0));
-        if (current == null) {
-            throw new EntityNotFoundException("folder", "slug", slugs.get(0));
+        Folder parent;
+        if (current.getParentFolder() != null) {
+            throw new EntityNotFoundException("Incorrect path: " + slugs);
         }
 
         for (int i = 1; i < slugs.size(); i++) {
             String slug = slugs.get(i);
-            current = folderRepository.findByParentFolderAndSlug(current, slug);
+            parent = current;
+            current = folderRepository.findByParentFolderAndSlug(parent, slug);
         }
-
         return current;
+    }
+
+    @Override
+    public List<Folder> getSiblingFolders(Folder folder) {
+        List<Folder> folders = folderRepository.getFoldersByParentFolder(folder.getParentFolder());
+        folders.remove(folder);
+        return folders;
     }
 
     private void validateUniqueSlug(Folder parent, Folder child) {
