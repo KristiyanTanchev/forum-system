@@ -17,8 +17,9 @@
             <div class="folder-breadcrumb">
                 <a th:href="@{/forum/root}">Root folder</a>
 
-                <span th:each="folder: ${folders}">›
-                    <a th:href="@{/forum/root/path(path=${folder.path})}">Folder name</a>
+                <span th:each="pathFolder: ${folder.pathFolders}">›
+                    <a th:href="@{/forum/root/{path}(path=${pathFolder.path})}"
+                       th:text="${pathFolder.name}">Folder name</a>
                 </span>
             </div>
 

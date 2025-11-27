@@ -3,6 +3,7 @@ package com.team3.forum.models.folderDtos;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +20,5 @@ public class FolderResponseDto {
     private int postCount;
     private String path;
     private int folderCount;
+    private List<FolderPathDto> pathFolders;
 }

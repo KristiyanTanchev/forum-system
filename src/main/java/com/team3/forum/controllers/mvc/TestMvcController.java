@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/forum")
+@RequestMapping("/testMvc")
 public class TestMvcController {
     @GetMapping("")
     public String getHomePage() {
