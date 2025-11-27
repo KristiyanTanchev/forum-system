@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Access Denied</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <header th:replace="~{Header:: navigation-bar}"></header>
+
+    <main class="auth-page">
+        <div class="container">
+            <section class="card auth-card" style="text-align:center;">
+                <h1 class="form-title">Access Denied</h1>
+                <p class="form-subtitle" th:text="${message ?: 'You do not have permission to access this page.'}"></p>
+                <div class="form-actions" style="justify-content:center;margin-top:1.5rem;">
+                    <a th:href="@{/forum}" class="btn btn-primary">Go to Forum</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer th:replace="~{Footer:: footer}"></footer>
+</div>
+</body>
+</html>

@@ -1419,3 +1419,15 @@ a {
 .folder-tree--children .folder-node > a {
     padding-left: 0.65rem;
 }
+
+.input-error {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4);
+}
+
+.field-error {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    color: #fca5a5;
+}

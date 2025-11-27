@@ -17,16 +17,6 @@ public class TestMvcController {
         return "FolderView";
     }
 
-    @GetMapping("/login")
-    public String getLoginPage() {
-        return "LoginView";
-    }
-
-    @GetMapping("/register")
-    public String getRegisterPage() {
-        return "RegisterView";
-    }
-
     @GetMapping("/postPage")
     public String getPostPage() {
         return "PostView";

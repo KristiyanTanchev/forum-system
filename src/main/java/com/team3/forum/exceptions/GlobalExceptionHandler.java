@@ -3,6 +3,7 @@ package com.team3.forum.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -48,6 +49,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityUpdateConflictException.class)
     public ResponseEntity<Map<String, Object>> handleEntityUpdateConflictException(EntityUpdateConflictException e) {
         return buildErrorResponse(HttpStatus.CONFLICT, "Conflict", e.getMessage());
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<Map<String, Object>> handleLockedException(LockedException e) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "Forbidden", e.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(
