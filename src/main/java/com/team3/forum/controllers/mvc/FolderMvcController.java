@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
-@RequestMapping("/forum/root")
+@RequestMapping("/path")
 public class FolderMvcController {
     private final FolderService folderService;
     private final FolderMapper folderMapper;
@@ -34,43 +34,18 @@ public class FolderMvcController {
         this.postService = postService;
     }
 
-    @GetMapping
-    public String getHomeFolder(Model model) {
-        List<FolderResponseDto> childFolderResponseDtos = folderService.findHomeFolders().stream()
-                .map(folderMapper::toResponseDto).toList();
-        model.addAttribute("folderName", "Root folder");
-        model.addAttribute("childFolders", childFolderResponseDtos);
-
-        FolderResponseDto folderResponseDto = FolderResponseDto.builder()
-                .name("Root folder")
-                .slug("")
-                .build();
-        model.addAttribute("folder", folderResponseDto);
-
-
-        List<Post> posts = postService
-                .getPostsInFolderPaginated(null, 1, "date", "desc");
-
-        List<PostResponseDto> mappedPosts = posts.stream()
-                .map(postMapper::toResponseDto)
-                .toList();
-        model.addAttribute("posts", mappedPosts);
-        return "FolderView";
-    }
-
-    @GetMapping("/{*path}")
+    @GetMapping({"/{*path}", ""})
     public String getHomeFolder(
             @PathVariable("path") String path,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "date") String orderBy,
             @RequestParam(defaultValue = "desc") String direction,
             Model model) {
+        List<String> slugs;
         if (path.isEmpty() || path.equals("/")) {
-            return "redirect:/forum/root";
-        }
-        List<String> slugs = List.of(path.substring(1).split("/"));
-        if (slugs.isEmpty()) {
-            return "redirect:/forum/root";
+            slugs = List.of("root");
+        } else {
+            slugs = List.of(path.substring(1).split("/"));
         }
         Folder folder = folderService.getFolderByPath(slugs);
 
@@ -83,11 +58,7 @@ public class FolderMvcController {
             model.addAttribute("parent", parentFolderDto);
         }
         if (folder.getParentFolder() == null) {
-            FolderResponseDto parentFolderDto = FolderResponseDto.builder()
-                    .name("Root folder")
-                    .slug("")
-                    .build();
-            model.addAttribute("parent", parentFolderDto);
+            model.addAttribute("parent", null);
         }
 
         model.addAttribute("siblingFolders", siblingFolderResponseDtos);

@@ -71,7 +71,7 @@
                                 Popular threads from this week, sorted by popularity.
                             </div>
                         </div>
-                        <a class="link-small" th:href="@{/forum/root}">View all</a>
+                        <a class="link-small" th:href="@{/path}">View all</a>
                     </header>
 
                     <div class="topic-list">
@@ -88,7 +88,7 @@
                         </header>
                         <div class="category-list">
                             <a class="category-item" th:each="folder : ${folders}"
-                               th:href="@{/forum/root/{slug}(slug=${folder.slug})}">
+                               th:href="@{/path/{slug}(slug=${folder.slug})}">
                                 <span th:text="'📁 ' + ${folder.name}">📁 Root</span>
                                 <span class="category-count" th:text="${folder.postCount} + ' topics'">12 topics</span>
                             </a>

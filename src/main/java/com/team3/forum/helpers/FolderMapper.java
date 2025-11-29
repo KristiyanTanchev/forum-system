@@ -41,7 +41,7 @@ public class FolderMapper {
                 .createdAt(folder.getCreatedAt())
                 .updatedAt(folder.getUpdatedAt())
                 .id(folder.getId())
-                .postCount(folder.getPosts().size())
+                .postCount(getFolderPostsCount(folder))
                 .folderCount(folder.getChildFolders().size())
                 .pathFolders(buildPathFolders(folder, new ArrayList<>()))
                 .path(buildPath(folder, ""))
@@ -68,5 +68,13 @@ public class FolderMapper {
                         .build()
         );
         return result;
+    }
+
+    private int getFolderPostsCount(Folder folder) {
+        int sum = folder.getPosts().size();
+        for (Folder child : folder.getChildFolders()) {
+            sum += getFolderPostsCount(child);
+        }
+        return sum;
     }
 }

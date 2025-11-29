@@ -15,10 +15,9 @@
         <div class="container">
             <!-- Breadcrumb & header -->
             <div class="folder-breadcrumb">
-                <a th:href="@{/forum/root}">Root folder</a>
-
-                <span th:each="pathFolder: ${folder.pathFolders}">›
-                    <a th:href="@{/forum/root/{path}(path=${pathFolder.path})}"
+                <span th:each="pathFolder, i: ${folder.pathFolders}">
+                    <span th:if="${i.index > 0}">›</span>
+                    <a th:href="@{/path/{path}(path=${pathFolder.path})}"
                        th:text="${pathFolder.name}">Folder name</a>
                 </span>
             </div>
@@ -43,23 +42,19 @@
                 <!-- LEFT: folder info + tree -->
                 <aside class="card folder-sidebar">
                     <div class="folder-sidebar-section">
-                        <div class="card-title">Folder details (TODO whole details section)</div>
+                        <div class="card-title">Folder details</div>
                         <div class="card-subtitle">
-                            Use folders to group discussions by franchise, genre or format.
+                            (TODO: consider adding a description field)
                         </div>
 
                         <div class="folder-stats">
-                            <div class="folder-stat-item">
-                                <span class="folder-stat-label">Topics</span>
-                                <span class="folder-stat-value">21</span>
+                            <div class="folder-stat-item" th:if="${folder.folderCount > 0}">
+                                <span class="folder-stat-label">Subfolders</span>
+                                <span class="folder-stat-value" th:text="${folder.folderCount}">21</span>
                             </div>
                             <div class="folder-stat-item">
                                 <span class="folder-stat-label">Posts</span>
-                                <span class="folder-stat-value">184</span>
-                            </div>
-                            <div class="folder-stat-item">
-                                <span class="folder-stat-label">Subfolders</span>
-                                <span class="folder-stat-value">3</span>
+                                <span class="folder-stat-value" th:text="${folder.postCount}">184</span>
                             </div>
                         </div>
                     </div>
@@ -70,7 +65,7 @@
 
                         <div class="folder-parent">
                             <a class="folder-parent-link"
-                               th:href="@{/forum/root/{path}(path=${parent.path})}">
+                               th:href="@{/path/{path}(path=${parent.path})}">
                                 <span class="folder-node-icon">⬅</span>
                                 <span class="folder-node-name" th:text="${parent.name}">TV Shows</span>
                             </a>
@@ -87,7 +82,7 @@
                         <ul class="folder-tree folder-tree--siblings">
                             <!-- Current folder -->
                             <li class="folder-node folder-node--active">
-                                <a th:href="@{/forum/root/{path}(path=${folder.path})}">
+                                <a th:href="@{/path/{path}(path=${folder.path})}">
                                     <span class="folder-node-icon">📂</span>
                                     <span class="folder-node-name" th:text="${folder.name}">Sci-Fi &amp; Fantasy</span>
                                     <span class="folder-node-count"
@@ -97,7 +92,7 @@
 
                             <!-- Siblings (same parent) -->
                             <li class="folder-node" th:each="sibling : ${siblingFolders}">
-                                <a th:href="@{/forum/root/{path}(path=${sibling.path})}">
+                                <a th:href="@{/path/{path}(path=${sibling.path})}">
                                     <span class="folder-node-icon">📂</span>
                                     <span class="folder-node-name" th:text="${sibling.name}">Drama</span>
                                     <span class="folder-node-count"
@@ -105,6 +100,12 @@
                                 </a>
                             </li>
                         </ul>
+
+                        <div class="folder-pagination" th:if="${siblingFolders.size() > 4}">
+                            <button class="btn btn-ghost folder-page-btn" type="button">‹ Prev</button>
+                            <span class="folder-page-info">Page 1 of 3</span>
+                            <button class="btn btn-ghost folder-page-btn" type="button">Next ›</button>
+                        </div>
                     </div>
 
                     <!-- CHILDREN OF CURRENT FOLDER -->
@@ -114,7 +115,7 @@
 
                         <ul class="folder-tree folder-tree--children">
                             <li class="folder-node" th:each="child : ${childFolders}">
-                                <a th:href="@{/forum/root/{path}(path=${child.path})}">
+                                <a th:href="@{/path/{path}(path=${child.path})}">
                                     <span class="folder-node-icon">📁</span>
                                     <span class="folder-node-name" th:text="${child.name}">Star Wars</span>
                                     <span class="folder-node-count"
@@ -122,6 +123,11 @@
                                 </a>
                             </li>
                         </ul>
+                    </div>
+                    <div class="folder-pagination" th:if="${childFolders.size() > 4}">
+                        <button class="btn btn-ghost folder-page-btn" type="button">‹ Prev</button>
+                        <span class="folder-page-info">Page 1 of 3</span>
+                        <button class="btn btn-ghost folder-page-btn" type="button">Next ›</button>
                     </div>
 
                 </aside>
