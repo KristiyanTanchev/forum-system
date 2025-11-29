@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <title>CineTalk – Login</title>
@@ -9,7 +9,7 @@
 <body>
 <div class="page">
     <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
+    <header th:replace="Header::navigation-bar"></header>
 
     <!-- MAIN -->
     <main class="auth-page">
@@ -20,6 +20,18 @@
                     <p class="form-subtitle">
                         Welcome back. Enter your credentials to continue.
                     </p>
+                </div>
+
+                <div th:if="${param.registered}" class="alert alert-success">
+                    ✓ Registration successful! Please log in.
+                </div>
+
+                <div th:if="${param.logout}" class="alert alert-info">
+                    You have been logged out successfully.
+                </div>
+
+                <div th:if="${error}" class="alert alert-error">
+                    <span th:text="${error}">Invalid username or password</span>
                 </div>
 
                 <form th:action="@{/auth/login}" method="post">
@@ -58,7 +70,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
+    <footer th:replace="Footer::footer"></footer>
 </div>
 </body>
 </html>

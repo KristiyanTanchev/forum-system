@@ -29,7 +29,7 @@ public class UserRestController {
     }
 
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable int id,
                                                       @Valid @RequestBody UserUpdateDto userUpdateDto,
                                                       @AuthenticationPrincipal CustomUserDetails userDetails) {

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit Profile – CineTalk Forum</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="profile-page">
+        <div class="container">
+            <section class="card profile-card-wide">
+                <div class="form-header">
+                    <h1 class="form-title">Edit profile</h1>
+                    <p class="form-subtitle">
+                        Update how other people see you on the forum.
+                    </p>
+                </div>
+
+                <form th:action="@{/profile/edit}" th:object="${userUpdateDto}" method="post">
+                    <div class="form-row-split">
+                        <div class="form-field">
+                            <label class="form-label" for="edit-first-name">First name</label>
+                            <input class="form-input"
+                                   id="edit-first-name"
+                                   th:field="*{firstName}"
+                                   th:errorclass="input-error"
+                                   type="text"
+                                   required
+                                  />
+                            <div class="field-error" th:errors="*{firstName}"></div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="edit-last-name">Last name</label>
+                            <input class="form-input"
+                                   id="edit-last-name"
+                                   th:field="*{lastName}"
+                                   th:errorclass="input-error"
+                                   type="text"
+                                   required
+                                  />
+                            <div class="field-error" th:errors="*{lastName}"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="edit-email">Email</label>
+                        <input class="form-input"
+                               id="edit-email"
+                               th:field="*{email}"
+                               th:errorclass="input-error"
+                               type="email"
+                               required/>
+                        <div class="field-error" th:errors="*{email}"></div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="edit-avatar-url">Avatar URL <span>(optional)</span></label>
+                        <input class="form-input"
+                               id="edit-avatar-url"
+                               th:field="*{avatarUrl}"
+                               type="url"
+                               placeholder="https://example.com/avatar.jpg"/>
+                        <p class="form-help">Provide a URL to an image for your avatar.</p>
+                    </div>
+
+                    <!-- Future features: Bio, Location, Password change -->
+                    <!-- <div class="form-field">
+                        <label class="form-label" for="edit-bio">Bio <span>(optional)</span></label>
+                        <textarea class="form-textarea" id="edit-bio" name="bio"
+                                  placeholder="Tell people what kind of movies / shows you love."></textarea>
+                    </div>
+
+                    <hr style="border:none;border-top:1px solid rgba(148,163,184,0.25);margin:1rem 0;">
+
+                    <div class="form-row-split">
+                        <div class="form-field">
+                            <label class="form-label" for="edit-password">New password <span>(optional)</span></label>
+                            <input class="form-input" id="edit-password" name="newPassword" type="password"/>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" for="edit-password2">Confirm password</label>
+                            <input class="form-input" id="edit-password2" name="confirmPassword" type="password"/>
+                        </div>
+                    </div>
+                    <p class="form-help">
+                        Leave password fields empty if you don't want to change it.
+                    </p> -->
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Save profile</button>
+                        <a th:href="@{/profile}" class="btn btn-ghost">Cancel</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

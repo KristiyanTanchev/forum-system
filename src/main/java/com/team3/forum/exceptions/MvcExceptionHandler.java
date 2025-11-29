@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@ControllerAdvice
+@ControllerAdvice(basePackages = "com.team3.forum.controllers.mvc")
 public class MvcExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -28,7 +28,7 @@ public class MvcExceptionHandler {
     @ExceptionHandler(DuplicateEntityException.class)
     public String handleDuplicateEntityException(DuplicateEntityException e,
                                                        RedirectAttributes redirectAttributes) {
-      redirectAttributes.addFlashAttribute("message", e.getMessage());
+        redirectAttributes.addFlashAttribute("error", e.getMessage());
         return "redirect:/auth/register";
     }
 
@@ -60,8 +60,4 @@ public class MvcExceptionHandler {
         mav.addObject("details", e.getMessage());
         return mav;
     }
-
-
-
-
 }

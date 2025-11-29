@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${user.username} + ' – CineTalk Forum'">User Profile – CineTalk Forum</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <!-- NAVBAR -->
+    <header th:replace="Header:: navigation-bar"></header>
+
+    <!-- MAIN -->
+    <main class="profile-page">
+        <div class="container">
+            <!-- Success message -->
+            <div th:if="${param.updated}" class="alert alert-success">
+                ✓ Profile updated successfully!
+            </div>
+
+            <div class="profile-layout">
+                <!-- LEFT: summary -->
+                <section class="card profile-summary-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar" th:if="${user.avatarUrl == null or user.avatarUrl.isEmpty()}"
+                             th:text="${#strings.substring(user.firstName, 0, 1)}">U</div>
+                        <img class="profile-avatar" th:if="${user.avatarUrl != null and !user.avatarUrl.isEmpty()}"
+                             th:src="${user.avatarUrl}" th:alt="${user.username} + ' avatar'"
+                             style="object-fit: cover;"/>
+                        <div>
+                            <div class="profile-username" th:text="${user.username}">username</div>
+                            <div class="profile-role-badges">
+                                <!-- shown if user is admin -->
+                                <span class="profile-badge profile-badge-admin" th:if="${user.isAdmin}">Admin</span>
+                                <!-- shown if this is your own profile -->
+                                <span class="profile-badge profile-badge-owner" th:if="${isOwnProfile}">You</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-meta">
+                        <span th:text="'Joined ' + ${#temporals.format(user.createdAt, 'MMM yyyy')}">Joined Jan 2025</span>
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="folder-stat-label">Topics</div>
+                            <div class="folder-stat-value" th:text="${userStats.topicCount}">0</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="folder-stat-label">Replies</div>
+                            <div class="folder-stat-value" th:text="${userStats.replyCount}">0</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="folder-stat-label">Likes received</div>
+                            <div class="folder-stat-value" th:text="${userStats.likesCount}">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Bio section - commented out for future use -->
+                    <!-- <p class="form-help" style="margin-top:0.7rem;" th:if="${user.bio}" th:text="${user.bio}">
+                        User bio
+                    </p> -->
+
+                    <div class="profile-actions">
+                        <!-- visible when this is your own profile -->
+                        <a th:if="${isOwnProfile}" th:href="@{/testMvc/createPost}" class="btn btn-primary btn-sm">New Post</a>
+                        <a th:if="${isOwnProfile}" th:href="@{/profile/edit}" class="btn btn-ghost btn-sm">Edit profile</a>
+
+                        <!-- visible when you are viewing someone else (future features) -->
+                        <!-- <button th:if="${!isOwnProfile}" class="btn btn-ghost btn-sm" type="button">Message</button>
+                        <button th:if="${!isOwnProfile}" class="btn btn-primary btn-sm" type="button">Follow</button> -->
+
+                        <!-- visible only for admins viewing other users (future features) -->
+                        <!-- <button th:if="${isAdmin and !isOwnProfile}" class="btn-danger-outline" type="button">Block user</button> -->
+                    </div>
+                </section>
+
+                <!-- RIGHT: activity -->
+                <section class="card profile-activity">
+                    <div class="profile-activity-tabs">
+                        <button class="profile-tab profile-tab--active" type="button">Topics</button>
+                        <!-- Future tabs -->
+                        <!-- <button class="profile-tab" type="button">Replies</button>
+                        <button class="profile-tab" type="button">Likes</button> -->
+                    </div>
+
+                    <div class="topic-list">
+                        <!-- Loop through user's posts -->
+                        <article class="topic" th:each="post : ${userPosts}">
+                            <div>
+                                <a th:href="@{/forum/posts/{id}(id=${post.id})}" class="topic-main-title" th:text="${post.title}">
+                                    Post title
+                                </a>
+                                <div class="topic-meta">
+                                    <span th:text="${#temporals.format(post.updatedAt, 'dd MMM yyyy')}">date</span>
+                                </div>
+                            </div>
+                            <div class="topic-stats">
+                                <div><span th:text="${post.commentsCount}">0</span> replies</div>
+                                <div><span th:text="${post.views}">0</span> views</div>
+                            </div>
+                        </article>
+
+                        <!-- Show message if no posts -->
+                        <div th:if="${#lists.isEmpty(userPosts)}" class="form-help" style="text-align: center; padding: 2rem;">
+                            No topics created yet.
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer th:replace="Footer:: footer"></footer>
+</div>
+</body>
+</html>

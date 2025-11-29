@@ -58,6 +58,4 @@ public class AdminRestController {
         userService.restoreById(id);
         return ResponseEntity.noContent().build();
     }
-    //ToDo Admin must be able to delete any post
-    //ToDo Admin must be able to filter and sort posts
 }

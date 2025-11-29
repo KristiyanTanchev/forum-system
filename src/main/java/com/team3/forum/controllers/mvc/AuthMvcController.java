@@ -78,4 +78,16 @@ public class AuthMvcController {
         return "redirect:/auth/login?registered=true";
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response){
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(false);
+        jwtCookie.setMaxAge(0);
+        jwtCookie.setPath("/");
+        response.addCookie(jwtCookie);
+
+        return "redirect:/auth/login?logout=true";
+    }
+
 }

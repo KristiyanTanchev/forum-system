@@ -40,11 +40,11 @@ public class TestMvcController {
 
     @GetMapping("/EditUser")
     public String getEditUserPage() {
-        return "EditUserView";
+        return "EditProfileView";
     }
 
     @GetMapping("/user")
     public String getUserPage() {
-        return "UserView";
+        return "ProfileView";
     }
 }

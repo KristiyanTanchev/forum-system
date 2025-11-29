@@ -7,6 +7,7 @@ import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
 import com.team3.forum.models.userDtos.UserCreateDto;
+import com.team3.forum.models.userDtos.UserStatsDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 import com.team3.forum.repositories.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -168,5 +169,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restoreById(int id) {
         userRepository.restoreById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserStatsDto getUserStats(int userId) {
+        User user = findById(userId);
+        return userMapper.toStatsDto(user);
     }
 }

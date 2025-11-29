@@ -1,5 +1,6 @@
 package com.team3.forum.security;
 
+import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.models.User;
 import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user;
+        try {
+            user = userRepository.findByUsername(username);
+        } catch (EntityNotFoundException e) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
 
-        if (user == null || user.isDeleted()) {
+        if (user.isDeleted()) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
 

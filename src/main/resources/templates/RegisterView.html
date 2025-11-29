@@ -22,26 +22,35 @@
                     </p>
                 </div>
 
-                <form>
+                <div th:if="${error}" class="alert alert-error">
+                    <span th:text="${error}"></span>
+                </div>
+
+
+                <form th:action="@{/auth/register}" th:object="${userCreateDto}" method="post">
                     <div class="form-row-split">
                         <div class="form-field">
                             <label class="form-label" for="register-firstname">First name</label>
-                            <input class="form-input" id="register-firstname" name="firstName"
+                            <input class="form-input"
+                                   id="register-firstname"
+                                   th:field="*{firstName}"
+                                   th:errorclass="input-error"
                                    placeholder="John"
                                    type="text"
-                                   required
-                                   minlength="4"
-                                   maxlength="32"/>
+                            />
+                            <div class="field-error" th:errors="*{firstName}"></div>
                         </div>
 
                         <div class="form-field">
                             <label class="form-label" for="register-lastname">Last name</label>
-                            <input class="form-input" id="register-lastname" name="lastName"
+                            <input class="form-input"
+                                   id="register-lastname"
+                                   th:field="*{lastName}"
+                                   th:errorclass="input-error"
                                    placeholder="Doe"
                                    type="text"
-                                   required
-                                   minlength="4"
-                                   maxlength="32"/>
+                                  />
+                            <div class="field-error" th:errors="*{lastName}"></div>
                         </div>
                     </div>
 
@@ -50,21 +59,26 @@
                             Username
                             <span>(4–50 characters, start with a letter)</span>
                         </label>
-                        <input class="form-input" id="register-username" name="username"
+                        <input class="form-input"
+                               id="register-username"
+                               th:field="*{username}"
+                               th:errorclass="input-error"
                                placeholder="johndoe"
                                type="text"
-                               required
-                               minlength="4"
-                               maxlength="50"
-                               pattern="^[A-Za-z][A-Za-z0-9._-]{3,49}$"/>
+                              />
+                        <div class="field-error" th:errors="*{username}"></div>
                     </div>
 
                     <div class="form-field">
                         <label class="form-label" for="register-email">Email</label>
-                        <input class="form-input" id="register-email" name="email"
+                        <input class="form-input"
+                               id="register-email"
+                               th:field="*{email}"
+                               th:errorclass="input-error"
                                placeholder="you@example.com"
                                type="email"
-                               required/>
+                             />
+                        <div class="field-error" th:errors="*{email}"></div>
                     </div>
 
                     <div class="form-field">
@@ -72,18 +86,21 @@
                             Password
                             <span>(minimum 8 characters)</span>
                         </label>
-                        <input class="form-input" id="register-password" name="password"
+                        <input class="form-input"
+                               id="register-password"
+                               th:field="*{password}"
+                               th:errorclass="input-error"
                                placeholder="••••••••"
                                type="password"
-                               required
-                               minlength="8"/>
+                               />
+                        <div class="field-error" th:errors="*{password}"></div>
                     </div>
 
                     <div class="form-actions">
                         <button class="btn btn-primary" type="submit">Create account</button>
                         <span class="form-help">
                             Already have an account?
-                            <a class="form-link" href="login.html">Log in</a>
+                            <a class="form-link" th:href="@{/auth/login}">Log in</a>
                         </span>
                     </div>
                 </form>

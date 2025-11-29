@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.team3.forum.controllers.rest")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)

@@ -2,6 +2,7 @@ package com.team3.forum.services;
 
 import com.team3.forum.models.User;
 import com.team3.forum.models.userDtos.UserCreateDto;
+import com.team3.forum.models.userDtos.UserStatsDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 
 import java.util.List;
@@ -19,4 +20,5 @@ public interface UserService {
     public List<User> searchUsers(String query);
     void softDeleteById(int id);
     void restoreById(int id);
+    UserStatsDto getUserStats(int userId);
 }
