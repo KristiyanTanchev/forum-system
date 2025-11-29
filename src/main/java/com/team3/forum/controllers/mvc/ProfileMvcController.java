@@ -85,8 +85,8 @@ public class ProfileMvcController {
             model.addAttribute("user", userMapper.toResponseDto(user));
             return "EditProfileView";
         }
-        userService.updateUser(userDetails.getId(), userUpdateDto,userDetails.getId());
-        return "redirect:/profile/" + userDetails.getUsername();
+        userService.updateUser(userDetails.getId(), userUpdateDto, userDetails.getId());
+        return "redirect:/profile/" + userDetails.getUsername() + "?updated=true";
     }
 }
 

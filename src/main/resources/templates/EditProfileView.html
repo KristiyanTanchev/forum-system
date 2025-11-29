@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Forum App – Home</title>
+    <title>Edit Profile – CineTalk Forum</title>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <link href="/css/styles.css" rel="stylesheet"/>
 </head>
@@ -22,29 +22,56 @@
                     </p>
                 </div>
 
-                <form>
+                <form th:action="@{/profile/edit}" th:object="${userUpdateDto}" method="post" novalidate>
                     <div class="form-row-split">
                         <div class="form-field">
-                            <label class="form-label" for="edit-display-name">Display name</label>
-                            <input class="form-input" id="edit-display-name" name="displayName"
-                                   type="text" value="martin"/>
+                            <label class="form-label" for="edit-first-name">First name</label>
+                            <input class="form-input"
+                                   id="edit-first-name"
+                                   th:field="*{firstName}"
+                                   th:errorclass="input-error"
+                                   type="text"
+                                   required
+                                  />
+                            <div class="field-error" th:errors="*{firstName}"></div>
                         </div>
                         <div class="form-field">
-                            <label class="form-label" for="edit-location">Location <span>(optional)</span></label>
-                            <input class="form-input" id="edit-location" name="location"
-                                   placeholder="e.g. Sofia, Bulgaria" type="text"/>
+                            <label class="form-label" for="edit-last-name">Last name</label>
+                            <input class="form-input"
+                                   id="edit-last-name"
+                                   th:field="*{lastName}"
+                                   th:errorclass="input-error"
+                                   type="text"
+                                   required
+                                  />
+                            <div class="field-error" th:errors="*{lastName}"></div>
                         </div>
                     </div>
 
                     <div class="form-field">
                         <label class="form-label" for="edit-email">Email</label>
-                        <input class="form-input" disabled id="edit-email"
-                               name="email" type="email" value="you@example.com"/>
-                        <p class="form-help">Email can be changed in account settings (or via backend).</p>
+                        <input class="form-input"
+                               id="edit-email"
+                               th:field="*{email}"
+                               th:errorclass="input-error"
+                               type="email"
+                               required/>
+                        <div class="field-error" th:errors="*{email}"></div>
                     </div>
 
                     <div class="form-field">
-                        <label class="form-label" for="edit-bio">Bio</label>
+                        <label class="form-label" for="edit-avatar-url">Avatar URL <span>(optional)</span></label>
+                        <input class="form-input"
+                               id="edit-avatar-url"
+                               th:field="*{avatarUrl}"
+                               type="url"
+                               placeholder="https://example.com/avatar.jpg"/>
+                        <p class="form-help">Provide a URL to an image for your avatar.</p>
+                    </div>
+
+                    <!-- Future features: Bio, Location, Password change -->
+                    <!-- <div class="form-field">
+                        <label class="form-label" for="edit-bio">Bio <span>(optional)</span></label>
                         <textarea class="form-textarea" id="edit-bio" name="bio"
                                   placeholder="Tell people what kind of movies / shows you love."></textarea>
                     </div>
@@ -53,23 +80,21 @@
 
                     <div class="form-row-split">
                         <div class="form-field">
-                            <label class="form-label" for="edit-password">New password</label>
-                            <input class="form-input" id="edit-password" name="newPassword"
-                                   type="password"/>
+                            <label class="form-label" for="edit-password">New password <span>(optional)</span></label>
+                            <input class="form-input" id="edit-password" name="newPassword" type="password"/>
                         </div>
                         <div class="form-field">
-                            <label class="form-label" for="edit-password2">Confirm</label>
-                            <input class="form-input" id="edit-password2" name="confirmPassword"
-                                   type="password"/>
+                            <label class="form-label" for="edit-password2">Confirm password</label>
+                            <input class="form-input" id="edit-password2" name="confirmPassword" type="password"/>
                         </div>
                     </div>
                     <p class="form-help">
-                        Leave password fields empty if you don’t want to change it.
-                    </p>
+                        Leave password fields empty if you don't want to change it.
+                    </p> -->
 
                     <div class="form-actions">
                         <button class="btn btn-primary" type="submit">Save profile</button>
-                        <button class="btn btn-ghost" type="button">Cancel</button>
+                        <a th:href="@{/profile}" class="btn btn-ghost">Cancel</a>
                     </div>
                 </form>
             </section>
