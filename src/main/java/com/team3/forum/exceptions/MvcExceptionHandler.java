@@ -28,7 +28,7 @@ public class MvcExceptionHandler {
     @ExceptionHandler(DuplicateEntityException.class)
     public String handleDuplicateEntityException(DuplicateEntityException e,
                                                        RedirectAttributes redirectAttributes) {
-      redirectAttributes.addFlashAttribute("message", e.getMessage());
+        redirectAttributes.addFlashAttribute("error", e.getMessage());
         return "redirect:/auth/register";
     }
 
