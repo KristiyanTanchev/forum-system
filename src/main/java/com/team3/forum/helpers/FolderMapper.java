@@ -33,6 +33,14 @@ public class FolderMapper {
                 .build();
     }
 
+    public FolderPathDto toPathDto(Folder folder) {
+        return FolderPathDto.builder()
+                .name(folder.getName())
+                .slug(folder.getSlug())
+                .path(buildPath(folder, ""))
+                .build();
+    }
+
 
     public FolderResponseDto toResponseDto(Folder folder) {
         return FolderResponseDto.builder()

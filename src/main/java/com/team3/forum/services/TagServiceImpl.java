@@ -78,4 +78,10 @@ public class TagServiceImpl implements TagService {
         }
         tagRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> findTopByOrderByPostsCountDesc(int limit) {
+        return tagRepository.findTopByOrderByPostsCountDesc(limit);
+    }
 }

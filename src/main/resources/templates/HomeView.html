@@ -26,9 +26,9 @@
                     </p>
 
                     <div class="hero-tags">
-                        <span class="pill">Movie Reviews</span>
-                        <span class="pill">Director Spotlights</span>
-                        <span class="pill">Cinema News</span>
+                        <a class="pill" th:each="tag: ${tags}"
+                           th:href="@{/forum/posts?tagId={tagId}(tagId=${tag.id})}" th:text="${tag.name}">Movie
+                            Reviews</a>
                     </div>
                 </div>
 
@@ -52,7 +52,7 @@
                     </div>
 
                     <div style="margin-top:0.8rem; display:flex; justify-content:flex-end;">
-                        <a th:href="@{/testMvc/createPost}" class="btn btn-primary">
+                        <a class="btn btn-primary" th:href="@{/forum/posts}">
                             Create new topic
                         </a>
                     </div>
@@ -61,8 +61,7 @@
         </section>
 
         <section class="content">
-            <div class="container content-grid">
-                <!-- LEFT COLUMN: Trending / latest topics -->
+            <div class="container">
                 <section class="card">
                     <header class="card-header">
                         <div>
@@ -71,7 +70,7 @@
                                 Popular threads from this week, sorted by popularity.
                             </div>
                         </div>
-                        <a class="link-small" th:href="@{/path}">View all</a>
+                        <a class="link-small" th:href="@{/forum/posts}">View all</a>
                     </header>
 
                     <div class="topic-list">
@@ -79,41 +78,6 @@
                         <a th:replace="PostPreviewFragment:: post-preview"></a>
                     </div>
                 </section>
-
-                <!-- RIGHT COLUMN: Sidebar -->
-                <aside aria-label="Forum sidebar" class="card">
-                    <div class="sidebar-section">
-                        <header class="card-header" style="margin-bottom:0.5rem;">
-                            <div class="card-title">Browse by folder</div>
-                        </header>
-                        <div class="category-list">
-                            <a class="category-item" th:each="folder : ${folders}"
-                               th:href="@{/path/{slug}(slug=${folder.slug})}">
-                                <span th:text="'📁 ' + ${folder.name}">📁 Root</span>
-                                <span class="category-count" th:text="${folder.postCount} + ' topics'">12 topics</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <div class="cta-card">
-                            <div class="cta-title">New here?</div>
-                            <p class="cta-text">
-                                Create an account to bookmark threads, vote on answers and
-                                get notified when someone replies to your questions.
-                            </p>
-                            <button class="btn btn-primary" type="button">
-                                Register &amp; join the discussion
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <div class="card-subtitle">
-                            Tip: Use folders as your “knowledge tree” and posts as leaves.
-                        </div>
-                    </div>
-                </aside>
             </div>
         </section>
     </main>

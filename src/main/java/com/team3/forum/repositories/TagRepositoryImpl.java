@@ -55,4 +55,11 @@ public class TagRepositoryImpl implements TagRepository {
     public void delete(Tag entity) {
         em.remove(em.contains(entity) ? entity : em.merge(entity));
     }
+
+    @Override
+    public List<Tag> findTopByOrderByPostsCountDesc(int limit) {
+        return em.createQuery("from Tag t order by size(t.posts) desc", Tag.class)
+                .setMaxResults(limit)
+                .getResultList();
+    }
 }

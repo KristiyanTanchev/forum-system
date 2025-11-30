@@ -1,8 +1,12 @@
 package com.team3.forum.models.postDtos;
 
+import com.team3.forum.models.Comment;
+import com.team3.forum.models.Tag;
+import com.team3.forum.models.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -28,5 +32,13 @@ public class PostResponseDto {
     private long views;
 
     private LocalDateTime updatedAt;
+
+    private List<Comment> comments;
+
+    private List<User> likedBy;
+
+    private String folderName;
+
+    private List<Tag> tags;
 
 }

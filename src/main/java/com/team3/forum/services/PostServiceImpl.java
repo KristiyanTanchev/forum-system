@@ -28,7 +28,7 @@ public class PostServiceImpl implements PostService {
     public static final String EDIT_AUTHORIZATION_ERROR = "You cannot edit this post.";
     public static final String DELETE_AUTHORIZATION_ERROR = "You cannot delete this post.";
     public static final String RESTORE_AUTHORIZATION_ERROR = "You cannot restore this post.";
-    public static final int POSTS_PAGE_SIZE = 20;
+    public static final int POSTS_PAGE_SIZE = 10;
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -151,6 +151,17 @@ public class PostServiceImpl implements PostService {
             page = 1;
         }
         return postRepository.findPostsInFolderPaginated(page, POSTS_PAGE_SIZE, folder, sortField, sortDirection);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId) {
+        PostSortField sortField = getSortField(orderBy);
+        SortDirection sortDirection = getSortDirection(direction);
+        if (page < 1) {
+            page = 1;
+        }
+        return postRepository.findPostsInFolderWithTagPaginated(page, POSTS_PAGE_SIZE, folder, sortField, sortDirection, tagId);
     }
 
     @Override

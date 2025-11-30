@@ -80,9 +80,7 @@ public class PostRepositoryImpl implements PostRepository {
 
         StringBuilder queryString = new StringBuilder("from Post p where p.isDeleted = false");
 
-        if (parent == null) {
-            queryString.append(" and p.folder is null");
-        } else {
+        if (parent != null) {
             queryString.append(" and p.folder = :parent");
         }
 
@@ -92,6 +90,43 @@ public class PostRepositoryImpl implements PostRepository {
                 .append(direction.name());
 
         var query = em.createQuery(queryString.toString(), Post.class);
+
+        if (parent != null) {
+            query.setParameter("parent", parent);
+        }
+
+        return query
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public List<Post> findPostsInFolderWithTagPaginated(int page,
+                                                        int size,
+                                                        Folder parent,
+                                                        PostSortField orderBy,
+                                                        SortDirection direction,
+                                                        int tagId) {
+        StringBuilder queryString = new StringBuilder("select distinct p from Post p join p.tags t where p.isDeleted = false");
+
+        if (parent != null) {
+            queryString.append(" and p.folder = :parent");
+        }
+        if (tagId != 0) {
+            queryString.append(" and t.id = :tagId");
+        }
+
+        queryString.append(" order by ")
+                .append(orderBy.getJpqlField())
+                .append(' ')
+                .append(direction.name());
+
+        var query = em.createQuery(queryString.toString(), Post.class);
+
+        if (tagId != 0) {
+            query.setParameter("tagId", tagId);
+        }
 
         if (parent != null) {
             query.setParameter("parent", parent);

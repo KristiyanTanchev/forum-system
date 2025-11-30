@@ -16,63 +16,59 @@
         <div class="container">
             <section class="card editor-card-wide">
                 <div class="form-header">
-                    <h1 class="form-title">Create new topic</h1>
+                    <h1 class="form-title">Create a new topic</h1>
                     <p class="form-subtitle">
-                        Start a discussion in the selected folder.
+                        Start a discussion in <span th:text="${folder.name}"></span> folder.
                     </p>
                 </div>
 
-                <form>
-                    <div class="form-row-split">
-                        <div class="form-field">
-                            <label class="form-label" for="post-folder">Folder</label>
-                            <select class="form-select" id="post-folder" name="folderId">
-                                <option>Movies / TV Shows</option>
-                                <option>Movies / Sci-Fi</option>
-                                <option>TV / Star Trek</option>
-                            </select>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label" for="post-type">Type <span>(optional)</span></label>
-                            <select class="form-select" id="post-type" name="type">
-                                <option>Discussion</option>
-                                <option>Review</option>
-                                <option>Question</option>
-                                <option>Recommendation</option>
-                            </select>
-                        </div>
-                    </div>
-
+                <form method="post" th:action="@{/forum/posts}" th:object="${post}">
                     <div class="form-field">
                         <label class="form-label" for="post-title">Title</label>
                         <input class="form-input" id="post-title" name="title"
                                placeholder="e.g. Is Andor the best Star Wars series so far?"
+                               th:field="*{title}"
                                type="text"/>
                     </div>
 
                     <div class="form-field">
                         <label class="form-label" for="post-body">Content</label>
-                        <textarea class="form-textarea" id="post-body"
+                        <textarea class="form-textarea form-textarea-wide" id="post-body"
                                   name="content"
-                                  placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."></textarea>
+                                  placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."
+                                  th:field="*{content}"></textarea>
                         <p class="form-help">
-                            Markdown supported. Be respectful and mark spoilers clearly.
+                            Markdown supported. Add spoilers with >! text, **bold** for emphasis, *italic* for emphasis,
+                            [text](url) for links.
                         </p>
                     </div>
 
                     <div class="form-field">
-                        <label class="form-label" for="post-tags">Tags <span>(optional)</span></label>
-                        <input class="form-input" id="post-tags" name="tags"
-                               placeholder="e.g. star wars, andor, tv show"
+                        <label class="form-label" for="post-tags-1">Tag 1 <span>(optional)</span></label>
+                        <input class="form-input" id="post-tags-1" name="tags"
+                               placeholder="e.g. star wars"
+                               th:field="*{tag1}"
+                               type="text"/>
+                        <br/><br/>
+                        <label class="form-label" for="post-tags-2">Tag 2 <span>(optional)</span></label>
+                        <input class="form-input" id="post-tags-2" name="tags"
+                               placeholder="e.g. andor"
+                               th:field="*{tag2}"
+                               type="text"/>
+                        <br/><br/>
+                        <label class="form-label" for="post-tags-3">Tag 3 <span>(optional)</span></label>
+                        <input class="form-input" id="post-tags-3" name="tags"
+                               placeholder="e.g. tv show"
+                               th:field="*{tag3}"
                                type="text"/>
                         <p class="form-help">
-                            Comma-separated tags help others find your topic.
+                            Enter up to three tags to help others find your topic.
                         </p>
                     </div>
+                    <input th:field="*{folderId}" type="hidden"/>
 
                     <div class="form-actions">
                         <button class="btn btn-primary" type="submit">Create topic</button>
-                        <button class="btn btn-ghost" type="button">Cancel</button>
                     </div>
                 </form>
             </section>

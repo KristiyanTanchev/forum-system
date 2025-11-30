@@ -3,6 +3,7 @@ package com.team3.forum.helpers;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
+import com.team3.forum.services.FolderService;
 import com.team3.forum.services.PostService;
 import com.team3.forum.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,13 @@ import org.springframework.stereotype.Component;
 public class PostMapper {
     private final UserService userService;
     private final PostService postService;
+    private final FolderService folderService;
 
     @Autowired
-    public PostMapper(UserService userService, PostService postService, PostService postService1) {
+    public PostMapper(UserService userService, PostService postService, FolderService folderService) {
         this.userService = userService;
-        this.postService = postService1;
+        this.postService = postService;
+        this.folderService = folderService;
     }
 
 
@@ -27,6 +30,7 @@ public class PostMapper {
         return Post.builder()
                 .content(dto.getContent())
                 .title(dto.getTitle())
+                .folder(folderService.findById(dto.getFolderId()))
                 .user(userService.findById(creatorId))
                 .build();
     }
@@ -39,8 +43,12 @@ public class PostMapper {
                 .creator(post.getUser().getUsername())
                 .commentsCount(post.getComments().size())
                 .views(postService.getPostViews(post.getId()))
+                .likedBy(post.getLikedBy().stream().toList())
                 .updatedAt(post.getUpdatedAt())
                 .userId(post.getUser().getId())
+                .comments(post.getComments().stream().toList())
+                .folderName(post.getFolder().getName())
+                .tags(post.getTags().stream().toList())
                 .build();
     }
 }

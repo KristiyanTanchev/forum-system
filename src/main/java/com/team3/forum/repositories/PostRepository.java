@@ -24,5 +24,7 @@ public interface PostRepository {
 
     List<Post> findPostsInFolderPaginated(int page, int size, Folder parent, PostSortField orderBy, SortDirection direction);
 
+    List<Post> findPostsInFolderWithTagPaginated(int page, int size, Folder parent, PostSortField orderBy, SortDirection direction, int tagId);
+
     List<Post> findAllSortedByViewsLastDays(int limit, int days);
 }

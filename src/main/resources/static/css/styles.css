@@ -1463,3 +1463,7 @@ a {
     border-color: rgba(251, 191, 36, 0.5);
     color: #fcd34d;
 }
+
+.form-textarea-wide {
+    width: 100%;
+}

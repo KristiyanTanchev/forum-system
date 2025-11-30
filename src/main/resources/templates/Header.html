@@ -2,6 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
+
 <header class="navbar" th:fragment="navigation-bar">
     <div class="container">
         <div class="navbar-inner">
@@ -15,8 +16,8 @@
 
             <nav class="nav-links">
                 <a th:href="@{/forum}">Home</a>
-                <a href="#">Categories</a>
-                <a href="#">Latest</a>
+                <a th:href="@{/path/root}">Browse by folder</a>
+                <a th:href="@{/forum/posts}">Browse by tag</a>
                 <a href="#">About</a>
             </nav>
 

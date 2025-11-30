@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <title>Forum App – Home</title>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <link href="/css/styles.css" rel="stylesheet"/>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
 </head>
 <body>
 <div class="page">
@@ -19,7 +21,7 @@
                 <section class="card post-card">
                     <header class="post-header">
                         <div class="post-label-row">
-                            <span class="pill">Discussion (TODO: tags go here)</span>
+                            <span class="pill" th:each="tag: ${tags}" th:text="${tag.name}"></span>
                         </div>
                         <h1 class="post-title" th:text="${post.title}"></h1>
                         <div class="post-meta">
@@ -39,10 +41,11 @@
                         <p th:text="${post.content}"></p>
                     </article>
 
-                    <!-- SIMPLE POST ACTIONS (when logged in) -->
-                    <div class="post-actions">
+                    <div class="post-actions" sec:authorize="isAuthenticated()">
                         <button class="btn btn-primary" type="button">Reply</button>
-                        <button class="btn btn-ghost" type="button">Follow thread</button>
+                        <button class="btn btn-ghost" type="button">Follow thread (TODO?)</button>
+                        <button class=" btn btn-ghost" type="button">Like ·
+                            <span th:text="${post.likedBy.size()}">24</span></button>
                     </div>
                 </section>
 
@@ -50,18 +53,36 @@
                 <section class="card comment-section">
                     <header class="card-header">
                         <div>
-                            <div class="card-title">Comments (TODO whole section)</div>
-                            <div class="card-subtitle">38 replies · sorted by newest</div>
+                            <div class="card-title">Comments</div>
+                            <div class="card-subtitle"><span th:text="${post.comments.size()}"></span> replies ·
+                                sorted by <span th:if="${sortCommentsBy=='date'}">newest</span>
+                                <span th:if="${sortCommentsBy=='likes'}">likes</span></div>
                         </div>
-                        <a class="link-small" href="#">Change sort</a>
+                        <div class="folder-toolbar">
+                            <!--                            <div class="folder-toolbar-left">-->
+                            <!--                                <span class="card-title">Posts:</span>-->
+                            <!--                                <span class="folder-toolbar-meta">Showing 1–10 of 21</span>-->
+                            <!--                            </div>-->
+                            <div class="folder-toolbar-right">
+                                <select class="comment-order-by folder-select"
+                                        name="sortCommentsBy"
+                                        th:value="${sortCommentsBy}">
+                                    <option th:selected="${sortCommentsBy == 'date'}" value="date">Sort by newest
+                                    </option>
+                                    <option th:selected="${sortCommentsBy == 'likes'}" value="likes">Sort by most
+                                        likes
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
                     </header>
 
                     <!-- COMMENT FORM (visible when logged in) -->
-                    <div class="comment-form">
+                    <div class="comment-form" sec:authorize="isAuthenticated()">
                         <div class="comment-form-header">
                             <span class="comment-form-avatar">M</span>
                             <div class="comment-form-meta">
-                                <div class="comment-form-user">You</div>
+                                <div class="comment-form-user" sec:authentication="name">You</div>
                                 <div class="comment-form-hint">Share your thoughts about this discussion.</div>
                             </div>
                         </div>
@@ -73,7 +94,8 @@
                                     rows="4"></textarea>
                             <div class="comment-form-actions">
                                 <button class="btn btn-primary" type="submit">Post comment</button>
-                                <span class="comment-form-note">Markdown supported · Be respectful</span>
+                                <span class="comment-form-note">Markdown supported. Add spoilers with >!
+                                    text, **bold** for emphasis, *italic* for emphasis, [text](url) for links.</span>
                             </div>
                         </form>
                     </div>
@@ -81,22 +103,23 @@
                     <!-- COMMENT LIST -->
                     <div class="comment-list">
                         <!-- Comment 1 -->
-                        <article class="comment">
+                        <article class="comment" th:each="comment: ${post.comments}">
                             <header class="comment-header">
                                 <div class="comment-avatar">A</div>
                                 <div class="comment-header-main">
                                     <div class="comment-author-row">
-                                        <span class="comment-author">ana</span>
-                                        <span class="comment-badge comment-badge-mod">Mod</span>
+                                        <span class="comment-author" th:text="${comment.user.username}">ana</span>
+                                        <span class="comment-badge comment-badge-mod" th:if="${comment.user.isAdmin()}">
+                                            Mod</span>
                                     </div>
                                     <div class="comment-meta">
-                                        <span>1 hour ago</span>
+                                        <span>1 hour ago (TODO)</span>
                                         <span>·</span>
-                                        <span>Edited</span>
+                                        <span>Edited (TODO)</span>
                                     </div>
                                 </div>
                             </header>
-                            <div class="comment-body">
+                            <div class="comment-body" th:text="${comment.content}">
                                 <p>
                                     For me, <em>The Last Kingdom</em> wins overall. The pacing is better and
                                     Uhtred has a more consistent arc than anyone in <em>Vikings</em>.
@@ -108,60 +131,9 @@
                             </div>
                             <footer class="comment-footer">
                                 <button class="comment-action" type="button">Reply</button>
-                                <button class="comment-action" type="button">Like · 24</button>
+                                <button class="comment-action" type="button">Like ·
+                                    <span th:text="${comment.likedBy.size()}">24</span></button>
                                 <button class="comment-action comment-action-soft" type="button">Report</button>
-                            </footer>
-                        </article>
-
-                        <!-- Comment 2 -->
-                        <article class="comment">
-                            <header class="comment-header">
-                                <div class="comment-avatar">G</div>
-                                <div class="comment-header-main">
-                                    <div class="comment-author-row">
-                                        <span class="comment-author">george</span>
-                                    </div>
-                                    <div class="comment-meta">
-                                        <span>47 minutes ago</span>
-                                    </div>
-                                </div>
-                            </header>
-                            <div class="comment-body">
-                                <p>
-                                    I’d say: if you want character-driven drama → <strong>The Last Kingdom</strong>.
-                                    If you want iconic moments and larger-than-life scenes → <strong>Vikings</strong>.
-                                </p>
-                            </div>
-                            <footer class="comment-footer">
-                                <button class="comment-action" type="button">Reply</button>
-                                <button class="comment-action" type="button">Like · 10</button>
-                            </footer>
-                        </article>
-
-                        <!-- Nested reply example (visual only) -->
-                        <article class="comment comment-nested">
-                            <header class="comment-header">
-                                <div class="comment-avatar">M</div>
-                                <div class="comment-header-main">
-                                    <div class="comment-author-row">
-                                        <span class="comment-author">martin</span>
-                                    </div>
-                                    <div class="comment-meta">
-                                        <span>32 minutes ago</span>
-                                        <span>· replying to george</span>
-                                    </div>
-                                </div>
-                            </header>
-                            <div class="comment-body">
-                                <p>
-                                    That’s a good way to frame it. I think I’ll rewatch the first season of
-                                    <em>Vikings</em> and then jump into the later seasons of
-                                    <em>The Last Kingdom</em>.
-                                </p>
-                            </div>
-                            <footer class="comment-footer">
-                                <button class="comment-action" type="button">Reply</button>
-                                <button class="comment-action" type="button">Like · 4</button>
                             </footer>
                         </article>
                     </div>
@@ -169,9 +141,14 @@
             </div>
         </div>
     </main>
-
     <!-- FOOTER -->
     <footer th:replace="Footer:: footer"></footer>
 </div>
 </body>
+<script>
+    $('.comment-order-by').on('change', function () {
+        console.log('a');
+        window.location.search = $.param({sortCommentsBy: $(this).val()});
+    })
+</script>
 </html>

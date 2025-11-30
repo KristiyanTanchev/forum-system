@@ -11,4 +11,6 @@ public interface TagRepository {
     List<Tag> findAll();
     void deleteById(int id);
     void delete(Tag entity);
+
+    List<Tag> findTopByOrderByPostsCountDesc(int limit);
 }

@@ -34,7 +34,8 @@
                     </div>
                 </div>
                 <div class="folder-header-actions">
-                    <button class="btn btn-primary" type="button">New topic</button>
+                    <a class="btn btn-primary" th:href="@{/forum/posts/new?folderId={folderId}(folderId=${folder.id})}"
+                       type="button">New topic</a>
                 </div>
             </div>
 
