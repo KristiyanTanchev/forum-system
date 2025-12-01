@@ -1,5 +1,6 @@
 package com.team3.forum.controllers.mvc;
 
+import com.team3.forum.models.loginDtos.LoginRequestDto;
 import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.security.JwtTokenProvider;
 import com.team3.forum.services.UserService;
@@ -32,7 +33,8 @@ public class AuthMvcController {
     }
 
     @GetMapping("/login")
-    public String getLoginPage() {
+    public String getLoginPage(Model model) {
+        model.addAttribute("loginRequestDto", new LoginRequestDto());
         return "LoginView";
     }
 
@@ -43,14 +45,19 @@ public class AuthMvcController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
-                        @RequestParam(required = false) String rememberMe,
-                        HttpServletResponse response) {
+    public String login(@Valid @ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto,
+                        BindingResult bindingResult,
+                        HttpServletResponse response,
+                        Model model) {
+
+        if (bindingResult.hasErrors()) {
+            return "LoginView";
+        }
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
+                new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword())
         );
+
         String jwt = jwtTokenProvider.generateToken(authentication);
 
         Cookie jwtCookie = new Cookie("jwt", jwt);
@@ -58,7 +65,7 @@ public class AuthMvcController {
         jwtCookie.setSecure(false);
         jwtCookie.setPath("/");
 
-        if (rememberMe != null) {
+        if (loginRequestDto.isRememberMe()) {
             jwtCookie.setMaxAge(30 * 24 * 60 * 60);  // 30 days
         } else {
             jwtCookie.setMaxAge(24 * 60 * 60);  // 1 day
@@ -79,7 +86,7 @@ public class AuthMvcController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletResponse response){
+    public String logout(HttpServletResponse response) {
         Cookie jwtCookie = new Cookie("jwt", null);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setSecure(false);
