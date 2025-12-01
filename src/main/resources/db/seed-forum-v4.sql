@@ -1,3 +1,4 @@
+-- 1) USERS FIRST
 INSERT INTO forum.users (user_id, first_name, last_name, username, email, password, is_admin, created_at, phone,
                          avatar_url, is_blocked, is_deleted)
 VALUES (1, 'Alice', 'Adminson', 'alice.admin', 'alice.admin@example.com',
@@ -87,137 +88,33 @@ INSERT INTO forum.users (user_id, first_name, last_name, username, email, passwo
 VALUES (22, 'Yvonne', 'Userton', 'yvonne.user', 'yvonne.user@example.com',
         '$2a$10$CZE9.LfucJLVP/hlp6IVbuoFUFE1scio7eYPI4145i1wGU4JmukVi', 0, '2025-11-04 13:00:00', null, null, 0, 0);
 
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 1);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 1);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 2);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (5, 2);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 3);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (5, 4);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 5);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (1, 6);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (5, 6);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (1, 7);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (1, 8);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (8, 8);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (1, 9);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (1, 10);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 11);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 12);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (10, 12);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 13);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 14);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (9, 14);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 15);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 16);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 17);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 18);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 19);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (6, 19);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 20);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 21);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 22);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (9, 22);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 23);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 24);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (5, 24);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 25);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 26);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 26);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 27);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (5, 28);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (9, 29);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 30);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 31);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (10, 31);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 32);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (9, 32);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 33);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 34);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (2, 35);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 36);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 37);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 38);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 39);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (3, 40);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 41);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 42);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (9, 42);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 43);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 44);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (5, 44);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 45);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (7, 46);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (4, 47);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (7, 47);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (7, 48);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (7, 49);
-INSERT INTO forum.tags_posts (tag_id, post_id)
-VALUES (7, 50);
 
+-- 2) FOLDERS (ROOT FIRST, THEN CHILDREN)
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (11, null, 'Root', 'root', '2025-11-28 00:44:38', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (1, 11, 'Movies', 'movies', '2025-11-20 10:00:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (2, 11, 'Series', 'series', '2025-11-20 10:05:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (3, 1, 'Action Movies', 'action-movies', '2025-11-20 10:10:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (4, 1, 'Drama Movies', 'drama-movies', '2025-11-20 10:15:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (5, 1, 'Comedy Movies', 'comedy-movies', '2025-11-20 10:20:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (6, 1, 'Sci-Fi Movies', 'sci-fi-movies', '2025-11-20 10:25:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (7, 2, 'Drama Series', 'drama-series', '2025-11-20 10:30:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (8, 2, 'Comedy Series', 'comedy-series', '2025-11-20 10:35:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (9, 2, 'Sci-Fi Series', 'sci-fi-series', '2025-11-20 10:40:00', null);
+INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
+VALUES (10, 2, 'Animated Series', 'animated-series', '2025-11-20 10:45:00', null);
+
+
+-- 3) TAGS (PARENTS FOR tags_posts)
 INSERT INTO forum.tags (tag_id, name)
 VALUES (1, 'action');
 INSERT INTO forum.tags (tag_id, name)
@@ -239,57 +136,8 @@ VALUES (8, 'superhero');
 INSERT INTO forum.tags (tag_id, name)
 VALUES (5, 'thriller');
 
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (1, 4, 1, '2025-11-19');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (2, 5, 1, '2025-11-20');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (3, 6, 2, '2025-11-21');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (4, 7, 3, '2025-11-21');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (5, 8, 3, '2025-11-22');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (6, 9, 4, '2025-11-22');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (7, 10, 5, '2025-11-23');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (8, 11, 6, '2025-11-23');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (9, 12, 7, '2025-11-24');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (10, 13, 8, '2025-11-24');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (11, 14, 9, '2025-11-25');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (12, 15, 10, '2025-11-25');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (13, 16, 11, '2025-11-26');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (14, 17, 12, '2025-11-26');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (15, 18, 13, '2025-11-27');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (24, 8, 15, '2025-11-18');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (25, 9, 22, '2025-11-19');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (16, 19, 26, '2025-11-20');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (17, 20, 27, '2025-11-21');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (23, 7, 28, '2025-11-18');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (18, 21, 31, '2025-11-22');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (19, 22, 36, '2025-11-23');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (20, 4, 41, '2025-11-24');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (21, 5, 46, '2025-11-25');
-INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
-VALUES (22, 6, 50, '2025-11-26');
 
+-- 4) POSTS (NEED users + folders)
 INSERT INTO forum.posts (post_id, user_id, title, content, created_at, updated_at, deleted_at, is_deleted, folder_id)
 VALUES (1, 4, 'Movies general discussion 01',
         'Seeded discussion content about movies and series for testing the forum application. Topic focuses on general movie talk.',
@@ -495,6 +343,141 @@ VALUES (51, 1, 'Test post in the root folder',
         'Some stuff to tell everybody to be civil and what not. You know the general stuff', '2025-11-28 09:02:08',
         null, null, 0, 11);
 
+
+-- 5) TAGS_POSTS (NEED tags + posts)
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 1);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 1);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 2);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (5, 2);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 3);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (5, 4);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 5);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (1, 6);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (5, 6);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (1, 7);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (1, 8);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (8, 8);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (1, 9);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (1, 10);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 11);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 12);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (10, 12);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 13);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 14);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (9, 14);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 15);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 16);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 17);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 18);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 19);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (6, 19);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 20);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 21);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 22);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (9, 22);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 23);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 24);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (5, 24);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 25);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 26);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 26);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 27);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (5, 28);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (9, 29);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 30);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 31);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (10, 31);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 32);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (9, 32);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 33);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 34);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (2, 35);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 36);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 37);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 38);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 39);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (3, 40);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 41);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 42);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (9, 42);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 43);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 44);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (5, 44);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 45);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (7, 46);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (4, 47);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (7, 47);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (7, 48);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (7, 49);
+INSERT INTO forum.tags_posts (tag_id, post_id)
+VALUES (7, 50);
+
+
+-- 6) LIKES (NEED users + posts)
 INSERT INTO forum.likes (user_id, post_id)
 VALUES (4, 1);
 INSERT INTO forum.likes (user_id, post_id)
@@ -586,29 +569,61 @@ VALUES (9, 46);
 INSERT INTO forum.likes (user_id, post_id)
 VALUES (10, 50);
 
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (1, 11, 'Movies', 'movies', '2025-11-20 10:00:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (2, 11, 'Series', 'series', '2025-11-20 10:05:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (3, 1, 'Action Movies', 'action-movies', '2025-11-20 10:10:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (4, 1, 'Drama Movies', 'drama-movies', '2025-11-20 10:15:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (5, 1, 'Comedy Movies', 'comedy-movies', '2025-11-20 10:20:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (6, 1, 'Sci-Fi Movies', 'sci-fi-movies', '2025-11-20 10:25:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (7, 2, 'Drama Series', 'drama-series', '2025-11-20 10:30:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (8, 2, 'Comedy Series', 'comedy-series', '2025-11-20 10:35:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (9, 2, 'Sci-Fi Series', 'sci-fi-series', '2025-11-20 10:40:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (10, 2, 'Animated Series', 'animated-series', '2025-11-20 10:45:00', null);
-INSERT INTO forum.folders (folder_id, parent_id, name, slug, created_at, updated_at)
-VALUES (11, null, 'Root', 'root', '2025-11-28 00:44:38', null);
 
+-- 7) POSTS_USERS_VIEWS (NEED users + posts)
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (1, 4, 1, '2025-11-19');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (2, 5, 1, '2025-11-20');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (3, 6, 2, '2025-11-21');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (4, 7, 3, '2025-11-21');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (5, 8, 3, '2025-11-22');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (6, 9, 4, '2025-11-22');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (7, 10, 5, '2025-11-23');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (8, 11, 6, '2025-11-23');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (9, 12, 7, '2025-11-24');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (10, 13, 8, '2025-11-24');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (11, 14, 9, '2025-11-25');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (12, 15, 10, '2025-11-25');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (13, 16, 11, '2025-11-26');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (14, 17, 12, '2025-11-26');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (15, 18, 13, '2025-11-27');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (24, 8, 15, '2025-11-18');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (25, 9, 22, '2025-11-19');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (16, 19, 26, '2025-11-20');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (17, 20, 27, '2025-11-21');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (23, 7, 28, '2025-11-18');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (18, 21, 31, '2025-11-22');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (19, 22, 36, '2025-11-23');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (20, 4, 41, '2025-11-24');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (21, 5, 46, '2025-11-25');
+INSERT INTO forum.posts_users_views (posts_users_views_id, user_id, post_id, view_date)
+VALUES (22, 6, 50, '2025-11-26');
+
+
+-- 8) COMMENTS (NEED users + posts)
 INSERT INTO forum.comments (comment_id, post_id, user_id, content, created_at, updated_at, deleted_at, is_deleted)
 VALUES (1, 1, 5, 'Really like this general movie discussion thread.', '2025-11-23 09:00:00', null, null, 0);
 INSERT INTO forum.comments (comment_id, post_id, user_id, content, created_at, updated_at, deleted_at, is_deleted)

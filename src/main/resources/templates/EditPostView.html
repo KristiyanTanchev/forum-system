@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Forum App – Home</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
+    <title>Edit post</title>
 </head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
 
-    <!-- MAIN -->
+<section layout:fragment="content">
     <main class="editor-page">
         <div class="container">
             <section class="card editor-card-wide">
@@ -47,10 +42,5 @@
             </section>
         </div>
     </main>
-
-
-    <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
-</div>
-</body>
+</section>
 </html>

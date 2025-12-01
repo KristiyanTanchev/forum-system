@@ -1,18 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Forum App – Home</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    <script th:src="@{/js/app.js}"></script>
+    <title>View post</title>
 </head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
 
+<section layout:fragment="content">
     <!-- MAIN CONTENT -->
     <main class="post-page">
         <div class="container">
@@ -141,14 +135,15 @@
             </div>
         </div>
     </main>
-    <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
-</div>
-</body>
-<script>
-    $('.comment-order-by').on('change', function () {
-        console.log('a');
-        window.location.search = $.param({sortCommentsBy: $(this).val()});
-    })
-</script>
+</section>
+<th:block layout:fragment="head">
+    <script th:inline="javascript">
+        $(function () {
+            $('.comment-order-by').on('change', function () {
+                console.log('a');
+                window.location.search = $.param({sortCommentsBy: $(this).val()});
+            });
+        });
+    </script>
+</th:block>
 </html>

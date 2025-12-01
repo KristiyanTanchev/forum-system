@@ -26,4 +26,6 @@ public interface UserRepository {
     boolean existsByUsername(String username);
 
     List<User> searchUsers(String searchTerm);
+
+    int getUsersCount();
 }

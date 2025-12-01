@@ -108,7 +108,7 @@ public class PostRepositoryImpl implements PostRepository {
                                                         PostSortField orderBy,
                                                         SortDirection direction,
                                                         int tagId) {
-        StringBuilder queryString = new StringBuilder("select distinct p from Post p join p.tags t where p.isDeleted = false");
+        StringBuilder queryString = new StringBuilder("select distinct p from Post p left join p.tags t where p.isDeleted = false");
 
         if (parent != null) {
             queryString.append(" and p.folder = :parent");
@@ -136,6 +136,31 @@ public class PostRepositoryImpl implements PostRepository {
                 .setFirstResult((page - 1) * size)
                 .setMaxResults(size)
                 .getResultList();
+    }
+
+    @Override
+    public int countPostsInFolderWithTag(Folder parent, int tagId) {
+        StringBuilder queryString = new StringBuilder(
+                "select count(distinct p) from Post p left join p.tags t where p.isDeleted = false"
+        );
+
+        if (parent != null) {
+            queryString.append(" and p.folder = :parent");
+        }
+        if (tagId != 0) {
+            queryString.append(" and t.id = :tagId");
+        }
+
+        var query = em.createQuery(queryString.toString(), Long.class);
+
+        if (parent != null) {
+            query.setParameter("parent", parent);
+        }
+        if (tagId != 0) {
+            query.setParameter("tagId", tagId);
+        }
+
+        return query.getSingleResult().intValue();
     }
 
     @Override

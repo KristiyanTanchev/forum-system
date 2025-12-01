@@ -10,6 +10,7 @@ import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.services.FolderService;
 import com.team3.forum.services.PostService;
 import com.team3.forum.services.TagService;
+import com.team3.forum.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,14 +28,16 @@ public class HomeMvcController {
     private final FolderService folderService;
     private final FolderMapper folderMapper;
     private final TagService tagService;
+    private final UserService userService;
 
     @Autowired
-    public HomeMvcController(PostService postService, PostMapper postMapper, FolderService folderService, FolderMapper folderMapper, TagService tagService) {
+    public HomeMvcController(PostService postService, PostMapper postMapper, FolderService folderService, FolderMapper folderMapper, TagService tagService, UserService userService) {
         this.postService = postService;
         this.postMapper = postMapper;
         this.folderService = folderService;
         this.folderMapper = folderMapper;
         this.tagService = tagService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -55,6 +58,8 @@ public class HomeMvcController {
                 .toList();
 
         model.addAttribute("tags", tags);
+
+        model.addAttribute("usersCount", userService.getUsersCount());
 
         return "HomeView";
     }

@@ -3,8 +3,8 @@ package com.team3.forum.controllers.mvc;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Folder;
-import com.team3.forum.models.Post;
 import com.team3.forum.models.folderDtos.FolderResponseDto;
+import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.services.FolderService;
 import com.team3.forum.services.PostService;
@@ -40,7 +40,13 @@ public class FolderMvcController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "date") String orderBy,
             @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int tagId,
             Model model) {
+
+        model.addAttribute("tagId", tagId);
+        model.addAttribute("orderBy", orderBy);
+        model.addAttribute("direction", direction);
+
         List<String> slugs;
         if (path.isEmpty() || path.equals("/")) {
             slugs = List.of("root");
@@ -48,6 +54,10 @@ public class FolderMvcController {
             slugs = List.of(path.substring(1).split("/"));
         }
         Folder folder = folderService.getFolderByPath(slugs);
+
+        PostPage pageInfo = postService.getPostsInFolderPaginated(folder, page, orderBy, direction, tagId);
+
+        model.addAttribute("pageInfo", pageInfo);
 
         List<Folder> siblingFolders = folderService.getSiblingFolders(folder);
         List<FolderResponseDto> siblingFolderResponseDtos = siblingFolders.stream()
@@ -73,11 +83,7 @@ public class FolderMvcController {
 
         model.addAttribute("childFolders", childFolderResponseDtos);
 
-        List<Post> posts = postService
-                .getPostsInFolderPaginated(folder, 1, "date", "desc");
-
-
-        List<PostResponseDto> mappedPosts = posts.stream()
+        List<PostResponseDto> mappedPosts = pageInfo.getItems().stream()
                 .map(postMapper::toResponseDto)
                 .toList();
         model.addAttribute("posts", mappedPosts);

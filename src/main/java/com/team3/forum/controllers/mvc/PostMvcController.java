@@ -5,6 +5,7 @@ import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.Tag;
 import com.team3.forum.models.postDtos.PostCreationDto;
+import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.security.CustomUserDetails;
@@ -43,13 +44,18 @@ public class PostMvcController {
     public String getAllPosts(
             Model model,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "date") String orderBy,
+            @RequestParam(defaultValue = "created_at") String orderBy,
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(defaultValue = "0") int tagId,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        List<PostResponseDto> posts = postService.getPostsInFolderPaginated(null, page, orderBy, direction, tagId)
-                .stream().map(postMapper::toResponseDto).toList();
+        PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, orderBy, direction, tagId);
+        model.addAttribute("pageInfo", pageInfo);
+        List<PostResponseDto> posts = pageInfo.getItems().stream()
+                .map(postMapper::toResponseDto).toList();
+
         model.addAttribute("posts", posts);
+
+
         if (tagId != 0) {
             Tag tag = tagService.findById(tagId);
             model.addAttribute("tag",
@@ -63,6 +69,8 @@ public class PostMvcController {
         model.addAttribute("tagId", tagId);
 
         model.addAttribute("orderBy", orderBy);
+
+        model.addAttribute("direction", direction);
 
         model.addAttribute("tags",
                 tagService.findAll().stream()
@@ -113,10 +121,12 @@ public class PostMvcController {
 
     @PostMapping("/new")
     public String createPost(
+            Model model,
             @Valid @ModelAttribute("post") PostCreationDto postCreationDto,
             BindingResult errors,
             @AuthenticationPrincipal CustomUserDetails principal) {
         if (errors.hasErrors()) {
+            model.addAttribute("folder", folderMapper.toPathDto(folderService.findById(postCreationDto.getFolderId())));
             return "CreatePostView";
         }
         if (principal == null) {

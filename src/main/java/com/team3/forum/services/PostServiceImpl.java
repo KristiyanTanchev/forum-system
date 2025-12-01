@@ -8,6 +8,7 @@ import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.enums.PostSortField;
 import com.team3.forum.models.enums.SortDirection;
+import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.repositories.PostRepository;
 import com.team3.forum.repositories.PostViewRepository;
@@ -155,13 +156,33 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId) {
+    public PostPage getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId) {
         PostSortField sortField = getSortField(orderBy);
         SortDirection sortDirection = getSortDirection(direction);
         if (page < 1) {
             page = 1;
         }
-        return postRepository.findPostsInFolderWithTagPaginated(page, POSTS_PAGE_SIZE, folder, sortField, sortDirection, tagId);
+        int totalPosts = postRepository.countPostsInFolderWithTag(folder, tagId);
+        int searchPage = Math.min((totalPosts - 1) / POSTS_PAGE_SIZE + 1, page);
+
+        List<Post> posts = postRepository.findPostsInFolderWithTagPaginated(
+                searchPage, POSTS_PAGE_SIZE, folder, sortField, sortDirection, tagId);
+
+        int totalPages = ((totalPosts - 1) / POSTS_PAGE_SIZE) + 1;
+        page = Math.min(page, totalPages);
+        int fromItem = (page - 1) * POSTS_PAGE_SIZE + 1;
+        int toItem = Math.min(totalPosts, page * POSTS_PAGE_SIZE);
+
+        return PostPage.builder()
+                .items(posts)
+                .fromItem(fromItem)
+                .toItem(toItem)
+                .page(page)
+                .size(POSTS_PAGE_SIZE)
+                .totalItems(totalPosts)
+                .totalPages(totalPages)
+                .tagId(tagId)
+                .build();
     }
 
     @Override

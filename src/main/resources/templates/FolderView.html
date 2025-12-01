@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
 <head>
-    <meta charset="UTF-8"/>
-    <title>Forum App – Home</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
+    <title>View posts</title>
 </head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
-    <!-- MAIN -->
+
+<section layout:fragment="content">
     <main class="folder-page">
         <div class="container">
             <!-- Breadcrumb & header -->
@@ -135,39 +132,44 @@
 
                 <!-- RIGHT: posts list in this folder -->
                 <section class="card folder-posts">
-                    <div class="folder-toolbar">
-                        <div class="folder-toolbar-left">
-                            <span class="card-title" th:text="'Topics in “' + ${folderName} + '“'"></span>
-                            <span class="folder-toolbar-meta">Showing 1–10 of 21</span>
+
+                    <form id="navigation-form" method="get" th:action="'/path' + ${path}">
+                        <div th:replace="~{PostFilterFragment:: post-filter(
+                            tags=${null},
+                            pageInfo=${pageInfo},
+                            tagId=${tagId},
+                            orderBy=${orderBy},
+                            direction=${direction})}">
                         </div>
-                        <div class="folder-toolbar-right">
-                            <select class="folder-select">
-                                <option>Sort by last activity</option>
-                                <option>Sort by newest</option>
-                                <option>Sort by most replies</option>
-                            </select>
-                        </div>
-                    </div>
+
+                    </form>
 
                     <div class="topic-list">
                         <!-- Topics -->
-                        <a th:replace="PostPreviewFragment:: post-preview"></a>
+                        <a th:replace="~{PostPreviewFragment:: post-preview(posts=${posts})}"></a>
                     </div>
 
-                    <!-- Simple pagination mockup -->
-                    <div class="folder-pagination">
-                        <button class="btn btn-ghost folder-page-btn" type="button">‹ Prev</button>
-                        <span class="folder-page-info">Page 1 of 3</span>
-                        <button class="btn btn-ghost folder-page-btn" type="button">Next ›</button>
-                    </div>
+                    <div th:replace="~{PostFilterFragment :: post-filter-buttons(pageInfo=${pageInfo})}"></div>
                 </section>
             </div>
         </div>
     </main>
+</section>
 
-
-    <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
-</div>
-</body>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        var form = $('#navigation-form')
+        $(form).find('select').on('change', function () {
+            $(this).closest('form').submit();
+        })
+        $('#prev-page-btn').on('click', function () {
+            $(form).find('select[name=page]').val(parseInt($('#navigation-form').find('select[name=page]').val()) - 1);
+            $(form).submit();
+        })
+        $('#next-page-btn').on('click', function () {
+            $(form).find('select[name=page]').val(parseInt($('#navigation-form').find('select[name=page]').val()) + 1);
+            $(form).submit();
+        })
+    </script>
+</th:block>
 </html>
