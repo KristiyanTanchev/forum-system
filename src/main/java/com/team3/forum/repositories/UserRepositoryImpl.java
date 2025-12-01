@@ -124,4 +124,9 @@ public class UserRepositoryImpl implements UserRepository {
                 .setParameter("search", searchPattern)
                 .getResultList();
     }
+
+    public int getUsersCount() {
+        return em.createQuery("select count(u) from User u where u.isDeleted = false", Long.class)
+                .getSingleResult().intValue();
+    }
 }

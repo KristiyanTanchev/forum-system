@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Forum App – Home</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
+    <title>Create post</title>
 </head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
 
-    <!-- MAIN -->
+<section layout:fragment="content">
     <main class="editor-page">
         <div class="container">
             <section class="card editor-card-wide">
@@ -22,13 +17,14 @@
                     </p>
                 </div>
 
-                <form method="post" th:action="@{/forum/posts}" th:object="${post}">
+                <form method="post" th:action="@{/forum/posts/new}" th:object="${post}">
                     <div class="form-field">
                         <label class="form-label" for="post-title">Title</label>
                         <input class="form-input" id="post-title" name="title"
                                placeholder="e.g. Is Andor the best Star Wars series so far?"
                                th:field="*{title}"
                                type="text"/>
+                        <div class="field-error" th:errors="*{title}"></div>
                     </div>
 
                     <div class="form-field">
@@ -37,6 +33,8 @@
                                   name="content"
                                   placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."
                                   th:field="*{content}"></textarea>
+
+                        <div class="field-error" th:errors="*{content}"></div>
                         <p class="form-help">
                             Markdown supported. Add spoilers with >! text, **bold** for emphasis, *italic* for emphasis,
                             [text](url) for links.
@@ -49,18 +47,21 @@
                                placeholder="e.g. star wars"
                                th:field="*{tag1}"
                                type="text"/>
+                        <div class="field-error" th:errors="*{tag1}"></div>
                         <br/><br/>
                         <label class="form-label" for="post-tags-2">Tag 2 <span>(optional)</span></label>
                         <input class="form-input" id="post-tags-2" name="tags"
                                placeholder="e.g. andor"
                                th:field="*{tag2}"
                                type="text"/>
+                        <div class="field-error" th:errors="*{tag2}"></div>
                         <br/><br/>
                         <label class="form-label" for="post-tags-3">Tag 3 <span>(optional)</span></label>
                         <input class="form-input" id="post-tags-3" name="tags"
                                placeholder="e.g. tv show"
                                th:field="*{tag3}"
                                type="text"/>
+                        <div class="field-error" th:errors="*{tag3}"></div>
                         <p class="form-help">
                             Enter up to three tags to help others find your topic.
                         </p>
@@ -74,10 +75,5 @@
             </section>
         </div>
     </main>
-
-
-    <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
-</div>
-</body>
+</section>
 </html>

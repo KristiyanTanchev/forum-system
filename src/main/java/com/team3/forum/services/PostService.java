@@ -2,6 +2,7 @@ package com.team3.forum.services;
 
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
+import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public interface PostService {
 
     List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction);
 
-    List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId);
+    PostPage getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId);
 
     List<Post> getTrendingPosts();
 }

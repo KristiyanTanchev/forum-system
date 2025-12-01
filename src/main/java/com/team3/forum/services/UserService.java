@@ -21,4 +21,6 @@ public interface UserService {
     void softDeleteById(int id);
     void restoreById(int id);
     UserStatsDto getUserStats(int userId);
+
+    int getUsersCount();
 }
