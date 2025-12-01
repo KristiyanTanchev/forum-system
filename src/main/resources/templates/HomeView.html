@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>CineTalk – Home</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
-</head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-    <!-- MAIN -->
+<head>
+    <title>Home</title>
+</head>
+
+
+<section layout:fragment="content">
     <main>
         <section class="hero">
             <div class="container hero-content">
@@ -34,15 +31,15 @@
 
                 <aside aria-label="Forum snapshot" class="hero-card">
                     <div class="hero-card-header">
-                        <span class="hero-card-title">This week on the forum (TODO whole section)</span>
+                        <span class="hero-card-title">In total on this CineTalk</span>
                         <span class="hero-card-badge">Live now</span>
                     </div>
 
-                    <div class="hero-card-main-number">142 new posts</div>
-                    <div class="card-subtitle">19 open threads need answers.</div>
+                    <div class="hero-card-main-number"><span th:text="${folders[0].postCount}"></span> posts</div>
+                    <div class="card-subtitle"><span th:text="${usersCount}"></span> registered users</div>
 
                     <div class="hero-card-meta">
-                        <span>Avg. response time: 14 min</span>
+                        <span>Posts this week: 14 min</span>
                         <span>Active members: 37</span>
                     </div>
 
@@ -75,15 +72,11 @@
 
                     <div class="topic-list">
                         <!-- Topics -->
-                        <a th:replace="PostPreviewFragment:: post-preview"></a>
+                        <a th:replace="~{PostPreviewFragment:: post-preview(posts=${posts})}"></a>
                     </div>
                 </section>
             </div>
         </section>
     </main>
-
-    <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
-</div>
-</body>
+</section>
 </html>

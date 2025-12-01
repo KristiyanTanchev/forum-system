@@ -2,7 +2,6 @@ package com.team3.forum.services;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
-import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
@@ -10,10 +9,10 @@ import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.models.userDtos.UserStatsDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 import com.team3.forum.repositories.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -177,4 +176,11 @@ public class UserServiceImpl implements UserService {
         User user = findById(userId);
         return userMapper.toStatsDto(user);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getUsersCount() {
+        return userRepository.getUsersCount();
+    }
+
 }
