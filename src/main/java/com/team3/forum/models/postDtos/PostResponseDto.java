@@ -33,6 +33,8 @@ public class PostResponseDto {
 
     private LocalDateTime updatedAt;
 
+    private LocalDateTime createdAt;
+
     private List<Comment> comments;
 
     private List<User> likedBy;
@@ -40,5 +42,7 @@ public class PostResponseDto {
     private String folderName;
 
     private List<Tag> tags;
+
+    private String createdAtString;
 
 }
