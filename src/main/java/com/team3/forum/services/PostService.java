@@ -35,4 +35,6 @@ public interface PostService {
     PostPage getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId);
 
     List<Post> getTrendingPosts();
+
+    int getPostsCount();
 }

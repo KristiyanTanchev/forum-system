@@ -183,4 +183,10 @@ public class PostRepositoryImpl implements PostRepository {
                 .setMaxResults(limit)
                 .getResultList();
     }
+
+    @Override
+    public int getPostsCount() {
+        return em.createQuery("select count(p) from Post p where p.isDeleted = false", Long.class)
+                .getSingleResult().intValue();
+    }
 }

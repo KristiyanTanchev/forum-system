@@ -71,4 +71,10 @@ public class CommentRepositoryImpl implements CommentRepository {
         }
         return result;
     }
+
+    @Override
+    public int getCommentCount() {
+        return em.createQuery("select count(c) from Comment c where c.isDeleted = false", Long.class)
+                .getSingleResult().intValue();
+    }
 }

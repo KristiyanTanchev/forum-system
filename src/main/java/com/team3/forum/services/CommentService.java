@@ -19,4 +19,5 @@ public interface CommentService {
     void likeComment(int commentId, int userId);
     void unlikeComment(int commentId, int userId);
     List<Comment> findAllByPostIdWithOrdering(int postId, String orderBy, String direction);
+    int getCommentCount();
 }

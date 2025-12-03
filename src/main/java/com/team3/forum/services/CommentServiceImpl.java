@@ -203,6 +203,11 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public int getCommentCount() {
+        return commentRepository.getCommentCount();
+    }
+
     private void verifyAdminOrOwner(Comment comment, User requester, RuntimeException error) {
         if (!requester.isAdmin() && comment.getUser().getId() != requester.getId()) {
             throw error;
