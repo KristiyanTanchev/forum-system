@@ -31,25 +31,30 @@
 
                 <aside aria-label="Forum snapshot" class="hero-card">
                     <div class="hero-card-header">
-                        <span class="hero-card-title">In total on this CineTalk</span>
+                        <span class="hero-card-title">In total on CineTalk</span>
                         <span class="hero-card-badge">Live now</span>
                     </div>
 
-                    <div class="hero-card-main-number"><span th:text="${folders[0].postCount}"></span> posts</div>
+                    <div class="hero-card-main-number"><span th:text="${folders[0].postCountWithSubfolders}"></span>
+                        posts
+                    </div>
                     <div class="card-subtitle"><span th:text="${usersCount}"></span> registered users</div>
 
-                    <div class="hero-card-meta">
-                        <span>Posts this week: 14 min</span>
-                        <span>Active members: 37</span>
-                    </div>
+                    <!--                    <div class="hero-card-meta">-->
+                    <!--                        <span>Posts this week: 14 min</span>-->
+                    <!--                        <span>Active members: 37</span>-->
+                    <!--                    </div>-->
 
-                    <div class="hero-card-chip-row">
-                        <span class="chip">🔥 most activity: Backend</span>
-                        <span class="chip">✨ new: Frontend UX</span>
-                    </div>
+                    <!--                    <div class="hero-card-chip-row">-->
+                    <!--                        <span class="chip">🔥 most activity: Backend</span>-->
+                    <!--                        <span class="chip">✨ new: Frontend UX</span>-->
+                    <!--                    </div>-->
 
-                    <div style="margin-top:0.8rem; display:flex; justify-content:flex-end;">
-                        <a class="btn btn-primary" th:href="@{/forum/posts}">
+                    <div
+                            sec:authorize="isAuthenticated()"
+                            style="margin-top:0.8rem; display:flex; justify-content:flex-end;"
+                    >
+                        <a class="btn btn-primary" th:href="@{/forum/posts/new}">
                             Create new topic
                         </a>
                     </div>

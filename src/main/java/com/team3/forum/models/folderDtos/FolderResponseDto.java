@@ -21,4 +21,6 @@ public class FolderResponseDto {
     private String path;
     private int folderCount;
     private List<FolderPathDto> pathFolders;
+    private int postCountWithSubfolders;
+    private String lastActivity;
 }
