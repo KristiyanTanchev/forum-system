@@ -129,4 +129,81 @@ public class UserRepositoryImpl implements UserRepository {
         return em.createQuery("select count(u) from User u where u.isDeleted = false", Long.class)
                 .getSingleResult().intValue();
     }
+
+    @Override
+    public List<User> findAllWithFilterPaginated(int page, int size, String searchQuery,
+                                                 String statusFilter, String sortBy, String direction) {
+
+        StringBuilder queryString = new StringBuilder("from User u");
+        queryString.append(buildUserWhereClause(searchQuery, statusFilter));
+
+        String orderBy = buildOrderByClause(sortBy, direction);
+        queryString.append(orderBy);
+
+        var query = em.createQuery(queryString.toString(), User.class);
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            query.setParameter("search", "%" + searchQuery.toLowerCase() + "%");
+        }
+
+        return query
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public int countUsersWithFilters(String searchQuery, String statusFilter) {
+        StringBuilder queryString = new StringBuilder("from User u");
+        queryString.append(buildUserWhereClause(searchQuery, statusFilter));
+
+        var query = em.createQuery(queryString.toString(), Long.class);
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            query.setParameter("search", "%" + searchQuery.toLowerCase() + "%");
+        }
+        return query.getSingleResult().intValue();
+    }
+
+    @Override
+    public int getBlockedUsersCount() {
+        return em.createQuery("select count(u) from User u " +
+                        "where u.isDeleted = false and u.isBlocked = true", Long.class)
+                .getSingleResult().intValue();
+    }
+
+    private String buildOrderByClause(String sortBy, String direction) {
+        String dir = "desc".equalsIgnoreCase(direction) ? "desc" : "asc";
+
+        return switch (sortBy != null ? sortBy : "username") {
+            case "email" -> "order by u.email " + dir;
+            case "firstName" -> "order by u.firstName " + dir;
+            default -> "order by u.username " + dir;
+        };
+    }
+
+    private StringBuilder buildUserWhereClause(String searchQuery, String statusFilter) {
+        StringBuilder whereClause = new StringBuilder("where u.isDeleted = false ");
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            whereClause.append("and (lower(u.username) like :search ")
+                    .append("or lower(u.email) like :search ")
+                    .append("or lower(u.firstName) like :search) ");
+        }
+
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            switch (statusFilter) {
+                case "active":
+                    whereClause.append("and u.isBlocked = false ");
+                    break;
+                case "blocked":
+                    whereClause.append("and u.isBlocked = true ");
+                    break;
+                case "admin":
+                    whereClause.append("and u.isAdmin = true ");
+                    break;
+            }
+        }
+        return whereClause;
+    }
 }

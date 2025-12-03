@@ -28,4 +28,11 @@ public interface UserRepository {
     List<User> searchUsers(String searchTerm);
 
     int getUsersCount();
+
+    List<User> findAllWithFilterPaginated(int page, int size, String searchQuery, String statusFilter,
+                                          String sortBy, String direction);
+
+    int countUsersWithFilters(String searchQuery, String statusFilter);
+
+    int getBlockedUsersCount();
 }
