@@ -1,141 +1,290 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Forum App – Home</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
-</head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <!-- MAIN -->
+<head>
+    <title layout:fragment="title">Admin Dashboard - CineTalk</title>
+</head>
+
+<th:block layout:fragment="content">
     <main class="admin-page">
         <div class="container">
-            <section class="card admin-card-wide">
-                <div class="form-header">
-                    <h1 class="form-title">Admin · Folders</h1>
-                    <p class="form-subtitle">
-                        Create and manage the folder structure for topics.
-                    </p>
+
+            <div class="admin-header">
+                <h1 class="hero-heading">
+                    Admin <span class="hero-gradient">Dashboard</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Manage users and monitor forum activity
+                </p>
+            </div>
+
+
+            <section class="admin-stats-grid">
+                <div class="card admin-stat-card">
+                    <div class="admin-stat-content">
+                        <div class="admin-stat-label">Total Users</div>
+                        <div class="admin-stat-value" th:text="${stats.totalUsers}">1,234</div>
+                        <div class="admin-stat-change">Active community</div>
+                    </div>
                 </div>
 
-                <div class="admin-layout">
-                    <!-- LEFT: create / edit folder -->
-                    <section>
-                        <h2 class="admin-section-title">Create new folder</h2>
-                        <p class="admin-note">
-                            Folders organise topics by franchise, genre or format.
-                        </p>
+                <div class="card admin-stat-card">
+                    <div class="admin-stat-content">
+                        <div class="admin-stat-label">Total Posts</div>
+                        <div class="admin-stat-value" th:text="${stats.totalPosts}">5,678</div>
+                        <div class="admin-stat-change">Growing daily</div>
+                    </div>
+                </div>
 
-                        <form style="margin-top:0.8rem;">
-                            <div class="form-field">
-                                <label class="form-label" for="folder-name">Name</label>
-                                <input class="form-input" id="folder-name" name="name"
-                                       placeholder="e.g. Star Wars, Drama, Animated"
-                                       type="text"/>
-                            </div>
+                <div class="card admin-stat-card">
+                    <div class="admin-stat-content">
+                        <div class="admin-stat-label">Total Comments</div>
+                        <div class="admin-stat-value" th:text="${stats.totalComments}">12,345</div>
+                        <div class="admin-stat-change">Engaged users</div>
+                    </div>
+                </div>
 
-                            <div class="form-field">
-                                <label class="form-label" for="folder-slug">Slug</label>
-                                <input class="form-input" id="folder-slug" name="slug"
-                                       placeholder="e.g. star-wars"
-                                       type="text"/>
-                                <p class="form-help">
-                                    Used in URLs. Only lowercase letters, numbers and dashes.
-                                </p>
-                            </div>
+                <div class="card admin-stat-card">
+                    <div class="admin-stat-content">
+                        <div class="admin-stat-label">Blocked Users</div>
+                        <div class="admin-stat-value" th:text="${stats.blockedUsers}">23</div>
+                        <div class="admin-stat-change admin-stat-change--neutral">Moderated</div>
+                    </div>
+                </div>
+            </section>
 
-                            <div class="form-field">
-                                <label class="form-label" for="folder-parent">Parent folder</label>
-                                <select class="form-select" id="folder-parent" name="parentId">
-                                    <option value="">(Root)</option>
-                                    <option>Movies</option>
-                                    <option>TV Shows</option>
-                                    <option>TV Shows / Sci-Fi & Fantasy</option>
-                                </select>
-                            </div>
 
-                            <div class="form-field">
-                                <label class="form-label" for="folder-desc">Description</label>
-                                <textarea class="form-textarea" id="folder-desc"
-                                          name="description"
-                                          placeholder="Optional short description shown on the folder page."></textarea>
-                            </div>
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Users Management</div>
+                        <div class="card-subtitle">Search by username, email, or first name</div>
+                    </div>
+                </div>
 
-                            <div class="form-actions">
-                                <button class="btn btn-primary" type="submit">Create folder</button>
-                                <button class="btn btn-ghost" type="button">Cancel</button>
-                            </div>
-                        </form>
-                    </section>
 
-                    <!-- RIGHT: existing folders overview -->
-                    <section>
-                        <h2 class="admin-section-title">Folder tree</h2>
-                        <p class="admin-note">
-                            Click a folder to edit or remove it.
-                        </p>
-
-                        <div class="card" style="margin-top:0.7rem;">
-                            <div class="card-subtitle" style="margin-bottom:0.5rem;">
-                                Root
-                            </div>
-                            <ul class="folder-tree">
-                                <li class="folder-node">
-                                    <a href="#">
-                                        <span class="folder-node-icon">🎬</span>
-                                        <span class="folder-node-name">Movies</span>
-                                        <span class="folder-node-count">34 topics</span>
-                                    </a>
-                                </li>
-                                <li class="folder-node">
-                                    <a href="#">
-                                        <span class="folder-node-icon">📺</span>
-                                        <span class="folder-node-name">TV Shows</span>
-                                        <span class="folder-node-count">21 topics</span>
-                                    </a>
-                                    <ul class="folder-node-children">
-                                        <li class="folder-node">
-                                            <a href="#">
-                                                <span class="folder-node-icon">📁</span>
-                                                <span class="folder-node-name">Sci-Fi & Fantasy</span>
-                                                <span class="folder-node-count">9</span>
-                                            </a>
-                                        </li>
-                                        <li class="folder-node">
-                                            <a href="#">
-                                                <span class="folder-node-icon">📁</span>
-                                                <span class="folder-node-name">Drama</span>
-                                                <span class="folder-node-count">8</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="folder-node">
-                                    <a href="#">
-                                        <span class="folder-node-icon">⭐</span>
-                                        <span class="folder-node-name">Awards Season</span>
-                                        <span class="folder-node-count">5 topics</span>
-                                    </a>
-                                </li>
-                            </ul>
-
-                            <p class="admin-note" style="margin-top:0.7rem;">
-                                You can implement “click to edit/delete” behaviour in your backend / JS.
-                            </p>
+                <form id="user-filter-form" method="get" th:action="@{/admin}">
+                    <div class="folder-toolbar">
+                        <div class="folder-toolbar-left">
+                            <span class="card-title">Users:</span>
+                            <span class="folder-toolbar-meta">
+                                Showing
+                                <span th:text="${pageInfo.fromItem}">1</span>–<span
+                                    th:text="${pageInfo.toItem}">10</span>
+                                of
+                                <span th:text="${pageInfo.totalItems}">1,234</span>
+                            </span>
                         </div>
-                    </section>
+                        <div class="folder-toolbar-right">
+
+                            <input type="text"
+                                   name="search"
+                                   class="folder-select admin-search-input"
+                                   placeholder="Search users..."
+                                   th:value="${searchQuery}"/>
+
+
+                            <select name="status" class="folder-select">
+                                <option value="">All Status</option>
+                                <option value="active" th:selected="${statusFilter == 'active'}">Active</option>
+                                <option value="blocked" th:selected="${statusFilter == 'blocked'}">Blocked</option>
+                                <option value="admin" th:selected="${statusFilter == 'admin'}">Admin</option>
+                            </select>
+
+
+                            <select name="sort" class="folder-select">
+                                <option value="username" th:selected="${sortBy == 'username'}">Sort by Username</option>
+                                <option value="email" th:selected="${sortBy == 'email'}">Sort by Email</option>
+                                <option value="firstName" th:selected="${sortBy == 'firstName'}">Sort by First Name
+                                </option>
+                            </select>
+
+
+                            <select name="direction" class="folder-select">
+                                <option value="asc" th:selected="${sortDirection == 'asc'}">ASC</option>
+                                <option value="desc" th:selected="${sortDirection == 'desc'}">DESC</option>
+                            </select>
+
+
+                            <input type="hidden" name="page" th:value="${pageInfo.page}" id="page-input"/>
+                        </div>
+                    </div>
+                </form>
+
+
+                <div class="topic-list">
+
+                    <article class="topic admin-user-topic"
+                             th:each="user : ${users}"
+                             th:classappend="${user.blocked} ? 'admin-user-topic--blocked' : ''">
+
+                        <div class="admin-user-info-section">
+                            <div class="admin-user-header">
+
+                                <div class="admin-user-avatar"
+                                     th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">J
+                                </div>
+                                <div class="admin-user-details">
+
+                                    <a th:href="@{/profile/{username}(username=${user.username})}"
+                                       class="admin-username-link">
+                                        <span th:text="${user.username}">john_doe</span>
+                                        <svg class="admin-external-link-icon" xmlns="http://www.w3.org/2000/svg"
+                                             width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                             stroke-linejoin="round">
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                            <polyline points="15 3 21 3 21 9"></polyline>
+                                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                                        </svg>
+                                    </a>
+                                    <div class="topic-meta">
+                                        <span th:text="${user.firstName + ' ' + user.lastName}">John Doe</span>
+                                        <span>·</span>
+                                        <span th:text="${user.email}">john.doe@example.com</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="admin-user-meta">
+                                <span>Joined <span th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Jan 15, 2025</span></span>
+                                <span><span th:text="${#lists.size(user.posts)}">42</span> posts</span>
+                                <span th:if="${user.blocked}" class="badge badge-danger">Blocked</span>
+                                <span th:unless="${user.blocked}" class="badge badge-success">Active</span>
+                                <span th:if="${user.admin}" class="badge badge-admin">Admin</span>
+                                <span th:unless="${user.admin}" class="badge badge-secondary">User</span>
+                            </div>
+                        </div>
+
+
+                        <div class="admin-user-actions-compact">
+
+                            <form th:if="${!user.blocked}"
+                                  th:action="@{/admin/users/{id}/block(id=${user.id})}"
+                                  method="post"
+                                  class="admin-action-form"
+                                  onsubmit="return confirm('Are you sure you want to block this user?');">
+                                <input type="hidden" name="search" th:value="${searchQuery}"/>
+                                <input type="hidden" name="status" th:value="${statusFilter}"/>
+                                <input type="hidden" name="sort" th:value="${sortBy}"/>
+                                <input type="hidden" name="direction" th:value="${sortDirection}"/>
+                                <input type="hidden" name="page" th:value="${pageInfo.page}"/>
+                                <button type="submit" class="btn btn-ghost btn-sm">Block</button>
+                            </form>
+                            <form th:if="${user.blocked}"
+                                  th:action="@{/admin/users/{id}/unblock(id=${user.id})}"
+                                  method="post"
+                                  class="admin-action-form"
+                                  onsubmit="return confirm('Are you sure you want to unblock this user?');">
+                                <input type="hidden" name="search" th:value="${searchQuery}"/>
+                                <input type="hidden" name="status" th:value="${statusFilter}"/>
+                                <input type="hidden" name="sort" th:value="${sortBy}"/>
+                                <input type="hidden" name="direction" th:value="${sortDirection}"/>
+                                <input type="hidden" name="page" th:value="${pageInfo.page}"/>
+                                <button type="submit" class="btn btn-ghost btn-sm">Unblock</button>
+                            </form>
+
+
+                            <form th:if="${!user.admin && !user.blocked}"
+                                  th:action="@{/admin/users/{id}/promote(id=${user.id})}"
+                                  method="post"
+                                  class="admin-action-form"
+                                  onsubmit="return confirm('Are you sure you want to promote this user to admin?');">
+                                <input type="hidden" name="search" th:value="${searchQuery}"/>
+                                <input type="hidden" name="status" th:value="${statusFilter}"/>
+                                <input type="hidden" name="sort" th:value="${sortBy}"/>
+                                <input type="hidden" name="direction" th:value="${sortDirection}"/>
+                                <input type="hidden" name="page" th:value="${pageInfo.page}"/>
+                                <button type="submit" class="btn btn-primary btn-sm">Make Admin</button>
+                            </form>
+                        </div>
+                    </article>
+                </div>
+
+
+                <div th:if="${#lists.isEmpty(users)}" class="admin-empty-state">
+                    <div class="admin-empty-icon">👥</div>
+                    <h3 class="admin-empty-title">No users found</h3>
+                    <p class="admin-empty-text">Try adjusting your search or filters</p>
+                </div>
+
+
+                <div id="pagination-data"
+                     th:data-total-pages="${pageInfo.totalPages}"
+                     th:data-current-page="${pageInfo.page}"
+                     class="pagination-data-hidden"></div>
+
+
+                <div class="folder-pagination" th:if="${!#lists.isEmpty(users)}">
+                    <button class="btn btn-ghost folder-page-btn"
+                            id="prev-page-btn"
+                            th:disabled="${pageInfo.page == 1}">‹ Prev
+                    </button>
+
+                    <span class="folder-page-info">
+                        Page <span th:text="${pageInfo.page}">1</span>
+                        of <span th:text="${pageInfo.totalPages}">124</span>
+                    </span>
+
+                    <button class="btn btn-ghost folder-page-btn"
+                            id="next-page-btn"
+                            th:disabled="${pageInfo.page == pageInfo.totalPages}">Next ›
+                    </button>
                 </div>
             </section>
         </div>
     </main>
+</th:block>
 
 
-    <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
-</div>
-</body>
+<th:block layout:fragment="scripts">
+    <script>
+        $(document).ready(function () {
+            var form = $('#user-filter-form');
+            var paginationData = $('#pagination-data');
+
+
+            var totalPages = parseInt(paginationData.data('total-pages')) || 1;
+            var currentPage = parseInt(paginationData.data('current-page')) || 1;
+
+
+            $(form).find('select').on('change', function () {
+                $('#page-input').val(1);
+                $(form).submit();
+            });
+
+            // Search on Enter key
+            $(form).find('input[name="search"]').on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $('#page-input').val(1);
+                    $(form).submit();
+                }
+            });
+
+
+            $('#prev-page-btn').on('click', function (e) {
+                e.preventDefault();
+                var currentPage = parseInt($('#page-input').val());
+                if (currentPage > 1) {
+                    $('#page-input').val(currentPage - 1);
+                    $(form).submit();
+                }
+            });
+
+
+            $('#next-page-btn').on('click', function (e) {
+                e.preventDefault();
+                var currentPage = parseInt($('#page-input').val());
+                if (currentPage < totalPages) {
+                    $('#page-input').val(currentPage + 1);
+                    $(form).submit();
+                }
+            });
+        });
+    </script>
+</th:block>
 </html>

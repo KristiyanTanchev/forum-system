@@ -13,4 +13,5 @@ public interface CommentRepository {
     void delete(Comment entity);
     List<Comment> findByPostId(int postId);
     Comment findByIdIncludeDeleted(int id);
+    int getCommentCount();
 }

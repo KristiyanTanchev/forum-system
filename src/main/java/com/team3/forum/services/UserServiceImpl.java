@@ -6,6 +6,7 @@ import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
 import com.team3.forum.models.userDtos.UserCreateDto;
+import com.team3.forum.models.userDtos.UserPage;
 import com.team3.forum.models.userDtos.UserStatsDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 import com.team3.forum.repositories.UserRepository;
@@ -183,4 +184,30 @@ public class UserServiceImpl implements UserService {
         return userRepository.getUsersCount();
     }
 
+    @Override
+    public UserPage getUsersWithFiltersPaginated(int page, int size, String searchQuery, String statusFilter, String sortBy, String direction) {
+        List<User> users = userRepository.findAllWithFilterPaginated(page, size, searchQuery, statusFilter, sortBy, direction);
+        int totalItems = userRepository.countUsersWithFilters(searchQuery, statusFilter);
+
+        int totalPages = (int) Math.ceil((double) totalItems / size);
+        int fromItem = totalItems > 0 ? (page - 1) * size + 1 : 0;
+        int toItem = Math.min(page * size, totalItems);
+
+        return UserPage.builder()
+                .items(users)
+                .page(page)
+                .size(size)
+                .totalItems(totalItems)
+                .totalPages(totalPages)
+                .fromItem(fromItem)
+                .toItem(toItem)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getBlockedUsersCount() {
+        return userRepository.getBlockedUsersCount();
+
+    }
 }

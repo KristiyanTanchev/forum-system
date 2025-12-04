@@ -29,4 +29,6 @@ public interface PostRepository {
     int countPostsInFolderWithTag(Folder parent, int tagId);
 
     List<Post> findAllSortedByViewsLastDays(int limit, int days);
+
+    int getPostsCount();
 }

@@ -9,7 +9,7 @@
 <body>
 <div class="page">
     <!-- NAVBAR -->
-    <header th:replace="Header:: navigation-bar"></header>
+    <header th:replace="Header::navigation-bar"></header>
 
     <!-- MAIN -->
     <main class="profile-page">
@@ -58,53 +58,20 @@
                         </div>
                     </div>
 
-                    <!-- Bio section - commented out for future use -->
-                    <!-- <p class="form-help" style="margin-top:0.7rem;" th:if="${user.bio}" th:text="${user.bio}">
-                        User bio
-                    </p> -->
-
                     <div class="profile-actions">
-                        <!-- visible when this is your own profile -->
-                        <a th:if="${isOwnProfile}" th:href="@{/testMvc/createPost}" class="btn btn-primary btn-sm">New Post</a>
+                        <a th:if="${isOwnProfile}" th:href="@{/forum/posts/new}" class="btn btn-primary btn-sm">New Post</a>
                         <a th:if="${isOwnProfile}" th:href="@{/profile/edit}" class="btn btn-ghost btn-sm">Edit profile</a>
-
-                        <!-- visible when you are viewing someone else (future features) -->
-                        <!-- <button th:if="${!isOwnProfile}" class="btn btn-ghost btn-sm" type="button">Message</button>
-                        <button th:if="${!isOwnProfile}" class="btn btn-primary btn-sm" type="button">Follow</button> -->
-
-                        <!-- visible only for admins viewing other users (future features) -->
-                        <!-- <button th:if="${isAdmin and !isOwnProfile}" class="btn-danger-outline" type="button">Block user</button> -->
                     </div>
                 </section>
 
-                <!-- RIGHT: activity -->
                 <section class="card profile-activity">
                     <div class="profile-activity-tabs">
                         <button class="profile-tab profile-tab--active" type="button">Topics</button>
-                        <!-- Future tabs -->
-                        <!-- <button class="profile-tab" type="button">Replies</button>
-                        <button class="profile-tab" type="button">Likes</button> -->
                     </div>
 
                     <div class="topic-list">
-                        <!-- Loop through user's posts -->
-                        <article class="topic" th:each="post : ${userPosts}">
-                            <div>
-                                <a th:href="@{/forum/posts/{id}(id=${post.id})}" class="topic-main-title" th:text="${post.title}">
-                                    Post title
-                                </a>
-                                <div class="topic-meta">
-                                    <span th:text="${#temporals.format(post.updatedAt, 'dd MMM yyyy')}">date</span>
-                                </div>
-                            </div>
-                            <div class="topic-stats">
-                                <div><span th:text="${post.commentsCount}">0</span> replies</div>
-                                <div><span th:text="${post.views}">0</span> views</div>
-                            </div>
-                        </article>
-
-                        <!-- Show message if no posts -->
-                        <div th:if="${#lists.isEmpty(userPosts)}" class="form-help" style="text-align: center; padding: 2rem;">
+                        <div th:replace="PostPreviewFragment::post-preview"></div>
+                        <div th:if="${#lists.isEmpty(posts)}" class="form-help" style="text-align: center; padding: 2rem;">
                             No topics created yet.
                         </div>
                     </div>
@@ -115,7 +82,7 @@
 
 
     <!-- FOOTER -->
-    <footer th:replace="Footer:: footer"></footer>
+    <footer th:replace="Footer::footer"></footer>
 </div>
 </body>
 </html>

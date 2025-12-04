@@ -53,7 +53,7 @@ public class ProfileMvcController {
 
         model.addAttribute("user", userMapper.toResponseDto(user));
         model.addAttribute("userStats", userService.getUserStats(user.getId()));
-        model.addAttribute("userPosts", postDtos);
+        model.addAttribute("posts", postDtos);
         model.addAttribute("isOwnProfile", userDetails.getUsername().equals(username));
         model.addAttribute("isAdmin", userDetails.isAdmin());
 

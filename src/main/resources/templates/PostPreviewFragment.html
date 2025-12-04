@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 <body>
 <!--/*@thymesVar id="posts" type=""*/-->
-<a class="topic" th:each="post : ${posts}" th:fragment="post-preview(posts)"
+<a class="topic" th:each="post : ${posts}" th:fragment="post-preview"
    th:href="@{/forum/posts/{id}(id=${post.id})}">
     <div>
         <div class="topic-main-title" th:text="${post.title}"></div>

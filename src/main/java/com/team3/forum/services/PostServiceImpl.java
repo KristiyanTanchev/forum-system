@@ -191,6 +191,11 @@ public class PostServiceImpl implements PostService {
         return postRepository.findAllSortedByViewsLastDays(5, 7);
     }
 
+    @Override
+    public int getPostsCount() {
+       return postRepository.getPostsCount();
+    }
+
     private void verifyAdminOrOwner(Post post, User requester, RuntimeException error) {
         if (!requester.isAdmin() && post.getUser().getId() != requester.getId()) {
             throw error;

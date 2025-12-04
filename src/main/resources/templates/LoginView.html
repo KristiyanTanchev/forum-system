@@ -34,27 +34,37 @@
                     <span th:text="${error}">Invalid username or password</span>
                 </div>
 
-                <form th:action="@{/auth/login}" method="post">
+                <form th:action="@{/auth/login}" th:object="${loginRequestDto}" method="post">
                     <div class="form-field">
                         <label class="form-label" for="login-identifier">Username</label>
-                        <input class="form-input" id="login-identifier" name="username"
+                        <input class="form-input"
+                               id="login-identifier"
+                               th:field="*{username}"
+                               th:errorclass="input-error"
                                placeholder="yourname"
                                type="text"/>
+                        <div class="field-error" th:errors="*{username}"></div>
                     </div>
 
                     <div class="form-field">
                         <label class="form-label" for="login-password">Password</label>
-                        <input class="form-input" id="login-password" name="password"
+                        <input class="form-input"
+                               id="login-password"
+                               th:field="*{password}"
+                               th:errorclass="input-error"
                                placeholder="••••••••"
                                type="password"/>
+                        <div class="field-error" th:errors="*{password}"></div>
                     </div>
 
-                    <div class="form-actions" style="justify-content:space-between;">
-                        <div style="display:flex;align-items:center;gap:0.35rem;font-size:0.8rem;">
-                            <input id="remember" style="accent-color:#3b82f6;" type="checkbox"/>
-                            <label for="remember">Remember me</label>
+                    <div class="form-actions">
+                        <div class="remember-me-container">
+                            <input id="remember"
+                                   th:field="*{rememberMe}"
+                                   style="accent-color:#3b82f6;"
+                                   type="checkbox"/>
+                            <label for="remember" class="checkbox-label">Remember me</label>
                         </div>
-                        <a class="form-link" href="#">Forgot password?</a>
                     </div>
 
                     <div class="form-actions">
