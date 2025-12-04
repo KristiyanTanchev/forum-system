@@ -9,9 +9,9 @@
         <div class="topic-main-title" th:text="${post.title}"></div>
         <div class="topic-meta">
             <span>by <strong th:text="${post.creator}"></strong></span>
-            <span>in <span th:text="${post.folderName}">Folder name</span></span>
+            <span th:text="${post.createdAtString}"></span>
+            <span>in <span class="topic-folder" th:text="${post.folderName}">Folder name</span></span>
             <span class="badge" th:each="tag: ${post.tags}" th:text="${tag.name}"></span>
-            <span th:text="${post.updatedAt}">last reply 8 min ago (TODO)</span>
         </div>
     </div>
     <div class="topic-stats">

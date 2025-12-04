@@ -1467,3 +1467,12 @@ a {
 .form-textarea-wide {
     width: 100%;
 }
+
+.topic-folder {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.12); /* soft blue-ish */
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    font-weight: 500;
+}

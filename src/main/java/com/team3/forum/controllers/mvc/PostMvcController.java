@@ -3,12 +3,14 @@ package com.team3.forum.controllers.mvc;
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.PostMapper;
+import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.Tag;
 import com.team3.forum.models.User;
 import com.team3.forum.models.Comment;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
+import com.team3.forum.models.folderDtos.FolderResponseDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
@@ -145,14 +147,43 @@ public class PostMvcController {
     @GetMapping("/new")
     public String createPostPage(
             Model model,
-            @RequestParam int folderId,
+            @RequestParam(defaultValue = "0") int folderId,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        if (folderId == 0) {
-            return "ErrorView404";
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to create a post!";
         }
-        model.addAttribute("folder", folderMapper.toPathDto(folderService.findById(folderId)));
+        Folder folder = null;
+        if (folderId == 0) {
+            folder = folderService.findHomeFolders().get(0);
+        } else {
+            folder = folderService.findById(folderId);
+        }
+
+        if (folder.getParentFolder() != null) {
+            FolderResponseDto parentFolderDto = folderMapper.toResponseDto(folder.getParentFolder());
+            model.addAttribute("parent", parentFolderDto);
+        }
+        if (folder.getParentFolder() == null) {
+            model.addAttribute("parent", null);
+        }
+        List<Folder> siblingFolders = folderService.getSiblingFolders(folder);
+        List<FolderResponseDto> siblingFolderResponseDtos = siblingFolders.stream()
+                .map(folderMapper::toResponseDto).toList();
+
+        model.addAttribute("siblingFolders", siblingFolderResponseDtos);
+
+        model.addAttribute("folderName", folder.getName());
+
+        model.addAttribute("folder", folderMapper.toResponseDto(folder));
+
+        List<FolderResponseDto> childFolderResponseDtos = folder.getChildFolders().stream()
+                .sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()))
+                .map(folderMapper::toResponseDto).toList();
+
+        model.addAttribute("childFolders", childFolderResponseDtos);
+        model.addAttribute("folder", folderMapper.toResponseDto(folder));
         PostCreationDto postCreationDto = new PostCreationDto();
-        postCreationDto.setFolderId(folderId);
+        postCreationDto.setFolderId(folder.getId());
         model.addAttribute("post", postCreationDto);
         return "CreatePostView";
     }
@@ -168,7 +199,7 @@ public class PostMvcController {
             return "CreatePostView";
         }
         if (principal == null) {
-            return "redirect:/login?error=You must be logged in to create a post!";
+            return "redirect:/auth/login?error=You must be logged in to create a post!";
         }
         Post post = postMapper.toEntity(postCreationDto, principal.getId());
         post = postService.create(post);

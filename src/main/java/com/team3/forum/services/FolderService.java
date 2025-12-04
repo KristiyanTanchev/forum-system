@@ -4,6 +4,7 @@ import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.folderDtos.FolderUpdateDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface FolderService {
@@ -24,4 +25,6 @@ public interface FolderService {
     Folder getFolderByPath(List<String> slugs);
 
     List<Folder> getSiblingFolders(Folder folder);
+
+    LocalDateTime getLastActivity(Folder folder);
 }
