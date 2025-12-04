@@ -104,6 +104,7 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public List<Post> findPostsInFolderWithTagPaginated(int page,
                                                         int size,
+                                                        String searchQuery,
                                                         Folder parent,
                                                         PostSortField orderBy,
                                                         SortDirection direction,
@@ -116,6 +117,9 @@ public class PostRepositoryImpl implements PostRepository {
         if (tagId != 0) {
             queryString.append(" and t.id = :tagId");
         }
+        if (searchQuery != null && !searchQuery.isBlank()) {
+            queryString.append(" and lower(p.title) like lower(:search)");
+        }
 
         queryString.append(" order by ")
                 .append(orderBy.getJpqlField())
@@ -126,6 +130,10 @@ public class PostRepositoryImpl implements PostRepository {
 
         if (tagId != 0) {
             query.setParameter("tagId", tagId);
+        }
+
+        if (searchQuery != null && !searchQuery.isBlank()) {
+            query.setParameter("search", "%" + searchQuery.toLowerCase() + "%");
         }
 
         if (parent != null) {
@@ -158,6 +166,37 @@ public class PostRepositoryImpl implements PostRepository {
         }
         if (tagId != 0) {
             query.setParameter("tagId", tagId);
+        }
+
+        return query.getSingleResult().intValue();
+    }
+
+    @Override
+    public int countPostsInFolderWithTagAndSearch(Folder parent, int tagId, String searchQuery) {
+        StringBuilder queryString = new StringBuilder(
+                "select count(distinct p) from Post p left join p.tags t where p.isDeleted = false"
+        );
+
+        if (parent != null) {
+            queryString.append(" and p.folder = :parent");
+        }
+        if (tagId != 0) {
+            queryString.append(" and t.id = :tagId");
+        }
+        if (searchQuery != null && !searchQuery.isBlank()) {
+            queryString.append(" and lower(p.title) like lower(:search)");
+        }
+
+        var query = em.createQuery(queryString.toString(), Long.class);
+
+        if (parent != null) {
+            query.setParameter("parent", parent);
+        }
+        if (tagId != 0) {
+            query.setParameter("tagId", tagId);
+        }
+        if (searchQuery != null && !searchQuery.isBlank()) {
+            query.setParameter("search", "%" + searchQuery.toLowerCase() + "%");
         }
 
         return query.getSingleResult().intValue();

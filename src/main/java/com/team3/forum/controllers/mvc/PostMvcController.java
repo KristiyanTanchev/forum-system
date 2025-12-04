@@ -3,11 +3,7 @@ package com.team3.forum.controllers.mvc;
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.PostMapper;
-import com.team3.forum.models.Folder;
-import com.team3.forum.models.Post;
-import com.team3.forum.models.Tag;
-import com.team3.forum.models.User;
-import com.team3.forum.models.Comment;
+import com.team3.forum.models.*;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
 import com.team3.forum.models.folderDtos.FolderResponseDto;
@@ -16,11 +12,7 @@ import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.security.CustomUserDetails;
-import com.team3.forum.services.FolderService;
-import com.team3.forum.services.PostService;
-import com.team3.forum.services.TagService;
-import com.team3.forum.services.CommentService;
-import com.team3.forum.services.UserService;
+import com.team3.forum.services.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,11 +53,12 @@ public class PostMvcController {
     public String getAllPosts(
             Model model,
             @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "created_at") String orderBy,
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(defaultValue = "0") int tagId,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, orderBy, direction, tagId);
+        PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, search, orderBy, direction, tagId);
         model.addAttribute("pageInfo", pageInfo);
         List<PostResponseDto> posts = pageInfo.getItems().stream()
                 .map(postMapper::toResponseDto).toList();

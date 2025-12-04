@@ -156,17 +156,17 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public PostPage getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId) {
+    public PostPage getPostsInFolderPaginated(Folder folder, int page, String searchQuery, String orderBy, String direction, int tagId) {
         PostSortField sortField = getSortField(orderBy);
         SortDirection sortDirection = getSortDirection(direction);
         if (page < 1) {
             page = 1;
         }
-        int totalPosts = postRepository.countPostsInFolderWithTag(folder, tagId);
+        int totalPosts = postRepository.countPostsInFolderWithTagAndSearch(folder, tagId, searchQuery);
         int searchPage = Math.min((totalPosts - 1) / POSTS_PAGE_SIZE + 1, page);
 
         List<Post> posts = postRepository.findPostsInFolderWithTagPaginated(
-                searchPage, POSTS_PAGE_SIZE, folder, sortField, sortDirection, tagId);
+                searchPage, POSTS_PAGE_SIZE, searchQuery, folder, sortField, sortDirection, tagId);
 
         int totalPages = ((totalPosts - 1) / POSTS_PAGE_SIZE) + 1;
         page = Math.min(page, totalPages);
@@ -181,6 +181,7 @@ public class PostServiceImpl implements PostService {
                 .size(POSTS_PAGE_SIZE)
                 .totalItems(totalPosts)
                 .totalPages(totalPages)
+                .searchQuery(searchQuery)
                 .tagId(tagId)
                 .build();
     }

@@ -29,4 +29,6 @@ public class PostPage {
     int toItem;
 
     int tagId;
+
+    String searchQuery;
 }

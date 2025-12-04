@@ -18,6 +18,9 @@
                     th:value="${page}">Page <span th:text="${page}"></span>
             </option>
         </select>
+        <input class="search-input folder-select" name="search" placeholder="Search posts..."
+               th:value="${pageInfo.searchQuery}"
+               type="text"/>
         <select class="tag-select folder-select"
                 name="tagId"
                 th:if="${tags != null}"
