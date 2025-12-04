@@ -19,4 +19,5 @@ public class CommentResponseDto {
     private boolean isDeleted;
     private LocalDateTime deletedAt;
     private int likesCount;
+    private boolean likedByCurrentUser;
 }

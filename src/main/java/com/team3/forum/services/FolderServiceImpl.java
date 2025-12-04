@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -145,6 +146,24 @@ public class FolderServiceImpl implements FolderService {
         List<Folder> folders = folderRepository.getFoldersByParentFolder(folder.getParentFolder());
         folders.remove(folder);
         return folders;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public LocalDateTime getLastActivity(Folder folder) {
+        LocalDateTime lastPost = folderRepository.getLastPostDate(folder);
+        LocalDateTime lastComment = folderRepository.getLastCommentDate(folder);
+        if (lastPost == null) {
+            return lastComment;
+        }
+        if (lastComment == null) {
+            return lastPost;
+        }
+        if (lastPost.isAfter(lastComment)) {
+            return lastPost;
+        } else {
+            return lastComment;
+        }
     }
 
     private void validateUniqueSlug(Folder parent, Folder child) {

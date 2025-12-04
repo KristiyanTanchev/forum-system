@@ -27,10 +27,10 @@
                         <span th:if="${parent != null}">·</span>
                         <span th:text="${folder.folderCount} + ' topics · ' + ${folder.postCount} + ' posts'">21 topics · 184 posts</span>
                         <span>·</span>
-                        <span>Last activity 12 minutes ago (TODO)</span>
+                        <span>Last activity <span th:text="${folder.lastActivity}"></span></span>
                     </div>
                 </div>
-                <div class="folder-header-actions">
+                <div class="folder-header-actions" sec:authorize="isAuthenticated()">
                     <a class="btn btn-primary" th:href="@{/forum/posts/new?folderId={folderId}(folderId=${folder.id})}"
                        type="button">New topic</a>
                 </div>

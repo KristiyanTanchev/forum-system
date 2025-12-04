@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -99,5 +100,31 @@ public class FolderRepositoryImpl implements FolderRepository {
                 .getResultStream()
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Folder", "slug", slug));
+    }
+
+    @Override
+    public LocalDateTime getLastPostDate(Folder folder) {
+        return em.createQuery("""
+                            select max(p.createdAt)
+                            from Post p
+                            where p.folder = :folder
+                              and p.isDeleted = false
+                        """, LocalDateTime.class)
+                .setParameter("folder", folder)
+                .getSingleResult();
+    }
+
+    @Override
+    public LocalDateTime getLastCommentDate(Folder folder) {
+        return em.createQuery("""
+                            select max(c.createdAt)
+                            from Post p
+                                join p.comments c
+                            where p.folder = :folder
+                              and c.isDeleted = false
+                              and p.isDeleted = false
+                        """, LocalDateTime.class)
+                .setParameter("folder", folder)
+                .getSingleResult();
     }
 }

@@ -7,6 +7,7 @@ import com.team3.forum.models.folderDtos.FolderResponseDto;
 import com.team3.forum.services.FolderService;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,15 +44,19 @@ public class FolderMapper {
 
 
     public FolderResponseDto toResponseDto(Folder folder) {
+        LocalDateTime lastActivity = folderService.getLastActivity(folder);
+        String lastActivityString = lastActivity != null ? TimeAgo.toTimeAgo(lastActivity) : "";
         return FolderResponseDto.builder()
                 .name(folder.getName())
                 .slug(folder.getSlug())
                 .createdAt(folder.getCreatedAt())
                 .updatedAt(folder.getUpdatedAt())
                 .id(folder.getId())
-                .postCount(getFolderPostsCount(folder))
+                .postCount(folder.getPosts().size())
+                .postCountWithSubfolders(getFolderPostsCount(folder))
                 .folderCount(folder.getChildFolders().size())
                 .pathFolders(buildPathFolders(folder, new ArrayList<>()))
+                .lastActivity(lastActivityString)
                 .path(buildPath(folder, ""))
                 .build();
     }

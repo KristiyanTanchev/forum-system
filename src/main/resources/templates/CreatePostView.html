@@ -17,61 +17,162 @@
                     </p>
                 </div>
 
-                <form method="post" th:action="@{/forum/posts/new}" th:object="${post}">
-                    <div class="form-field">
-                        <label class="form-label" for="post-title">Title</label>
-                        <input class="form-input" id="post-title" name="title"
-                               placeholder="e.g. Is Andor the best Star Wars series so far?"
-                               th:field="*{title}"
-                               type="text"/>
-                        <div class="field-error" th:errors="*{title}"></div>
-                    </div>
+                <div class="folder-layout">
+                    <!-- LEFT: folder info + tree -->
+                    <aside class="card folder-sidebar">
+                        <div class="folder-sidebar-section">
+                            <div class="card-title">Folder details</div>
+                            <div class="card-subtitle">
+                                (TODO: consider adding a description field)
+                            </div>
 
-                    <div class="form-field">
-                        <label class="form-label" for="post-body">Content</label>
-                        <textarea class="form-textarea form-textarea-wide" id="post-body"
-                                  name="content"
-                                  placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."
-                                  th:field="*{content}"></textarea>
+                            <div class="folder-stats">
+                                <div class="folder-stat-item" th:if="${folder.folderCount > 0}">
+                                    <span class="folder-stat-label">Subfolders</span>
+                                    <span class="folder-stat-value" th:text="${folder.folderCount}">21</span>
+                                </div>
+                                <div class="folder-stat-item">
+                                    <span class="folder-stat-label">Posts</span>
+                                    <span class="folder-stat-value" th:text="${folder.postCount}">184</span>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="field-error" th:errors="*{content}"></div>
-                        <p class="form-help">
-                            Markdown supported. Add spoilers with >! text, **bold** for emphasis, *italic* for emphasis,
-                            [text](url) for links.
-                        </p>
-                    </div>
+                        <!-- PARENT FOLDER (one level up) -->
+                        <div class="folder-sidebar-section" th:if="${parent != null}">
+                            <div class="card-title" style="margin-bottom:0.3rem;">Parent folder</div>
 
-                    <div class="form-field">
-                        <label class="form-label" for="post-tags-1">Tag 1 <span>(optional)</span></label>
-                        <input class="form-input" id="post-tags-1" name="tags"
-                               placeholder="e.g. star wars"
-                               th:field="*{tag1}"
-                               type="text"/>
-                        <div class="field-error" th:errors="*{tag1}"></div>
-                        <br/><br/>
-                        <label class="form-label" for="post-tags-2">Tag 2 <span>(optional)</span></label>
-                        <input class="form-input" id="post-tags-2" name="tags"
-                               placeholder="e.g. andor"
-                               th:field="*{tag2}"
-                               type="text"/>
-                        <div class="field-error" th:errors="*{tag2}"></div>
-                        <br/><br/>
-                        <label class="form-label" for="post-tags-3">Tag 3 <span>(optional)</span></label>
-                        <input class="form-input" id="post-tags-3" name="tags"
-                               placeholder="e.g. tv show"
-                               th:field="*{tag3}"
-                               type="text"/>
-                        <div class="field-error" th:errors="*{tag3}"></div>
-                        <p class="form-help">
-                            Enter up to three tags to help others find your topic.
-                        </p>
-                    </div>
-                    <input th:field="*{folderId}" type="hidden"/>
+                            <div class="folder-parent">
+                                <a class="folder-parent-link"
+                                   th:href="@{/forum/posts/new?folderId={folderId}(folderId=${parent.id})}">
+                                    <span class="folder-node-icon">⬅</span>
+                                    <span class="folder-node-name" th:text="${parent.name}">TV Shows</span>
+                                </a>
+                                <div class="folder-parent-meta"
+                                     th:text="${parent.postCount} + ' topics'">
+                                    21 topics
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="form-actions">
-                        <button class="btn btn-primary" type="submit">Create topic</button>
-                    </div>
-                </form>
+                        <!-- CURRENT FOLDER + SIBLINGS -->
+                        <div class="folder-sidebar-section">
+                            <div class="card-title" style="margin-bottom:0.3rem;">This level</div>
+                            <ul class="folder-tree folder-tree--siblings">
+                                <!-- Current folder -->
+                                <li class="folder-node folder-node--active">
+                                    <a th:href="@{/forum/posts/new?folderId={folderId}(folderId=${folder.id})}">
+                                        <span class="folder-node-icon">📂</span>
+                                        <span class="folder-node-name"
+                                              th:text="${folder.name}">Sci-Fi &amp; Fantasy</span>
+                                        <span class="folder-node-count"
+                                              th:text="${folder.postCount} + ' topics'">9 topics</span>
+                                    </a>
+                                </li>
+
+                                <!-- Siblings (same parent) -->
+                                <li class="folder-node" th:each="sibling : ${siblingFolders}">
+                                    <a th:href="@{/forum/posts/new?folderId={folderId}(folderId=${sibling.id})}">
+                                        <span class="folder-node-icon">📂</span>
+                                        <span class="folder-node-name" th:text="${sibling.name}">Drama</span>
+                                        <span class="folder-node-count"
+                                              th:text="${sibling.postCount} + ' topics'">8 topics</span>
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="folder-pagination" th:if="${siblingFolders.size() > 4}">
+                                <button class="btn btn-ghost folder-page-btn" type="button">‹ Prev</button>
+                                <span class="folder-page-info">Page 1 of 3</span>
+                                <button class="btn btn-ghost folder-page-btn" type="button">Next ›</button>
+                            </div>
+                        </div>
+
+                        <!-- CHILDREN OF CURRENT FOLDER -->
+                        <div class="folder-sidebar-section"
+                             th:if="${childFolders != null and !#lists.isEmpty(childFolders)}">
+                            <div class="card-title" style="margin-bottom:0.3rem;">Subfolders</div>
+
+                            <ul class="folder-tree folder-tree--children">
+                                <li class="folder-node" th:each="child : ${childFolders}">
+                                    <a th:href="@{/forum/posts/new?folderId={folderId}(folderId=${child.id})}">
+                                        <span class="folder-node-icon">📁</span>
+                                        <span class="folder-node-name" th:text="${child.name}">Star Wars</span>
+                                        <span class="folder-node-count"
+                                              th:text="${child.postCount} + ' topics'">4 topics</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="folder-pagination" th:if="${childFolders.size() > 4}">
+                            <button class="btn btn-ghost folder-page-btn" type="button">‹ Prev</button>
+                            <span class="folder-page-info">Page 1 of 3</span>
+                            <button class="btn btn-ghost folder-page-btn" type="button">Next ›</button>
+                        </div>
+
+                    </aside>
+                    <!-- RIGHT: posts list in this folder -->
+                    <section class="card folder-posts">
+                        <form method="post" th:action="@{/forum/posts/new}" th:object="${post}">
+                            <div class="form-field">
+                                <label class="form-label" for="post-title">Title</label>
+                                <input class="form-input" id="post-title" name="title"
+                                       placeholder="e.g. Is Andor the best Star Wars series so far?"
+                                       th:field="*{title}"
+                                       type="text"/>
+                                <div class="field-error" th:errors="*{title}"></div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="post-body">Content</label>
+                                <textarea class="form-textarea form-textarea-wide" id="post-body"
+                                          name="content"
+                                          placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."
+                                          th:field="*{content}"></textarea>
+
+                                <div class="field-error" th:errors="*{content}"></div>
+                                <p class="form-help">
+                                    Markdown supported. Add spoilers with >! text, **bold** for emphasis, *italic* for
+                                    emphasis,
+                                    [text](url) for links.
+                                </p>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label" for="post-tags-1">Tag 1 <span>(optional)</span></label>
+                                <input class="form-input" id="post-tags-1" name="tags"
+                                       placeholder="e.g. star wars"
+                                       th:field="*{tag1}"
+                                       type="text"/>
+                                <div class="field-error" th:errors="*{tag1}"></div>
+                                <br/><br/>
+                                <label class="form-label" for="post-tags-2">Tag 2 <span>(optional)</span></label>
+                                <input class="form-input" id="post-tags-2" name="tags"
+                                       placeholder="e.g. andor"
+                                       th:field="*{tag2}"
+                                       type="text"/>
+                                <div class="field-error" th:errors="*{tag2}"></div>
+                                <br/><br/>
+                                <label class="form-label" for="post-tags-3">Tag 3 <span>(optional)</span></label>
+                                <input class="form-input" id="post-tags-3" name="tags"
+                                       placeholder="e.g. tv show"
+                                       th:field="*{tag3}"
+                                       type="text"/>
+                                <div class="field-error" th:errors="*{tag3}"></div>
+                                <p class="form-help">
+                                    Enter up to three tags to help others find your topic.
+                                </p>
+                            </div>
+                            <input th:field="*{folderId}" type="hidden"/>
+
+                            <div class="form-actions">
+                                <button class="btn btn-primary" type="submit">Create topic</button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+
+
             </section>
         </div>
     </main>
