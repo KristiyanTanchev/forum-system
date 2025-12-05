@@ -15,7 +15,7 @@ public class UserMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .avatarUrl(user.getAvatarUrl())
-                .isAdmin(user.isAdmin())
+                .role(user.getRole().name())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

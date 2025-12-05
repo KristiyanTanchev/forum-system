@@ -5,6 +5,7 @@ import com.team3.forum.exceptions.DuplicateEntityException;
 import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.models.userDtos.UserPage;
 import com.team3.forum.models.userDtos.UserStatsDto;
@@ -25,6 +26,8 @@ public class UserServiceImpl implements UserService {
     public static final String ALREADY_BLOCKED_ERROR = "User is already blocked.";
     public static final String NOT_BLOCKED_ERROR = "User is not blocked.";
     public static final String ALREADY_ADMIN_ERROR = "User is already an admin.";
+    public static final String ALREADY_MODERATOR_ERROR = "User is already a moderator.";
+    public static final String ADMIN_ONLY_ERROR = "Only administrators can perform this action.";
     public static final String BLOCKED_USER_ERROR = "Cannot perform this action on a blocked user.";
     public static final String DELETED_USER_ERROR = "Cannot perform this action on a deleted user.";
 
@@ -53,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setAdmin(false);
+        user.setRole(Role.USER);
         user.setBlocked(false);
         user.setDeleted(false);
         user.setCreatedAt(LocalDateTime.now());
@@ -151,7 +154,27 @@ public class UserServiceImpl implements UserService {
         if (user.isDeleted()) {
             throw new EntityUpdateConflictException(DELETED_USER_ERROR);
         }
-        user.setAdmin(true);
+        user.setRole(Role.ADMIN);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User promoteToModerator(int userId) {
+        User user = userRepository.findById(userId);
+
+        if (user.getRole() == Role.MODERATOR) {
+            throw new EntityUpdateConflictException(ALREADY_MODERATOR_ERROR);
+        }
+        if (user.isAdmin()) {
+            throw new EntityUpdateConflictException(ALREADY_ADMIN_ERROR);
+        }
+        if (user.isBlocked()) {
+            throw new EntityUpdateConflictException(BLOCKED_USER_ERROR);
+        }
+        if (user.isDeleted()) {
+            throw new EntityUpdateConflictException(DELETED_USER_ERROR);
+        }
+        user.setRole(Role.MODERATOR);
         return userRepository.save(user);
     }
 

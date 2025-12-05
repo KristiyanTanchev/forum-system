@@ -114,7 +114,7 @@ public class PostMvcController {
             post = postService.findById(postId);
         }
 
-        if (principal != null && principal.isAdmin() || post.getUser().getId() == principal.getId()) {
+        if (principal != null && (principal.isModerator() || post.getUser().getId() == principal.getId())) {
             model.addAttribute("canEdit", true);
         }
 

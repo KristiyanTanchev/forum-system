@@ -16,6 +16,6 @@ public class UserResponseDto {
     private String username;
     private String email;
     private String avatarUrl;
-    private boolean isAdmin;
+    private String role;
     private LocalDateTime createdAt;
 }

@@ -50,22 +50,28 @@ public class AdminMvcController {
 
         return "AdminView";
     }
-        @PostMapping("/users/{id}/block")
-        public String blockUser(@PathVariable int id) {
-            userService.blockUser(id);
-            return "redirect:/admin";
-        }
-
-        @PostMapping("/users/{id}/unblock")
-        public String unblockUser(@PathVariable int id) {
-            userService.unblockUser(id);
-            return "redirect:/admin";
-        }
-
-        @PostMapping("/users/{id}/promote")
-        public String promoteToAdmin(@PathVariable int id) {
-            userService.promoteToAdmin(id);
-            return "redirect:/admin";
-        }
+    @PostMapping("/users/{id}/block")
+    public String blockUser(@PathVariable int id) {
+        userService.blockUser(id);
+        return "redirect:/admin";
     }
+
+    @PostMapping("/users/{id}/unblock")
+    public String unblockUser(@PathVariable int id) {
+        userService.unblockUser(id);
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/users/{id}/promote-admin")
+    public String promoteToAdmin(@PathVariable int id) {
+        userService.promoteToAdmin(id);
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/users/{id}/promote-moderator")
+    public String promoteToModerator(@PathVariable int id) {
+        userService.promoteToModerator(id);
+        return "redirect:/admin";
+    }
+}
 

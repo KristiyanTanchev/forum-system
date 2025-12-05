@@ -27,6 +27,8 @@ public interface UserService {
 
     User promoteToAdmin(int id);
 
+    User promoteToModerator(int userId);
+
     public List<User> searchUsers(String query);
 
     void softDeleteById(int id);

@@ -6,6 +6,7 @@ import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 import com.team3.forum.repositories.UserRepository;
@@ -215,6 +216,7 @@ public class UserServiceImplTest {
         User result = userService.promoteToAdmin(mockUser.getId());
         //Assert
         Assertions.assertTrue(result.isAdmin());
+        Assertions.assertEquals(Role.ADMIN, result.getRole());
         Mockito.verify(mockUserRepository, Mockito.times(1)).save(mockUser);
     }
 
@@ -230,7 +232,7 @@ public class UserServiceImplTest {
     @Test
     public void promoteToAdmin_Should_Throw_When_UserIsAlreadyAdmin() {
         var mockUser = createMockUser();
-        mockUser.setAdmin(true);
+        mockUser.setRole(Role.ADMIN);
         Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
         //Act, Assert
         Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToAdmin(1));
@@ -255,6 +257,65 @@ public class UserServiceImplTest {
         Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
         //Act, Assert
         Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToAdmin(1));
+    }
+
+    @Test
+    public void promoteToModerator_Should_Promote_User_Successfully() {
+        //Arrange
+        var mockUser = createMockUser();
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.save(mockUser)).thenReturn(mockUser);
+        //Act
+        User result = userService.promoteToModerator(mockUser.getId());
+        //Assert
+        Assertions.assertTrue(result.isModerator());
+        Assertions.assertEquals(Role.MODERATOR, result.getRole());
+        Mockito.verify(mockUserRepository, Mockito.times(1)).save(mockUser);
+    }
+
+    @Test
+    public void promoteToModerator_Should_Throw_When_UserNotFound() {
+        //Arrange
+        Mockito.when(mockUserRepository.findById(999))
+                .thenThrow(new EntityNotFoundException("User", 999));
+        //Act, Assert
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.promoteToModerator(999));
+    }
+
+    @Test
+    public void promoteToModerator_Should_Throw_When_UserIsAlreadyModerator() {
+        var mockUser = createMockModerator();
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToModerator(mockUser.getId()));
+    }
+
+    @Test
+    public void promoteToModerator_Should_Throw_When_UserIsAlreadyAdmin() {
+        var mockUser = createMockAdmin();
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToModerator(mockUser.getId()));
+    }
+
+    @Test
+    public void promoteToModerator_Should_Throw_When_UserIsBlocked() {
+        //Arrange
+        var mockUser = createMockUser();
+        mockUser.setBlocked(true);
+        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToModerator(1));
+    }
+
+    @Test
+    public void promoteToModerator_Should_Throw_When_UserIsDeleted() {
+        //Arrange
+        var mockUser = createMockUser();
+        mockUser.setDeleted(true);
+        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToModerator(1));
     }
 
     @Test
@@ -326,6 +387,7 @@ public class UserServiceImplTest {
         User result = userService.createUser(dto);
         //Assert
         Assertions.assertNotNull(result);
+        Assertions.assertEquals(Role.USER, result.getRole());
         Assertions.assertFalse(result.isAdmin());
         Assertions.assertFalse(result.isBlocked());
         Assertions.assertFalse(result.isDeleted());
@@ -375,9 +437,7 @@ public class UserServiceImplTest {
         // Arrange
         UserUpdateDto dto = createMockUserUpdateDto();
         User existingUser = createMockUser();
-        User admin = createMockUser();
-        admin.setId(2);
-        admin.setAdmin(true);
+        User admin = createMockAdmin();
 
         Mockito.when(mockUserRepository.findById(1)).thenReturn(existingUser);
         Mockito.when(mockUserRepository.findById(2)).thenReturn(admin);
@@ -421,7 +481,7 @@ public class UserServiceImplTest {
         User existingUser = createMockUser();
         User requester = createMockUser();
         requester.setId(2);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Mockito.when(mockUserRepository.findById(1)).thenReturn(existingUser);
         Mockito.when(mockUserRepository.findById(2)).thenReturn(requester);

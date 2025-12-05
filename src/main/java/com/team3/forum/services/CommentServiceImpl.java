@@ -9,6 +9,7 @@ import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.repositories.CommentRepository;
 import com.team3.forum.repositories.PostRepository;
 import com.team3.forum.repositories.UserRepository;
@@ -70,7 +71,7 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null || comment.isDeleted()) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-        verifyAdminOrOwner(comment, user, new AuthorizationException(EDIT_AUTHORIZATION_ERROR));
+        verifyModeratorOrOwner(comment, user, new AuthorizationException(EDIT_AUTHORIZATION_ERROR));
         comment.setContent(dto.getContent());
         comment.setUpdatedAt(LocalDateTime.now());
         return commentRepository.save(comment);
@@ -112,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
         if (comment.isDeleted()) {
             throw new EntityUpdateConflictException(String.format("Comment with id %d is already deleted.", commentId));
         }
-        verifyAdminOrOwner(comment, user, new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
+        verifyModeratorOrOwner(comment, user, new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
         comment.setDeleted(true);
         comment.setDeletedAt(LocalDateTime.now());
         commentRepository.save(comment);
@@ -132,7 +133,7 @@ public class CommentServiceImpl implements CommentService {
         if (comment == null) {
             throw new EntityNotFoundException("Comment", commentId);
         }
-        verifyAdminOrOwner(comment, user, new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
+        verifyModeratorOrOwner(comment, user, new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
         if (!comment.isDeleted()) {
             throw new EntityUpdateConflictException(String.format("Comment with id %d is not deleted.", commentId));
         }
@@ -208,9 +209,23 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.getCommentCount();
     }
 
-    private void verifyAdminOrOwner(Comment comment, User requester, RuntimeException error) {
-        if (!requester.isAdmin() && comment.getUser().getId() != requester.getId()) {
-            throw error;
+    private void verifyModeratorOrOwner(Comment comment, User requester, RuntimeException error) {
+
+        if (comment.getUser().getId() == requester.getId()) {
+            return;
         }
+
+
+        if (requester.isModerator()) {
+            Role targetRole = comment.getUser().getRole();
+            if (targetRole == Role.USER) {
+                return;
+            }
+            if (requester.isAdmin()) {
+                return;
+            }
+        }
+
+        throw error;
     }
 }

@@ -7,7 +7,10 @@
     <div class="container">
         <div class="navbar-inner">
             <div class="brand">
-                <div class="brand-logo" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">C</div>
+                <div class="brand-logo"
+                     style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">
+                    C
+                </div>
                 <div>
                     <div class="brand-title">CineTalk</div>
                     <div class="brand-subtitle">Cinema Forum</div>
@@ -36,8 +39,8 @@
                     </a>
                     <a th:href="@{/auth/logout}" class="btn btn-danger">Logout</a>
                 </div>
-                <!-- Show if admin -->
-                <div sec:authorize="hasRole('ADMIN')">
+                <!-- Show if admin or moderator -->
+                <div sec:authorize="hasRole('MODERATOR')">
                     <a th:href="@{/admin}" class="btn btn-ghost">Admin</a>
                 </div>
             </div>
@@ -47,31 +50,6 @@
                 <div class="mobile-bar"></div>
             </button>
         </div>
-
-        <!-- Mobile-only menu -->
-        <!--        <div id="mobileMenu" class="mobile-menu">-->
-        <!--            <div class="mobile-menu-section">-->
-        <!--                <div class="mobile-menu-section-title">Navigate</div>-->
-        <!--                <div class="mobile-menu-links">-->
-        <!--                    <a href="#">Home</a>-->
-        <!--                    <a href="#">Categories</a>-->
-        <!--                    <a href="#">Latest</a>-->
-        <!--                    <a href="#">About</a>-->
-        <!--                </div>-->
-        <!--            </div>-->
-
-        <!--            <div class="mobile-menu-section">-->
-        <!--                <div class="mobile-menu-section-title">Account</div>-->
-        <!--                <div class="mobile-menu-links">-->
-        <!--                    &lt;!&ndash; Same logic: show login/register OR logout depending on session &ndash;&gt;-->
-        <!--                    <a href="#">Login</a>-->
-        <!--                    <a href="#">Register</a>-->
-        <!--                    &lt;!&ndash; <a href="#">Logout</a> &ndash;&gt;-->
-        <!--                </div>-->
-        <!--            </div>-->
-        <!--        </div>-->
-
-
     </div>
 </header>
 </body>

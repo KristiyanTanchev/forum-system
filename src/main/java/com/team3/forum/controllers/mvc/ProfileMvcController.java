@@ -36,6 +36,9 @@ public class ProfileMvcController {
 
     @GetMapping
     public String redirectToOwnProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return "redirect:/auth/login";
+        }
         return "redirect:/profile/" + userDetails.getUsername();
     }
 
@@ -54,8 +57,8 @@ public class ProfileMvcController {
         model.addAttribute("user", userMapper.toResponseDto(user));
         model.addAttribute("userStats", userService.getUserStats(user.getId()));
         model.addAttribute("posts", postDtos);
-        model.addAttribute("isOwnProfile", userDetails.getUsername().equals(username));
-        model.addAttribute("isAdmin", userDetails.isAdmin());
+        model.addAttribute("isOwnProfile", userDetails != null && userDetails.getUsername().equals(username));
+        model.addAttribute("isAdmin", userDetails != null && userDetails.isAdmin());
 
         return "ProfileView";
     }

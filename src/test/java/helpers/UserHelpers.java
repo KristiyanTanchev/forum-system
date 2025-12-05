@@ -1,6 +1,7 @@
 package helpers;
 
 import com.team3.forum.models.User;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.userDtos.UserCreateDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 
@@ -15,11 +16,27 @@ public class UserHelpers {
         user.setUsername("john_doe");
         user.setEmail("john.doe@example.com");
         user.setPassword("encoded_password");
-        user.setAdmin(false);
+        user.setRole(Role.USER);
         user.setBlocked(false);
         user.setDeleted(false);
         user.setCreatedAt(LocalDateTime.now());
         return user;
+    }
+
+    public static User createMockAdmin() {
+        User admin = createMockUser();
+        admin.setId(2);
+        admin.setUsername("admin_user");
+        admin.setRole(Role.ADMIN);
+        return admin;
+    }
+
+    public static User createMockModerator() {
+        User moderator = createMockUser();
+        moderator.setId(3);
+        moderator.setUsername("moderator_user");
+        moderator.setRole(Role.MODERATOR);
+        return moderator;
     }
 
     public static UserCreateDto createMockUserCreateDto() {

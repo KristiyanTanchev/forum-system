@@ -41,9 +41,15 @@ public class AdminRestController {
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 
-    @PostMapping("/users/{id}/promote")
-    public ResponseEntity<UserResponseDto> promoteUser(@PathVariable int id) {
+    @PostMapping("/users/{id}/promote-admin")
+    public ResponseEntity<UserResponseDto> promoteToAdmin(@PathVariable int id) {
         User user = userService.promoteToAdmin(id);
+        return ResponseEntity.ok(userMapper.toResponseDto(user));
+    }
+
+    @PostMapping("/users/{id}/promote-moderator")
+    public ResponseEntity<UserResponseDto> promoteToModerator(@PathVariable int id) {
+        User user = userService.promoteToModerator(id);
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 

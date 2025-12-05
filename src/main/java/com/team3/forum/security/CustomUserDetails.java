@@ -1,5 +1,6 @@
 package com.team3.forum.security;
 
+import com.team3.forum.models.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +12,8 @@ import java.util.Collection;
 public class CustomUserDetails extends User {
     private int id;
     private String email;
-    private boolean isAdmin;
+    private Role role;
+
     public CustomUserDetails(String username,
                              String password,
                              boolean enabled,
@@ -21,11 +23,19 @@ public class CustomUserDetails extends User {
                              Collection<? extends GrantedAuthority> authorities,
                              int userId,
                              String email,
-                             boolean isAdmin) {
+                             Role role) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = userId;
         this.email = email;
-        this.isAdmin = isAdmin;
+        this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
+    }
+
+    public boolean isModerator() {
+        return role == Role.MODERATOR || role == Role.ADMIN;
     }
 }
 

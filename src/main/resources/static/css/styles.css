@@ -161,6 +161,15 @@ a {
     background: rgba(127, 29, 29, 0.9);
 }
 
+.btn-warning {
+    border-color: rgba(251, 191, 36, 0.6);
+    background: rgba(217, 119, 6, 0.7);
+}
+
+.btn-warning:hover {
+    background: rgba(217, 119, 6, 0.9);
+}
+
 .mobile-menu-toggle {
     display: none;
     border: none;
@@ -1705,4 +1714,5 @@ a {
     background: rgba(59, 130, 246, 0.12); /* soft blue-ish */
     border: 1px solid rgba(59, 130, 246, 0.3);
     font-weight: 500;
+}
 }

@@ -31,8 +31,9 @@
                         <div>
                             <div class="profile-username" th:text="${user.username}">username</div>
                             <div class="profile-role-badges">
-                                <!-- shown if user is admin -->
-                                <span class="profile-badge profile-badge-admin" th:if="${user.isAdmin}">Admin</span>
+                                <!-- shown based on user role -->
+                                <span class="profile-badge profile-badge-admin" th:if="${user.role == 'ADMIN'}">Admin</span>
+                                <span class="profile-badge profile-badge-mod" th:if="${user.role == 'MODERATOR'}">Moderator</span>
                                 <!-- shown if this is your own profile -->
                                 <span class="profile-badge profile-badge-owner" th:if="${isOwnProfile}">You</span>
                             </div>

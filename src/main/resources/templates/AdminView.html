@@ -93,6 +93,8 @@
                                 <option value="active" th:selected="${statusFilter == 'active'}">Active</option>
                                 <option value="blocked" th:selected="${statusFilter == 'blocked'}">Blocked</option>
                                 <option value="admin" th:selected="${statusFilter == 'admin'}">Admin</option>
+                                <option value="moderator" th:selected="${statusFilter == 'moderator'}">Moderator</option>
+                                <option value="user" th:selected="${statusFilter == 'user'}">User</option>
                             </select>
 
 
@@ -154,8 +156,9 @@
                                 <span><span th:text="${#lists.size(user.posts)}">42</span> posts</span>
                                 <span th:if="${user.blocked}" class="badge badge-danger">Blocked</span>
                                 <span th:unless="${user.blocked}" class="badge badge-success">Active</span>
-                                <span th:if="${user.admin}" class="badge badge-admin">Admin</span>
-                                <span th:unless="${user.admin}" class="badge badge-secondary">User</span>
+                                <span th:if="${user.role.name() == 'ADMIN'}" class="badge badge-admin">Admin</span>
+                                <span th:if="${user.role.name() == 'MODERATOR'}" class="badge badge-warning">Moderator</span>
+                                <span th:if="${user.role.name() == 'USER'}" class="badge badge-secondary">User</span>
                             </div>
                         </div>
 
@@ -167,11 +170,6 @@
                                   method="post"
                                   class="admin-action-form"
                                   onsubmit="return confirm('Are you sure you want to block this user?');">
-                                <input type="hidden" name="search" th:value="${searchQuery}"/>
-                                <input type="hidden" name="status" th:value="${statusFilter}"/>
-                                <input type="hidden" name="sort" th:value="${sortBy}"/>
-                                <input type="hidden" name="direction" th:value="${sortDirection}"/>
-                                <input type="hidden" name="page" th:value="${pageInfo.page}"/>
                                 <button type="submit" class="btn btn-ghost btn-sm">Block</button>
                             </form>
                             <form th:if="${user.blocked}"
@@ -179,25 +177,26 @@
                                   method="post"
                                   class="admin-action-form"
                                   onsubmit="return confirm('Are you sure you want to unblock this user?');">
-                                <input type="hidden" name="search" th:value="${searchQuery}"/>
-                                <input type="hidden" name="status" th:value="${statusFilter}"/>
-                                <input type="hidden" name="sort" th:value="${sortBy}"/>
-                                <input type="hidden" name="direction" th:value="${sortDirection}"/>
-                                <input type="hidden" name="page" th:value="${pageInfo.page}"/>
                                 <button type="submit" class="btn btn-ghost btn-sm">Unblock</button>
                             </form>
 
-
-                            <form th:if="${!user.admin && !user.blocked}"
-                                  th:action="@{/admin/users/{id}/promote(id=${user.id})}"
+                            <!-- Promote to Moderator button (only for regular users, not blocked) -->
+                            <form th:if="${user.role.name() == 'USER' && !user.blocked}"
+                                  th:action="@{/admin/users/{id}/promote-moderator(id=${user.id})}"
                                   method="post"
                                   class="admin-action-form"
+                                  sec:authorize="hasRole('ADMIN')"
+                                  onsubmit="return confirm('Are you sure you want to promote this user to moderator?');">
+                                <button type="submit" class="btn btn-warning btn-sm">Make Moderator</button>
+                            </form>
+
+                            <!-- Promote to Admin button (for users and moderators, not blocked) -->
+                            <form th:if="${user.role.name() != 'ADMIN' && !user.blocked}"
+                                  th:action="@{/admin/users/{id}/promote-admin(id=${user.id})}"
+                                  method="post"
+                                  class="admin-action-form"
+                                  sec:authorize="hasRole('ADMIN')"
                                   onsubmit="return confirm('Are you sure you want to promote this user to admin?');">
-                                <input type="hidden" name="search" th:value="${searchQuery}"/>
-                                <input type="hidden" name="status" th:value="${statusFilter}"/>
-                                <input type="hidden" name="sort" th:value="${sortBy}"/>
-                                <input type="hidden" name="direction" th:value="${sortDirection}"/>
-                                <input type="hidden" name="page" th:value="${pageInfo.page}"/>
                                 <button type="submit" class="btn btn-primary btn-sm">Make Admin</button>
                             </form>
                         </div>

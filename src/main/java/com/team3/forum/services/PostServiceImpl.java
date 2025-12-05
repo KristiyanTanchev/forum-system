@@ -7,6 +7,7 @@ import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.enums.PostSortField;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.enums.SortDirection;
 import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostUpdateDto;
@@ -77,7 +78,7 @@ public class PostServiceImpl implements PostService {
         if (persistent == null) {
             throw new EntityNotFoundException("Post", id);
         }
-        verifyAdminOrOwner(persistent,
+        verifyModeratorOrOwner(persistent,
                 requester,
                 new AuthorizationException(DELETE_AUTHORIZATION_ERROR));
         persistent.setDeleted(true);
@@ -93,7 +94,7 @@ public class PostServiceImpl implements PostService {
             throw new EntityNotFoundException("Post", id);
         }
 
-        verifyAdminOrOwner(persistent,
+        verifyModeratorOrOwner(persistent,
                 requester,
                 new AuthorizationException(RESTORE_AUTHORIZATION_ERROR));
 
@@ -112,7 +113,7 @@ public class PostServiceImpl implements PostService {
         User requester = userRepository.findById(requesterId);
         Post persistent = postRepository.findById(postId);
 
-        verifyAdminOrOwner(persistent,
+        verifyModeratorOrOwner(persistent,
                 requester,
                 new AuthorizationException(EDIT_AUTHORIZATION_ERROR));
 
@@ -213,10 +214,24 @@ public class PostServiceImpl implements PostService {
        return postRepository.getPostsCount();
     }
 
-    private void verifyAdminOrOwner(Post post, User requester, RuntimeException error) {
-        if (!requester.isAdmin() && post.getUser().getId() != requester.getId()) {
-            throw error;
+    private void verifyModeratorOrOwner(Post post, User requester, RuntimeException error) {
+        // Owner can edit/delete their own posts
+        if (post.getUser().getId() == requester.getId()) {
+            return;
         }
+
+        // Moderators can delete posts, but not from other mods or admins
+        if (requester.isModerator()) {
+            Role targetRole = post.getUser().getRole();
+            if (targetRole == Role.USER) {
+                return; // Moderator can act on regular user posts
+            }
+            if (requester.isAdmin()) {
+                return; // Admins can act on anyone's posts
+            }
+        }
+
+        throw error;
     }
 
     @Override

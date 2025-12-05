@@ -200,7 +200,13 @@ public class UserRepositoryImpl implements UserRepository {
                     whereClause.append("and u.isBlocked = true ");
                     break;
                 case "admin":
-                    whereClause.append("and u.isAdmin = true ");
+                    whereClause.append("and u.role = 'ADMIN' ");
+                    break;
+                case "moderator":
+                    whereClause.append("and u.role = 'MODERATOR' ");
+                    break;
+                case "user":
+                    whereClause.append("and u.role = 'USER' ");
                     break;
             }
         }

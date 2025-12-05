@@ -50,18 +50,27 @@ public class CustomUserDetailsService implements UserDetailsService {
                 getAuthorities(user),
                 user.getId(),
                 user.getEmail(),
-                user.isAdmin()
+                user.getRole()
         );
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (user.isAdmin()) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        switch (user.getRole()) {
+            case ADMIN:
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                authorities.add(new SimpleGrantedAuthority("ROLE_MODERATOR"));
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                break;
+            case MODERATOR:
+                authorities.add(new SimpleGrantedAuthority("ROLE_MODERATOR"));
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                break;
+            case USER:
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                break;
         }
-
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
         return authorities;
     }

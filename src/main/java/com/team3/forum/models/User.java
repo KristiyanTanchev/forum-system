@@ -1,6 +1,7 @@
 package com.team3.forum.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.team3.forum.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -37,8 +38,10 @@ public class User {
     @JsonIgnore
     private String password;
 
-    @Column(name = "is_admin")
-    private boolean isAdmin;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    @Builder.Default
+    private Role role = Role.USER;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -69,4 +72,12 @@ public class User {
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
+    }
+
+    public boolean isModerator() {
+        return role == Role.MODERATOR || role == Role.ADMIN;
+    }
 }
