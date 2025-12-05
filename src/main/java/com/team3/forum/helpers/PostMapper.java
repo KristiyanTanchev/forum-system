@@ -36,6 +36,14 @@ public class PostMapper {
     }
 
     public PostResponseDto toResponseDto(Post post) {
+        String updatedAtString = "";
+        if (post.getUpdatedAt() != null) {
+            updatedAtString = TimeAgo.toTimeAgo(post.getUpdatedAt());
+        }
+        String deletedAtString = "";
+        if (post.isDeleted()) {
+            deletedAtString = TimeAgo.toTimeAgo(post.getDeletedAt());
+        }
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -47,6 +55,9 @@ public class PostMapper {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .createdAtString(TimeAgo.toTimeAgo(post.getCreatedAt()))
+                .updatedAtString(updatedAtString)
+                .deletedAtString(deletedAtString)
+                .isDeleted(post.isDeleted())
                 .userId(post.getUser().getId())
                 .comments(post.getComments().stream().toList())
                 .folderName(post.getFolder().getName())

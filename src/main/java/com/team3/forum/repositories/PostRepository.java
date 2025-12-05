@@ -24,9 +24,11 @@ public interface PostRepository {
 
     List<Post> findPostsInFolderPaginated(int page, int size, Folder parent, PostSortField orderBy, SortDirection direction);
 
-    List<Post> findPostsInFolderWithTagPaginated(int page, int size, Folder parent, PostSortField orderBy, SortDirection direction, int tagId);
+    List<Post> findPostsInFolderWithTagPaginated(int page, int size, String searchQuery, Folder parent, PostSortField orderBy, SortDirection direction, int tagId);
 
     int countPostsInFolderWithTag(Folder parent, int tagId);
+
+    int countPostsInFolderWithTagAndSearch(Folder parent, int tagId, String searchQuery);
 
     List<Post> findAllSortedByViewsLastDays(int limit, int days);
 

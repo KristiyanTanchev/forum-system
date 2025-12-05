@@ -11,6 +11,9 @@
             <span>by <strong th:text="${post.creator}"></strong></span>
             <span th:text="${post.createdAtString}"></span>
             <span>in <span class="topic-folder" th:text="${post.folderName}">Folder name</span></span>
+            <span th:if="${post.updatedAt != null && !post.isDeleted}"
+                  th:text="'| updated ' + ${post.updatedAtString} + ' |'"></span>
+            <span th:if="${post.isDeleted}" th:text="'| deleted ' + ${post.deletedAtString} + ' |'"></span>
             <span class="badge" th:each="tag: ${post.tags}" th:text="${tag.name}"></span>
         </div>
     </div>

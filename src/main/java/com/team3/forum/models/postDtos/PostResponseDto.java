@@ -45,4 +45,10 @@ public class PostResponseDto {
 
     private String createdAtString;
 
+    private String updatedAtString;
+
+    private String deletedAtString;
+
+    private boolean isDeleted;
+
 }

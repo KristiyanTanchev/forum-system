@@ -50,10 +50,20 @@
                     </article>
 
                     <div class="post-actions" sec:authorize="isAuthenticated()">
-                        <button class="btn btn-primary" type="button">Reply</button>
-                        <button class="btn btn-ghost" type="button">Follow thread (TODO?)</button>
-                        <button class=" btn btn-ghost" type="button">Like ·
+                        <button class=" btn btn-ghost" th:if="${!post.deleted}" type="button">Like ·
                             <span th:text="${post.likedBy.size()}">24</span></button>
+                        <a class="btn btn-ghost" th:href="@{/forum/posts/{postId}/edit(postId=${post.id})}"
+                           th:if="${canEdit != null && canEdit && !post.deleted}">Edit</a>
+                        <form method="post" onsubmit="return confirm('Are you sure you want to delete this post?');"
+                              style="display:inline" th:action="@{/forum/posts/{postId}/delete(postId=${post.id})}"
+                              th:if="${canEdit != null && canEdit && !post.deleted}">
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                        <form method="post" onsubmit="return confirm('Are you sure you want to restore this post?');"
+                              style="display:inline" th:action="@{/forum/posts/{postId}/restore(postId=${post.id})}"
+                              th:if="${canEdit != null && canEdit && post.deleted}">
+                            <button class="btn btn-primary" type="submit">Restore</button>
+                        </form>
                     </div>
                 </section>
 

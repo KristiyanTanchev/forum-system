@@ -1,6 +1,7 @@
 package com.team3.forum.models.postDtos;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -17,4 +18,13 @@ public class PostUpdateDto {
     @NotNull
     @Size(min = 32, max = 8192)
     private String content;
+
+    @Size(max = 32)
+    private String tag1;
+
+    @Size(max = 32)
+    private String tag2;
+
+    @Size(max = 32)
+    private String tag3;
 }

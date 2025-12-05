@@ -11,34 +11,79 @@
         <div class="container">
             <section class="card editor-card-wide">
                 <div class="form-header">
-                    <h1 class="form-title">Edit topic</h1>
+                    <h1 class="form-title">Edit post</h1>
                     <p class="form-subtitle">
-                        Update your post. Major changes should be explained in a comment.
+                        Editing your topic in <span th:text="${folder.name}"></span> folder.
                     </p>
                 </div>
 
-                <form>
-                    <!-- same fields as create post, but prefilled server-side -->
-                    <div class="form-field">
-                        <label class="form-label" for="edit-title">Title</label>
-                        <input class="form-input" id="edit-title" name="title"
-                               type="text"
-                               value="Is Andor the most mature Star Wars show?"/>
-                    </div>
 
-                    <div class="form-field">
-                        <label class="form-label" for="edit-body">Content</label>
-                        <textarea class="form-textarea" id="edit-body"
-                                  name="content">Existing post body here…</textarea>
-                    </div>
+                <!-- RIGHT: edit form -->
+                <section class="card folder-posts">
+                    <form method="post"
+                          th:action="@{/forum/posts/{postId}/edit(postId=${postId})}"
+                          th:object="${post}">
+                        <div class="form-field">
+                            <label class="form-label" for="post-title">Title</label>
+                            <input class="form-input" id="post-title" name="title"
+                                   placeholder="Edit your topic title"
+                                   th:field="*{title}"
+                                   type="text"/>
+                            <div class="field-error" th:errors="*{title}"></div>
+                        </div>
 
-                    <div class="form-actions">
-                        <button class="btn btn-primary" type="submit">Save changes</button>
-                        <button class="btn btn-ghost" type="button">Cancel</button>
-                        <!-- owner or admin only -->
-                        <button class="btn btn-danger btn-sm" type="button">Delete topic</button>
-                    </div>
-                </form>
+                        <div class="form-field">
+                            <label class="form-label" for="post-body">Content</label>
+                            <textarea class="form-textarea form-textarea-wide" id="post-body"
+                                      name="content"
+                                      placeholder="Update your post content here."
+                                      th:field="*{content}"></textarea>
+
+                            <div class="field-error" th:errors="*{content}"></div>
+                            <p class="form-help">
+                                Markdown supported. Spoilers: >! text, **bold**, *italic*, [text](url).
+                            </p>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="post-tags-1">Tag 1 <span>(optional)</span></label>
+                            <input class="form-input" id="post-tags-1"
+                                   placeholder="e.g. star wars"
+                                   th:field="*{tag1}"
+                                   type="text"/>
+                            <div class="field-error" th:errors="*{tag1}"></div>
+                            <br/><br/>
+
+                            <label class="form-label" for="post-tags-2">Tag 2 <span>(optional)</span></label>
+                            <input class="form-input" id="post-tags-2"
+                                   placeholder="e.g. andor"
+                                   th:field="*{tag2}"
+                                   type="text"/>
+                            <div class="field-error" th:errors="*{tag2}"></div>
+                            <br/><br/>
+
+                            <label class="form-label" for="post-tags-3">Tag 3 <span>(optional)</span></label>
+                            <input class="form-input" id="post-tags-3"
+                                   placeholder="e.g. tv show"
+                                   th:field="*{tag3}"
+                                   type="text"/>
+                            <div class="field-error" th:errors="*{tag3}"></div>
+                            <p class="form-help">
+                                Enter up to three tags to help others find your topic.
+                            </p>
+                        </div>
+
+                        <!-- NO folderId input here on purpose -->
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit">Save changes</button>
+                            <a class="btn btn-ghost"
+                               th:href="@{/forum/posts/{postId}(postId=${postId})}">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </section>
             </section>
         </div>
     </main>

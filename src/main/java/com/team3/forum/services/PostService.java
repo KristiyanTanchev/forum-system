@@ -12,6 +12,8 @@ public interface PostService {
 
     Post findById(int id);
 
+    Post findByIdIncludeDeleted(int id, int requesterId);
+
     void deleteById(int id, int requesterId);
 
     Post restoreById(int id, int requesterId);
@@ -32,7 +34,7 @@ public interface PostService {
 
     List<Post> getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction);
 
-    PostPage getPostsInFolderPaginated(Folder folder, int page, String orderBy, String direction, int tagId);
+    PostPage getPostsInFolderPaginated(Folder folder, int page, String searchQuery, String orderBy, String direction, int tagId);
 
     List<Post> getTrendingPosts();
 

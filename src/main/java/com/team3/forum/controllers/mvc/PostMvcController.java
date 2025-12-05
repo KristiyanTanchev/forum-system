@@ -3,24 +3,17 @@ package com.team3.forum.controllers.mvc;
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.PostMapper;
-import com.team3.forum.models.Folder;
-import com.team3.forum.models.Post;
-import com.team3.forum.models.Tag;
-import com.team3.forum.models.User;
-import com.team3.forum.models.Comment;
+import com.team3.forum.models.*;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
 import com.team3.forum.models.folderDtos.FolderResponseDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
+import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.security.CustomUserDetails;
-import com.team3.forum.services.FolderService;
-import com.team3.forum.services.PostService;
-import com.team3.forum.services.TagService;
-import com.team3.forum.services.CommentService;
-import com.team3.forum.services.UserService;
+import com.team3.forum.services.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,6 +28,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/forum/posts")
 public class PostMvcController {
+    private final static int FOLDER_PAGE_SIZE = 5;
+
+
     private final PostService postService;
     private final PostMapper postMapper;
     private final FolderService folderService;
@@ -61,11 +57,12 @@ public class PostMvcController {
     public String getAllPosts(
             Model model,
             @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "created_at") String orderBy,
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(defaultValue = "0") int tagId,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, orderBy, direction, tagId);
+        PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, search, orderBy, direction, tagId);
         model.addAttribute("pageInfo", pageInfo);
         List<PostResponseDto> posts = pageInfo.getItems().stream()
                 .map(postMapper::toResponseDto).toList();
@@ -109,10 +106,18 @@ public class PostMvcController {
         } else {
             model.addAttribute("sortCommentsBy", "date");
         }
-        Post post = postService.findById(postId);
+        Post post;
         if (principal != null) {
+            post = postService.findByIdIncludeDeleted(postId, principal.getId());
             postService.registerView(postId, principal.getId());
+        } else {
+            post = postService.findById(postId);
         }
+
+        if (principal != null && principal.isAdmin() || post.getUser().getId() == principal.getId()) {
+            model.addAttribute("canEdit", true);
+        }
+
         model.addAttribute("tags",
                 post.getTags().stream()
                         .map(tag -> TagResponseDto.builder().id(tag.getId()).name(tag.getName()).build())
@@ -148,6 +153,8 @@ public class PostMvcController {
     public String createPostPage(
             Model model,
             @RequestParam(defaultValue = "0") int folderId,
+            @RequestParam(defaultValue = "1") int siblingPage,
+            @RequestParam(defaultValue = "1") int childPage,
             @AuthenticationPrincipal CustomUserDetails principal) {
         if (principal == null) {
             return "redirect:/auth/login?error=You must be logged in to create a post!";
@@ -159,6 +166,48 @@ public class PostMvcController {
             folder = folderService.findById(folderId);
         }
 
+        // ---------- SIBLING FOLDERS ----------
+        List<Folder> allSiblingFolders = folderService.getSiblingFolders(folder);
+        int siblingTotal = allSiblingFolders.size();
+        int siblingTotalPages = siblingTotal == 0 ? 1
+                : (int) Math.ceil((double) siblingTotal / FOLDER_PAGE_SIZE);
+
+        siblingPage = Math.max(1, Math.min(siblingPage, siblingTotalPages));
+        int siblingFrom = (siblingPage - 1) * FOLDER_PAGE_SIZE;
+        int siblingTo = Math.min(siblingFrom + FOLDER_PAGE_SIZE, siblingTotal);
+
+        List<FolderResponseDto> siblingFolderResponseDtos = allSiblingFolders
+                .subList(siblingFrom, siblingTo).stream()
+                .map(folderMapper::toResponseDto)
+                .toList();
+
+        model.addAttribute("siblingFolders", siblingFolderResponseDtos);
+        model.addAttribute("siblingPage", siblingPage);
+        model.addAttribute("siblingTotalPages", siblingTotalPages);
+
+        // ---------- CHILD FOLDERS ----------
+        List<Folder> allChildFolders = folder.getChildFolders().stream()
+                .sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()))
+                .toList();
+
+        int childTotal = allChildFolders.size();
+        int childTotalPages = childTotal == 0 ? 1
+                : (int) Math.ceil((double) childTotal / FOLDER_PAGE_SIZE);
+
+        childPage = Math.max(1, Math.min(childPage, childTotalPages));
+        int childFrom = (childPage - 1) * FOLDER_PAGE_SIZE;
+        int childTo = Math.min(childFrom + FOLDER_PAGE_SIZE, childTotal);
+
+        List<FolderResponseDto> childFolderResponseDtos = allChildFolders
+                .subList(childFrom, childTo).stream()
+                .map(folderMapper::toResponseDto)
+                .toList();
+
+        model.addAttribute("childFolders", childFolderResponseDtos);
+        model.addAttribute("childPage", childPage);
+        model.addAttribute("childTotalPages", childTotalPages);
+
+
         if (folder.getParentFolder() != null) {
             FolderResponseDto parentFolderDto = folderMapper.toResponseDto(folder.getParentFolder());
             model.addAttribute("parent", parentFolderDto);
@@ -166,22 +215,11 @@ public class PostMvcController {
         if (folder.getParentFolder() == null) {
             model.addAttribute("parent", null);
         }
-        List<Folder> siblingFolders = folderService.getSiblingFolders(folder);
-        List<FolderResponseDto> siblingFolderResponseDtos = siblingFolders.stream()
-                .map(folderMapper::toResponseDto).toList();
-
-        model.addAttribute("siblingFolders", siblingFolderResponseDtos);
 
         model.addAttribute("folderName", folder.getName());
 
         model.addAttribute("folder", folderMapper.toResponseDto(folder));
 
-        List<FolderResponseDto> childFolderResponseDtos = folder.getChildFolders().stream()
-                .sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()))
-                .map(folderMapper::toResponseDto).toList();
-
-        model.addAttribute("childFolders", childFolderResponseDtos);
-        model.addAttribute("folder", folderMapper.toResponseDto(folder));
         PostCreationDto postCreationDto = new PostCreationDto();
         postCreationDto.setFolderId(folder.getId());
         model.addAttribute("post", postCreationDto);
@@ -205,6 +243,110 @@ public class PostMvcController {
         post = postService.create(post);
         return "redirect:/forum/posts/" + post.getId();
     }
+
+
+    @GetMapping("/{postId}/edit")
+    public String editPostPage(
+            Model model,
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to edit a post!";
+        }
+
+        Post post = postService.findById(postId);
+
+        if (!principal.isAdmin() && post.getUser().getId() != principal.getId()) {
+            return "redirect:/forum/posts/" + postId + "?error=You are not allowed to edit this post.";
+        }
+
+        PostUpdateDto dto = new PostUpdateDto();
+        dto.setTitle(post.getTitle());
+        dto.setContent(post.getContent());
+
+        var tags = post.getTags().stream().toList();
+        if (tags.size() > 0) dto.setTag1(tags.get(0).getName());
+        if (tags.size() > 1) dto.setTag2(tags.get(1).getName());
+        if (tags.size() > 2) dto.setTag3(tags.get(2).getName());
+
+        Folder folder = post.getFolder();
+
+        model.addAttribute("folder", folderMapper.toResponseDto(folder));
+        model.addAttribute("post", dto);
+        model.addAttribute("postId", postId);
+
+        return "EditPostView";
+    }
+
+    @PostMapping("/{postId}/edit")
+    public String updatePost(
+            Model model,
+            @PathVariable int postId,
+            @Valid @ModelAttribute("post") PostUpdateDto postUpdateDto,
+            BindingResult errors,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to edit a post!";
+        }
+
+        Post existing = postService.findById(postId);
+
+        // Authorization: only owner or admin
+        if (!principal.isAdmin() && existing.getUser().getId() != principal.getId()) {
+            return "redirect:/forum/posts/" + postId + "?error=You are not allowed to edit this post.";
+        }
+
+        if (errors.hasErrors()) {
+            model.addAttribute("folder", folderMapper.toResponseDto(existing.getFolder()));
+            model.addAttribute("postId", postId);
+            return "EditPostView";
+        }
+
+        postService.update(postId, postUpdateDto, principal.getId());
+
+        return "redirect:/forum/posts/" + postId;
+    }
+
+    @PostMapping("/{postId}/delete")
+    public String deletePost(
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to delete posts!";
+        }
+
+        try {
+            postService.deleteById(postId, principal.getId());
+            return "redirect:/forum";
+        } catch (AuthorizationException e) {
+            return "ErrorView403";
+        } catch (Exception e) {
+            return "ErrorView404";
+        }
+    }
+
+    @PostMapping("/{postId}/restore")
+    public String restorePost(
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to restore posts!";
+        }
+
+        try {
+            postService.restoreById(postId, principal.getId());
+            return "redirect:/forum/posts/" + postId;
+        } catch (AuthorizationException e) {
+            return "ErrorView403";
+        } catch (Exception e) {
+            return "ErrorView404";
+        }
+    }
+
 
     @PostMapping("/{postId}/comments")
     public String createComment(
