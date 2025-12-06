@@ -92,10 +92,9 @@
                                 <form method="get" th:action="@{/forum/posts/{id}(id=${post.id})}">
                                     <select class="comment-order-by folder-select"
                                             name="sortCommentsBy"
-                                            th:value="${sortCommentsBy}"
                                             onchange="this.form.submit()">
-                                        <option value="date">Sort by newest</option>
-                                        <option value="likes">Sort by most likes</option>
+                                        <option value="date" th:selected="${sortCommentsBy == 'date'}">Sort by newest</option>
+                                        <option value="likes" th:selected="${sortCommentsBy == 'likes'}">Sort by most likes</option>
                                     </select>
                                     <input type="hidden" name="commentPage" th:value="${commentPage}" id="comment-page-input"/>
                                     <input type="hidden" name="commentSize" value="10"/>
@@ -271,6 +270,11 @@
                     $('#comment-page-input').val(currentPage + 1);
                     form.submit();
                 }
+            });
+
+            // When changing sort order, reset to first page
+            $('select[name="sortCommentsBy"]').on('change', function() {
+                $('#comment-page-input').val(0);
             });
         }
     });
