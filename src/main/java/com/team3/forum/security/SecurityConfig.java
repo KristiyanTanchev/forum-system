@@ -72,6 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/users/*/demote-moderator").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("MODERATOR")
                         .requestMatchers("/api/admin/**").hasRole("MODERATOR")
+                        .requestMatchers("/folders").hasRole("MODERATOR")
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()

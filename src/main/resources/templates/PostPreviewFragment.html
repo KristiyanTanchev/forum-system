@@ -14,12 +14,27 @@
             <span th:if="${post.updatedAt != null && !post.isDeleted}"
                   th:text="'| updated ' + ${post.updatedAtString} + ' |'"></span>
             <span th:if="${post.isDeleted}" th:text="'| deleted ' + ${post.deletedAtString} + ' |'"></span>
-            <span class="badge" th:each="tag: ${post.tags}" th:text="${tag.name}"></span>
+            <div class="topic-tags">
+                <span class="badge"
+                      th:each="tag : ${post.tags}"
+                      th:text="${tag.name}">
+                </span>
+            </div>
         </div>
     </div>
     <div class="topic-stats">
-        <div th:text="${post.commentsCount} + ' replies'"></div>
-        <div th:text="${post.views} + ' views'"></div>
+        <div class="topic-stat">
+            <span class="topic-stat-number" th:text="${post.commentsCount}"></span>
+            <span class="topic-stat-label">replies</span>
+        </div>
+        <div class="topic-stat">
+            <span class="topic-stat-number" th:text="${post.views}"></span>
+            <span class="topic-stat-label">views</span>
+        </div>
+        <div class="topic-stat">
+            <span class="topic-stat-number" th:text="${post.likedBy.size()}"></span>
+            <span class="topic-stat-label">likes</span>
+        </div>
     </div>
 </a>
 </body>

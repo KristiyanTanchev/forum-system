@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
       layout:decorate="~{Layout}"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>View posts</title>
@@ -31,7 +31,18 @@
                     </div>
                 </div>
                 <div class="folder-header-actions" sec:authorize="isAuthenticated()">
-                    <a class="btn btn-primary" th:href="@{/forum/posts/new?folderId={folderId}(folderId=${folder.id})}"
+                    <a class="btn btn-ghost" sec:authorize="hasRole('MODERATOR')"
+                       th:href="@{/folders/new(folderId=${folder.id})}"
+                       type="button">New folder</a>
+                    <a class="btn btn-ghost" sec:authorize="hasRole('MODERATOR')"
+                       th:href="@{/folders/{id}/edit(id=${folder.id})}"
+                       type="button">Edit this folder</a>
+                    <form method="post" onsubmit="return confirm('Are you sure you want to delete this folder? This action cannot be undone.');"
+                          sec:authorize="hasRole('MODERATOR')"
+                          th:action="@{/folders/{id}/delete(id=${folder.id})}">
+                        <button class="btn btn-danger" type="submit">Delete folder</button>
+                    </form>
+                    <a class="btn btn-primary" th:href="@{/forum/posts/new(folderId=${folder.id})}"
                        type="button">New topic</a>
                 </div>
             </div>
@@ -41,8 +52,7 @@
                 <aside class="card folder-sidebar">
                     <div class="folder-sidebar-section">
                         <div class="card-title">Folder details</div>
-                        <div class="card-subtitle">
-                            (TODO: consider adding a description field)
+                        <div class="card-subtitle" th:text="${folder.description}">
                         </div>
 
                         <div class="folder-stats">
@@ -148,8 +158,8 @@
 
                         <span class="folder-page-info"
                               th:text="'Page ' + ${childPage} + ' of ' + ${childTotalPages}">
-        Page 1 of 3
-    </span>
+                            Page 1 of 3
+                        </span>
 
                         <button class="btn btn-ghost folder-page-btn child-page-btn"
                                 data-delta="1"

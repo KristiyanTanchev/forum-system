@@ -2,11 +2,11 @@ package com.team3.forum.controllers.mvc;
 
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.helpers.FolderMapper;
+import com.team3.forum.helpers.FolderPageHelper;
 import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.*;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
-import com.team3.forum.models.folderDtos.FolderResponseDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
@@ -28,8 +28,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/forum/posts")
 public class PostMvcController {
-    private final static int FOLDER_PAGE_SIZE = 5;
-
 
     private final PostService postService;
     private final PostMapper postMapper;
@@ -39,11 +37,14 @@ public class PostMvcController {
     private final CommentService commentService;
     private final UserService userService;
 
+    private final FolderPageHelper folderPageHelper;
+
     @Autowired
     public PostMvcController(PostService postService, PostMapper postMapper,
                              FolderService folderService, FolderMapper folderMapper,
                              TagService tagService, CommentService commentService,
-                             UserService userService) {
+                             UserService userService,
+                             FolderPageHelper folderPageHelper) {
         this.postService = postService;
         this.postMapper = postMapper;
         this.folderService = folderService;
@@ -51,6 +52,7 @@ public class PostMvcController {
         this.tagService = tagService;
         this.commentService = commentService;
         this.userService = userService;
+        this.folderPageHelper = folderPageHelper;
     }
 
     @GetMapping
@@ -166,59 +168,7 @@ public class PostMvcController {
             folder = folderService.findById(folderId);
         }
 
-        // ---------- SIBLING FOLDERS ----------
-        List<Folder> allSiblingFolders = folderService.getSiblingFolders(folder);
-        int siblingTotal = allSiblingFolders.size();
-        int siblingTotalPages = siblingTotal == 0 ? 1
-                : (int) Math.ceil((double) siblingTotal / FOLDER_PAGE_SIZE);
-
-        siblingPage = Math.max(1, Math.min(siblingPage, siblingTotalPages));
-        int siblingFrom = (siblingPage - 1) * FOLDER_PAGE_SIZE;
-        int siblingTo = Math.min(siblingFrom + FOLDER_PAGE_SIZE, siblingTotal);
-
-        List<FolderResponseDto> siblingFolderResponseDtos = allSiblingFolders
-                .subList(siblingFrom, siblingTo).stream()
-                .map(folderMapper::toResponseDto)
-                .toList();
-
-        model.addAttribute("siblingFolders", siblingFolderResponseDtos);
-        model.addAttribute("siblingPage", siblingPage);
-        model.addAttribute("siblingTotalPages", siblingTotalPages);
-
-        // ---------- CHILD FOLDERS ----------
-        List<Folder> allChildFolders = folder.getChildFolders().stream()
-                .sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()))
-                .toList();
-
-        int childTotal = allChildFolders.size();
-        int childTotalPages = childTotal == 0 ? 1
-                : (int) Math.ceil((double) childTotal / FOLDER_PAGE_SIZE);
-
-        childPage = Math.max(1, Math.min(childPage, childTotalPages));
-        int childFrom = (childPage - 1) * FOLDER_PAGE_SIZE;
-        int childTo = Math.min(childFrom + FOLDER_PAGE_SIZE, childTotal);
-
-        List<FolderResponseDto> childFolderResponseDtos = allChildFolders
-                .subList(childFrom, childTo).stream()
-                .map(folderMapper::toResponseDto)
-                .toList();
-
-        model.addAttribute("childFolders", childFolderResponseDtos);
-        model.addAttribute("childPage", childPage);
-        model.addAttribute("childTotalPages", childTotalPages);
-
-
-        if (folder.getParentFolder() != null) {
-            FolderResponseDto parentFolderDto = folderMapper.toResponseDto(folder.getParentFolder());
-            model.addAttribute("parent", parentFolderDto);
-        }
-        if (folder.getParentFolder() == null) {
-            model.addAttribute("parent", null);
-        }
-
-        model.addAttribute("folderName", folder.getName());
-
-        model.addAttribute("folder", folderMapper.toResponseDto(folder));
+        folderPageHelper.populateSidebar(folder, siblingPage, childPage, model);
 
         PostCreationDto postCreationDto = new PostCreationDto();
         postCreationDto.setFolderId(folder.getId());
@@ -272,7 +222,7 @@ public class PostMvcController {
 
         Folder folder = post.getFolder();
 
-        model.addAttribute("folder", folderMapper.toResponseDto(folder));
+        model.addAttribute("folder", folderService.buildFolderResponseDto(folder));
         model.addAttribute("post", dto);
         model.addAttribute("postId", postId);
 
@@ -299,7 +249,7 @@ public class PostMvcController {
         }
 
         if (errors.hasErrors()) {
-            model.addAttribute("folder", folderMapper.toResponseDto(existing.getFolder()));
+            model.addAttribute("folder", folderService.buildFolderResponseDto(existing.getFolder()));
             model.addAttribute("postId", postId);
             return "EditPostView";
         }
@@ -347,6 +297,46 @@ public class PostMvcController {
         }
     }
 
+
+    @PostMapping("/{postId}/like")
+    public String likePost(
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to like comments!";
+        }
+
+        try {
+            postService.likePost(postId, principal.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Post liked!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to like post: " + e.getMessage());
+        }
+
+        return "redirect:/forum/posts/" + postId;
+    }
+
+    @PostMapping("/{postId}/unlike")
+    public String unlikePost(
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to unlike comments!";
+        }
+
+        try {
+            postService.unlikePost(postId, principal.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Post unliked!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to unlike post: " + e.getMessage());
+        }
+
+        return "redirect:/forum/posts/" + postId;
+    }
 
     @PostMapping("/{postId}/comments")
     public String createComment(

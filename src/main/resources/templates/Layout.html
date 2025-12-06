@@ -27,6 +27,23 @@
     <!-- GLOBAL NAVBAR -->
     <header th:replace="~{Header :: navigation-bar}"></header>
 
+    <!-- FLASH MESSAGES -->
+    <div class="container" style="margin-top: 1rem;" th:if="${successMessage}">
+        <div class="alert alert-success">
+            <span th:text="${successMessage}"></span>
+        </div>
+    </div>
+    <div class="container" style="margin-top: 1rem;" th:if="${errorMessage}">
+        <div class="alert alert-error">
+            <span th:text="${errorMessage}"></span>
+        </div>
+    </div>
+    <div class="container" style="margin-top: 1rem;" th:if="${param.error}">
+        <div class="alert alert-error">
+            <span th:text="${param.error}"></span>
+        </div>
+    </div>
+
     <!-- MAIN PAGE CONTENT -->
     <main layout:fragment="content"></main>
 

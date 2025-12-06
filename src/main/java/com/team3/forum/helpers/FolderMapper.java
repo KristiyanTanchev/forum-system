@@ -1,36 +1,18 @@
 package com.team3.forum.helpers;
 
 import com.team3.forum.models.Folder;
-import com.team3.forum.models.folderDtos.FolderCreateDto;
-import com.team3.forum.models.folderDtos.FolderPathDto;
-import com.team3.forum.models.folderDtos.FolderResponseDto;
-import com.team3.forum.services.FolderService;
+import com.team3.forum.models.folderDtos.*;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-//TODO: Ideally mapper should not call services.
-// Getting views can be done with the repository query, but time consuming.
-// Consider it for future improvements.
 @Component
 public class FolderMapper {
-    private final FolderService folderService;
-
-    public FolderMapper(FolderService folderService) {
-        this.folderService = folderService;
-    }
 
     public Folder toEntity(FolderCreateDto dto) {
-        Folder parent = null;
-        if (dto.getParentFolderId() != 0){
-            parent = folderService.findById(dto.getParentFolderId());
-        }
         return Folder.builder()
                 .name(dto.getName())
-                .parentFolder(parent)
                 .slug(dto.getSlug())
+                .description(dto.getDescription())
                 .build();
     }
 
@@ -42,22 +24,30 @@ public class FolderMapper {
                 .build();
     }
 
+    public FolderUpdateDto toUpdateDto(Folder folder) {
+        return FolderUpdateDto.builder()
+                .id(folder.getId())
+                .name(folder.getName())
+                .slug(folder.getSlug())
+                .description(folder.getDescription())
+                .build();
+    }
 
-    public FolderResponseDto toResponseDto(Folder folder) {
-        LocalDateTime lastActivity = folderService.getLastActivity(folder);
-        String lastActivityString = lastActivity != null ? TimeAgo.toTimeAgo(lastActivity) : "";
+
+    public FolderResponseDto toResponseDto(Folder folder, FolderCalculatedStatsDto folderCalculatedStatsDto) {
         return FolderResponseDto.builder()
                 .name(folder.getName())
                 .slug(folder.getSlug())
+                .description(folder.getDescription())
                 .createdAt(folder.getCreatedAt())
                 .updatedAt(folder.getUpdatedAt())
                 .id(folder.getId())
-                .postCount(folder.getPosts().size())
-                .postCountWithSubfolders(getFolderPostsCount(folder))
-                .folderCount(folder.getChildFolders().size())
-                .pathFolders(buildPathFolders(folder, new ArrayList<>()))
-                .lastActivity(lastActivityString)
-                .path(buildPath(folder, ""))
+                .postCount(folderCalculatedStatsDto.getPostCount())
+                .postCountWithSubfolders(folderCalculatedStatsDto.getPostCountWithSubfolders())
+                .folderCount(folderCalculatedStatsDto.getFolderCount())
+                .pathFolders(folderCalculatedStatsDto.getPathFolders())
+                .lastActivity(folderCalculatedStatsDto.getLastActivity())
+                .path(folderCalculatedStatsDto.getPath())
                 .build();
     }
 
@@ -69,25 +59,4 @@ public class FolderMapper {
         return sb.append(path).append(folder.getSlug()).toString();
     }
 
-    private List<FolderPathDto> buildPathFolders(Folder folder, List<FolderPathDto> result) {
-        if (folder.getParentFolder() != null) {
-            buildPathFolders(folder.getParentFolder(), result);
-        }
-        result.add(
-                FolderPathDto.builder()
-                        .path(buildPath(folder, ""))
-                        .slug(folder.getSlug())
-                        .name(folder.getName())
-                        .build()
-        );
-        return result;
-    }
-
-    private int getFolderPostsCount(Folder folder) {
-        int sum = folder.getPosts().size();
-        for (Folder child : folder.getChildFolders()) {
-            sum += getFolderPostsCount(child);
-        }
-        return sum;
-    }
 }

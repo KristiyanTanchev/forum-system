@@ -38,7 +38,7 @@ public class FolderRestController {
     @GetMapping
     public ResponseEntity<List<FolderResponseDto>> getHome() {
         List<FolderResponseDto> response = folderService.findHomeFolders().stream()
-                .map(folderMapper::toResponseDto)
+                .map(folderService::buildFolderResponseDto)
                 .toList();
         return ResponseEntity.ok(response);
     }
@@ -47,11 +47,8 @@ public class FolderRestController {
     public ResponseEntity<FolderResponseDto> create(
             @RequestBody @Valid FolderCreateDto folderCreateDto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        //TODO: This one has some issues when slugs is empty. TBD if we will even allow folder creation on root level
-        Folder folder = folderMapper.toEntity(folderCreateDto);
-
-        Folder detached = folderService.create(folder, new ArrayList<>(), userDetails.getId());
-        FolderResponseDto response = folderMapper.toResponseDto(detached);
+        Folder detached = folderService.create(folderCreateDto, new ArrayList<>(), userDetails.getId());
+        FolderResponseDto response = folderService.buildFolderResponseDto(detached);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -63,10 +60,10 @@ public class FolderRestController {
 
         Folder folder = folderService.getFolderByPath(slugs);
 
-        FolderResponseDto folderDto = folderMapper.toResponseDto(folder);
+        FolderResponseDto folderDto = folderService.buildFolderResponseDto(folder);
 
         List<FolderResponseDto> subFolders = folder.getChildFolders().stream()
-                .map(folderMapper::toResponseDto)
+                .map(folderService::buildFolderResponseDto)
                 .toList();
 
         List<PostResponseDto> posts = folderService.getPostsInFolder(folder).stream()
@@ -86,10 +83,8 @@ public class FolderRestController {
 
         List<String> slugs = List.of(path.substring(1).split("/"));
 
-        Folder folder = folderMapper.toEntity(folderCreateDto);
-
-        Folder created = folderService.create(folder, slugs, userDetails.getId());
-        FolderResponseDto response = folderMapper.toResponseDto(created);
+        Folder created = folderService.create(folderCreateDto, slugs, userDetails.getId());
+        FolderResponseDto response = folderService.buildFolderResponseDto(created);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -104,7 +99,7 @@ public class FolderRestController {
 
         Folder updated = folderService.update(slugs, folderUpdateDto, userDetails.getId());
 
-        FolderResponseDto response = folderMapper.toResponseDto(updated);
+        FolderResponseDto response = folderService.buildFolderResponseDto(updated);
         return ResponseEntity.ok(response);
     }
 

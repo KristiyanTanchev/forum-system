@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit folder</title>
+</head>
+
+<section layout:fragment="content">
+    <main class="editor-page">
+        <div class="container">
+            <section class="card editor-card-wide">
+                <!-- HEADER -->
+                <div class="form-header">
+                    <h1 class="form-title">Edit folder</h1>
+                    <p class="form-subtitle">
+                        You are editing folder
+                        <span th:text="${folder.name}">Current folder</span>.
+                    </p>
+                </div>
+
+                <section class="card folder-posts">
+                    <!-- read-only parent info -->
+                    <div class="form-field">
+                        <label class="form-label">Parent folder</label>
+
+                        <!-- has parent -->
+                        <div class="form-static" th:if="${parent != null}">
+                            <a class="link"
+                               th:href="@{/folders(folderId=${parent.id})}"
+                               th:text="${parent.name}">
+                                Parent folder
+                            </a>
+                        </div>
+
+                        <!-- root folder -->
+                        <div class="form-static" th:if="${parent == null}">
+                            <span>This is a top-level folder.</span>
+                        </div>
+                    </div>
+
+                    <!-- EDIT FORM -->
+                    <form method="post"
+                          th:action="@{/folders/edit}"
+                          th:object="${folderForm}">
+                        <!-- keep id hidden; parent is NOT editable -->
+                        <input th:field="*{id}" type="hidden"/>
+
+                        <div class="form-field">
+                            <label class="form-label" for="folder-name">Folder name</label>
+                            <input class="form-input"
+                                   id="folder-name"
+                                   placeholder="e.g. Sci-Fi &amp; Fantasy"
+                                   th:field="*{name}"
+                                   type="text">
+                            <div class="field-error" th:errors="*{name}"></div>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="folder-slug">Slug</label>
+                            <input class="form-input"
+                                   id="folder-slug"
+                                   placeholder="e.g. sci-fi-fantasy"
+                                   th:field="*{slug}"
+                                   type="text">
+                            <div class="field-error" th:errors="*{slug}"></div>
+                            <p class="form-help">
+                                Used in the URL. Lowercase, letters, numbers and dashes only.
+                            </p>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="folder-description">
+                                Description <span>(optional)</span>
+                            </label>
+                            <textarea class="form-textarea form-textarea-wide"
+                                      id="folder-description"
+                                      placeholder="Describe what belongs in this folder."
+                                      th:field="*{description}"></textarea>
+                            <div class="field-error" th:errors="*{description}"></div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit">Save changes</button>
+                            <a class="btn btn-ghost"
+                               th:href="@{/folders(folderId=${folder.id})}">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </section>
+            </section>
+        </div>
+    </main>
+</section>
+
+<th:block layout:fragment="scripts">
+    <!-- No extra scripts needed for now -->
+</th:block>
+</html>

@@ -40,6 +40,8 @@ public class Folder {
 
     private String slug;
 
+    private String description;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

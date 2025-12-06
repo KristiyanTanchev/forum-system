@@ -187,7 +187,7 @@ public class PostServiceImpl implements PostService {
 
         int totalPages = ((totalPosts - 1) / POSTS_PAGE_SIZE) + 1;
         page = Math.min(page, totalPages);
-        int fromItem = (page - 1) * POSTS_PAGE_SIZE + 1;
+        int fromItem = Math.min((page - 1) * POSTS_PAGE_SIZE + 1, totalPosts);
         int toItem = Math.min(totalPosts, page * POSTS_PAGE_SIZE);
 
         return PostPage.builder()
@@ -211,7 +211,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public int getPostsCount() {
-       return postRepository.getPostsCount();
+        return postRepository.getPostsCount();
     }
 
     private void verifyModeratorOrOwner(Post post, User requester, RuntimeException error) {

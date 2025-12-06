@@ -1,39 +1,43 @@
 <!DOCTYPE html>
 <html lang="en"
       layout:decorate="~{Layout}"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create post</title>
+    <title>Create folder</title>
 </head>
 
 <section layout:fragment="content">
     <main class="editor-page">
         <div class="container">
             <section class="card editor-card-wide">
+                <!-- HEADER -->
                 <div class="form-header">
-                    <h1 class="form-title">Create a new topic</h1>
+                    <h1 class="form-title">Create a new folder</h1>
                     <p class="form-subtitle">
-                        Start a discussion in <span th:text="${folder.name}"></span> folder.
+                        Create a subfolder inside
+                        <span th:text="${folder.name}">Current folder</span>.
                     </p>
                 </div>
 
                 <div class="folder-layout">
                     <!-- LEFT: folder info + tree -->
                     <aside class="card folder-sidebar">
+                        <!-- Folder details -->
                         <div class="folder-sidebar-section">
                             <div class="card-title">Folder details</div>
-                            <div class="card-subtitle" th:text="${folder.description}">
-
+                            <div class="card-subtitle">
+                                You are creating a folder under this location.
                             </div>
 
                             <div class="folder-stats">
                                 <div class="folder-stat-item" th:if="${folder.folderCount > 0}">
                                     <span class="folder-stat-label">Subfolders</span>
-                                    <span class="folder-stat-value" th:text="${folder.folderCount}">21</span>
+                                    <span class="folder-stat-value" th:text="${folder.folderCount}">0</span>
                                 </div>
                                 <div class="folder-stat-item">
                                     <span class="folder-stat-label">Posts</span>
-                                    <span class="folder-stat-value" th:text="${folder.postCount}">184</span>
+                                    <span class="folder-stat-value" th:text="${folder.postCount}">0</span>
                                 </div>
                             </div>
                         </div>
@@ -44,13 +48,15 @@
 
                             <div class="folder-parent">
                                 <a class="folder-parent-link"
-                                   th:href="@{/forum/posts/new?folderId={folderId}(folderId=${parent.id})}">
+                                   th:href="@{/folders/new(folderId=${parent.id},
+                                          siblingPage=${siblingPage},
+                                          childPage=${childPage})}">
                                     <span class="folder-node-icon">⬅</span>
-                                    <span class="folder-node-name" th:text="${parent.name}">TV Shows</span>
+                                    <span class="folder-node-name" th:text="${parent.name}">Parent folder</span>
                                 </a>
                                 <div class="folder-parent-meta"
                                      th:text="${parent.postCount} + ' topics'">
-                                    21 topics
+                                    0 topics
                                 </div>
                             </div>
                         </div>
@@ -58,25 +64,30 @@
                         <!-- CURRENT FOLDER + SIBLINGS -->
                         <div class="folder-sidebar-section">
                             <div class="card-title" style="margin-bottom:0.3rem;">This level</div>
+
                             <ul class="folder-tree folder-tree--siblings">
                                 <!-- Current folder -->
                                 <li class="folder-node folder-node--active">
-                                    <a th:href="@{/forum/posts/new?folderId={folderId}(folderId=${folder.id})}">
+                                    <a th:href="@{/folders/new(folderId=${folder.id},
+                                             siblingPage=${siblingPage},
+                                             childPage=${childPage})}">
                                         <span class="folder-node-icon">📂</span>
                                         <span class="folder-node-name"
-                                              th:text="${folder.name}">Sci-Fi &amp; Fantasy</span>
+                                              th:text="${folder.name}">Current folder</span>
                                         <span class="folder-node-count"
-                                              th:text="${folder.postCount} + ' topics'">9 topics</span>
+                                              th:text="${folder.postCount} + ' topics'">0 topics</span>
                                     </a>
                                 </li>
 
-                                <!-- Siblings (same parent) -->
+                                <!-- Siblings -->
                                 <li class="folder-node" th:each="sibling : ${siblingFolders}">
-                                    <a th:href="@{/forum/posts/new?folderId={folderId}(folderId=${sibling.id})}">
+                                    <a th:href="@{/folders/new(folderId=${sibling.id},
+                                             siblingPage=${siblingPage},
+                                             childPage=${childPage})}">
                                         <span class="folder-node-icon">📂</span>
-                                        <span class="folder-node-name" th:text="${sibling.name}">Drama</span>
+                                        <span class="folder-node-name" th:text="${sibling.name}">Sibling</span>
                                         <span class="folder-node-count"
-                                              th:text="${sibling.postCount} + ' topics'">8 topics</span>
+                                              th:text="${sibling.postCount} + ' topics'">0 topics</span>
                                     </a>
                                 </li>
                             </ul>
@@ -91,8 +102,8 @@
 
                                 <span class="folder-page-info"
                                       th:text="'Page ' + ${siblingPage} + ' of ' + ${siblingTotalPages}">
-                                Page 1 of 3
-                            </span>
+                                    Page 1 of 1
+                                </span>
 
                                 <button class="btn btn-ghost folder-page-btn sibling-page-btn"
                                         data-delta="1"
@@ -103,22 +114,25 @@
                             </div>
                         </div>
 
-                        <!-- CHILDREN OF CURRENT FOLDER -->
+                        <!-- CHILD FOLDERS -->
                         <div class="folder-sidebar-section"
                              th:if="${childFolders != null and !#lists.isEmpty(childFolders)}">
                             <div class="card-title" style="margin-bottom:0.3rem;">Subfolders</div>
 
                             <ul class="folder-tree folder-tree--children">
                                 <li class="folder-node" th:each="child : ${childFolders}">
-                                    <a th:href="@{/forum/posts/new?folderId={folderId}(folderId=${child.id})}">
+                                    <a th:href="@{/folders/new(folderId=${child.id},
+                                             siblingPage=${siblingPage},
+                                             childPage=${childPage})}">
                                         <span class="folder-node-icon">📁</span>
-                                        <span class="folder-node-name" th:text="${child.name}">Star Wars</span>
+                                        <span class="folder-node-name" th:text="${child.name}">Child</span>
                                         <span class="folder-node-count"
-                                              th:text="${child.postCount} + ' topics'">4 topics</span>
+                                              th:text="${child.postCount} + ' topics'">0 topics</span>
                                     </a>
                                 </li>
                             </ul>
                         </div>
+
                         <div class="folder-pagination" th:if="${childTotalPages > 1}">
                             <button class="btn btn-ghost folder-page-btn child-page-btn"
                                     data-delta="-1"
@@ -129,7 +143,7 @@
 
                             <span class="folder-page-info"
                                   th:text="'Page ' + ${childPage} + ' of ' + ${childTotalPages}">
-                                Page 1 of 3
+                                Page 1 of 1
                             </span>
 
                             <button class="btn btn-ghost folder-page-btn child-page-btn"
@@ -139,77 +153,62 @@
                                 Next ›
                             </button>
                         </div>
-
                     </aside>
-                    <!-- RIGHT: posts list in this folder -->
+
+                    <!-- RIGHT: create folder form -->
                     <section class="card folder-posts">
-                        <form id="navigation-form" method="get" th:action="@{/forum/posts/new}">
+                        <!-- navigation form: keeps folderId + sibling/child pagination in sync -->
+                        <form id="navigation-form" method="get" th:action="@{/folders/new}">
                             <input name="folderId" th:value="${folder.id}" type="hidden">
                             <input name="siblingPage" th:value="${siblingPage}" type="hidden">
                             <input name="childPage" th:value="${childPage}" type="hidden">
                         </form>
 
-                        <form method="post" th:action="@{/forum/posts/new}" th:object="${post}">
+                        <form method="post"
+                              th:action="@{/folders/new}"
+                              th:object="${folderForm}">
                             <div class="form-field">
-                                <label class="form-label" for="post-title">Title</label>
-                                <input class="form-input" id="post-title" name="title"
-                                       placeholder="e.g. Is Andor the best Star Wars series so far?"
-                                       th:field="*{title}"
-                                       type="text"/>
-                                <div class="field-error" th:errors="*{title}"></div>
+                                <label class="form-label" for="folder-name">Folder name</label>
+                                <input class="form-input"
+                                       id="folder-name"
+                                       placeholder="e.g. Sci-Fi &amp; Fantasy"
+                                       th:field="*{name}"
+                                       type="text">
+                                <div class="field-error" th:errors="*{name}"></div>
                             </div>
 
                             <div class="form-field">
-                                <label class="form-label" for="post-body">Content</label>
-                                <textarea class="form-textarea form-textarea-wide" id="post-body"
-                                          name="content"
-                                          placeholder="Write your post here. You can describe what you liked, disliked, ask questions, etc."
-                                          th:field="*{content}"></textarea>
-
-                                <div class="field-error" th:errors="*{content}"></div>
+                                <label class="form-label" for="folder-slug">Slug</label>
+                                <input class="form-input"
+                                       id="folder-slug"
+                                       placeholder="e.g. sci-fi-fantasy"
+                                       th:field="*{slug}"
+                                       type="text">
+                                <div class="field-error" th:errors="*{slug}"></div>
                                 <p class="form-help">
-                                    Markdown supported. Add spoilers with >! text, **bold** for emphasis, *italic* for
-                                    emphasis,
-                                    [text](url) for links.
+                                    Used in the URL. Lowercase, letters, numbers and dashes only.
                                 </p>
                             </div>
 
                             <div class="form-field">
-                                <label class="form-label" for="post-tags-1">Tag 1 <span>(optional)</span></label>
-                                <input class="form-input" id="post-tags-1" name="tags"
-                                       placeholder="e.g. star wars"
-                                       th:field="*{tag1}"
-                                       type="text"/>
-                                <div class="field-error" th:errors="*{tag1}"></div>
-                                <br/><br/>
-                                <label class="form-label" for="post-tags-2">Tag 2 <span>(optional)</span></label>
-                                <input class="form-input" id="post-tags-2" name="tags"
-                                       placeholder="e.g. andor"
-                                       th:field="*{tag2}"
-                                       type="text"/>
-                                <div class="field-error" th:errors="*{tag2}"></div>
-                                <br/><br/>
-                                <label class="form-label" for="post-tags-3">Tag 3 <span>(optional)</span></label>
-                                <input class="form-input" id="post-tags-3" name="tags"
-                                       placeholder="e.g. tv show"
-                                       th:field="*{tag3}"
-                                       type="text"/>
-                                <div class="field-error" th:errors="*{tag3}"></div>
-                                <p class="form-help">
-                                    Enter up to three tags to help others find your topic.
-                                </p>
+                                <label class="form-label" for="folder-description">Description
+                                    <span>(optional)</span></label>
+                                <textarea class="form-textarea form-textarea-wide"
+                                          id="folder-description"
+                                          placeholder="Describe what belongs in this folder."
+                                          th:field="*{description}"></textarea>
+                                <div class="field-error" th:errors="*{description}"></div>
                             </div>
 
-                            <input th:field="*{folderId}" type="hidden"/>
+                            <!-- parent folder id -->
+                            <input th:field="*{parentFolderId}" th:value="${folder.id}" type="hidden"/>
 
                             <div class="form-actions">
-                                <button class="btn btn-primary" type="submit">Create topic</button>
+                                <button class="btn btn-primary" type="submit">Create folder</button>
                             </div>
                         </form>
                     </section>
                 </div>
-
-
             </section>
         </div>
     </main>
@@ -219,20 +218,7 @@
     <script th:inline="javascript">
         var form = $('#navigation-form');
 
-        $(form).find('select').on('change', function () {
-            $(this).closest('form').submit();
-        });
-        $('#prev-page-btn').on('click', function () {
-            $(form).find('select[name=page]')
-                .val(parseInt($(form).find('select[name=page]').val()) - 1);
-            $(form).submit();
-        });
-        $('#next-page-btn').on('click', function () {
-            $(form).find('select[name=page]')
-                .val(parseInt($(form).find('select[name=page]').val()) + 1);
-            $(form).submit();
-        });
-
+        // sibling / child pagination for sidebar
         $('.sibling-page-btn').on('click', function () {
             var delta = parseInt($(this).data('delta'));
             var input = $(form).find('input[name=siblingPage]');

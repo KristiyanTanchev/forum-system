@@ -4,10 +4,12 @@ import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.exceptions.FolderNotEmptyException;
+import com.team3.forum.helpers.FolderMapper;
+import com.team3.forum.helpers.TimeAgo;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
-import com.team3.forum.models.folderDtos.FolderUpdateDto;
+import com.team3.forum.models.folderDtos.*;
 import com.team3.forum.repositories.FolderRepository;
 import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,11 +35,13 @@ public class FolderServiceImpl implements FolderService {
 
     private final FolderRepository folderRepository;
     private final UserRepository userRepository;
+    private final FolderMapper folderMapper;
 
     @Autowired
-    public FolderServiceImpl(FolderRepository folderRepository, UserRepository userRepository) {
+    public FolderServiceImpl(FolderRepository folderRepository, UserRepository userRepository, FolderMapper folderMapper) {
         this.folderRepository = folderRepository;
         this.userRepository = userRepository;
+        this.folderMapper = folderMapper;
     }
 
     @Override
@@ -66,16 +71,38 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public Folder create(Folder folder, List<String> slugs, int requesterId) {
+    public Folder create(FolderCreateDto folderCreateDto, List<String> slugs, int requesterId) {
+        int parentId = folderCreateDto.getParentFolderId();
         if (slugs.isEmpty()) {
             throw new EntityUpdateConflictException(CREATE_NO_SLUGS_ERROR);
         }
         User requester = userRepository.findById(requesterId);
-        if (!requester.isAdmin()) {
+        if (!requester.isModerator()) {
             throw new AuthorizationException(CREATE_AUTHORIZATION_ERROR);
         }
-
         Folder parent = getFolderByPath(slugs);
+        Folder folder = folderMapper.toEntity(folderCreateDto);
+        folder.setParentFolder(parent);
+
+        validateUniqueSlug(parent, folder);
+
+        return folderRepository.save(folder);
+    }
+
+    @Override
+    public Folder create(FolderCreateDto folderCreateDto, int requesterId) {
+        int parentId = folderCreateDto.getParentFolderId();
+        if (parentId == 0) {
+            throw new EntityUpdateConflictException(CREATE_NO_SLUGS_ERROR);
+        }
+        User requester = userRepository.findById(requesterId);
+        if (!requester.isModerator()) {
+            throw new AuthorizationException(CREATE_AUTHORIZATION_ERROR);
+        }
+        Folder parent = findById(parentId);
+        Folder folder = folderMapper.toEntity(folderCreateDto);
+        folder.setParentFolder(parent);
+
         folder.setParentFolder(parent);
 
         validateUniqueSlug(parent, folder);
@@ -88,8 +115,15 @@ public class FolderServiceImpl implements FolderService {
         if (slugs.isEmpty()) {
             throw new EntityUpdateConflictException(EDIT_NO_SLUGS_ERROR);
         }
+        folderUpdateDto.setId(getFolderByPath(slugs).getId());
+        return update(folderUpdateDto, requesterId);
+    }
 
-        Folder folder = getFolderByPath(slugs);
+
+    @Override
+    public Folder update(FolderUpdateDto folderUpdateDto, int requesterId) {
+
+        Folder folder = findById(folderUpdateDto.getId());
         if (folder.getParentFolder() == null) {
             throw new EntityUpdateConflictException(EDIT_NO_SLUGS_ERROR);
         }
@@ -101,6 +135,7 @@ public class FolderServiceImpl implements FolderService {
 
         folder.setName(folderUpdateDto.getName());
         folder.setSlug(folderUpdateDto.getSlug());
+        folder.setDescription(folderUpdateDto.getDescription());
 
         validateUniqueSlug(folder.getParentFolder(), folder);
 
@@ -151,8 +186,9 @@ public class FolderServiceImpl implements FolderService {
     @Override
     @Transactional(readOnly = true)
     public LocalDateTime getLastActivity(Folder folder) {
-        LocalDateTime lastPost = folderRepository.getLastPostDate(folder);
-        LocalDateTime lastComment = folderRepository.getLastCommentDate(folder);
+        Folder persistent = folderRepository.findById(folder.getId());
+        LocalDateTime lastPost = folderRepository.getLastPostDate(persistent);
+        LocalDateTime lastComment = folderRepository.getLastCommentDate(persistent);
         if (lastPost == null) {
             return lastComment;
         }
@@ -164,6 +200,26 @@ public class FolderServiceImpl implements FolderService {
         } else {
             return lastComment;
         }
+    }
+
+    @Override
+    public List<String> buildSlugPath(Folder folder) {
+        List<String> slugs = new ArrayList<>();
+
+        Folder current = folder;
+        while (current != null) {
+            slugs.add(current.getSlug());
+            current = current.getParentFolder();
+        }
+
+        Collections.reverse(slugs);
+        return slugs;
+    }
+
+    @Transactional(readOnly = true)
+    public FolderResponseDto buildFolderResponseDto(Folder folder) {
+        Folder persistent = folderRepository.findById(folder.getId());
+        return folderMapper.toResponseDto(folder, buildFolderCalculatedStatsDto(persistent));
     }
 
     private void validateUniqueSlug(Folder parent, Folder child) {
@@ -178,4 +234,46 @@ public class FolderServiceImpl implements FolderService {
         }
     }
 
+    private FolderCalculatedStatsDto buildFolderCalculatedStatsDto(Folder folder) {
+        LocalDateTime lastActivity = getLastActivity(folder);
+        String lastActivityString = lastActivity != null ? TimeAgo.toTimeAgo(lastActivity) : "";
+        return FolderCalculatedStatsDto.builder()
+                .postCount(folder.getPosts().size())
+                .folderCount(folder.getChildFolders().size())
+                .lastActivity(lastActivityString)
+                .path(buildPath(folder, ""))
+                .pathFolders(buildPathFolders(folder, new ArrayList<>()))
+                .postCountWithSubfolders(getFolderPostsCount(folder))
+                .build();
+    }
+
+    private String buildPath(Folder folder, String path) {
+        StringBuilder sb = new StringBuilder();
+        if (folder.getParentFolder() != null) {
+            sb.append(buildPath(folder.getParentFolder(), path)).append("/");
+        }
+        return sb.append(path).append(folder.getSlug()).toString();
+    }
+
+    private List<FolderPathDto> buildPathFolders(Folder folder, List<FolderPathDto> result) {
+        if (folder.getParentFolder() != null) {
+            buildPathFolders(folder.getParentFolder(), result);
+        }
+        result.add(
+                FolderPathDto.builder()
+                        .path(buildPath(folder, ""))
+                        .slug(folder.getSlug())
+                        .name(folder.getName())
+                        .build()
+        );
+        return result;
+    }
+
+    private int getFolderPostsCount(Folder folder) {
+        int sum = folder.getPosts().size();
+        for (Folder child : folder.getChildFolders()) {
+            sum += getFolderPostsCount(child);
+        }
+        return sum;
+    }
 }
