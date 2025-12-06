@@ -141,13 +141,11 @@ public class PostMvcController {
             comments = commentService.findAllByPostId(postId);
         }
 
-        // ADD PAGINATION LOGIC HERE:
         int totalComments = comments.size();
         int totalPages = (int) Math.ceil((double) totalComments / commentSize);
         int start = commentPage * commentSize;
         int end = Math.min(start + commentSize, totalComments);
 
-        // Get paginated comments
         List<Comment> paginatedComments;
         if (start >= totalComments) {
             paginatedComments = List.of();
@@ -155,17 +153,15 @@ public class PostMvcController {
             paginatedComments = comments.subList(start, end);
         }
 
-        // Initialize lazy collections on paginated comments only
         paginatedComments.forEach(comment -> {
-            comment.getLikedBy().size(); // Force initialization
+            comment.getLikedBy().size();
         });
 
-        // Convert paginated comments to DTOs
+
         List<CommentResponseDto> commentDtos = paginatedComments.stream()
                 .map(comment -> commentMapper.toResponseDto(comment, currentUser))
                 .toList();
 
-        // ADD THESE 5 LINES - minimal model attributes for pagination:
         model.addAttribute("comments", commentDtos);
         model.addAttribute("commentPage", commentPage);
         model.addAttribute("commentTotalPages", totalPages);
@@ -173,7 +169,6 @@ public class PostMvcController {
         model.addAttribute("commentToItem", end);
         model.addAttribute("commentTotalItems", totalComments);
 
-        // KEEP THE REST OF YOUR EXISTING CODE EXACTLY AS IS
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("commentCreationDto", new CommentCreationDto());
 
