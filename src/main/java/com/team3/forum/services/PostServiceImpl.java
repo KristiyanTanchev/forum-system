@@ -3,14 +3,19 @@ package com.team3.forum.services;
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
 import com.team3.forum.exceptions.EntityNotFoundException;
+import com.team3.forum.helpers.CommentMapper;
+import com.team3.forum.helpers.PostMapper;
+import com.team3.forum.helpers.TimeAgo;
+import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.enums.PostSortField;
 import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.enums.SortDirection;
-import com.team3.forum.models.postDtos.PostPage;
-import com.team3.forum.models.postDtos.PostUpdateDto;
+import com.team3.forum.models.postDtos.*;
+import com.team3.forum.models.tagDtos.TagResponseDto;
+import com.team3.forum.repositories.FolderRepository;
 import com.team3.forum.repositories.PostRepository;
 import com.team3.forum.repositories.PostViewRepository;
 import com.team3.forum.repositories.UserRepository;
@@ -34,13 +39,21 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final FolderRepository folderRepository;
     private final PostViewRepository postViewRepository;
+    private final PostMapper postMapper;
+    private final CommentMapper commentMapper;
+    private final UserMapper userMapper;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, PostViewRepository postViewRepository) {
+    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, FolderRepository folderRepository, PostViewRepository postViewRepository, PostMapper postMapper, CommentMapper commentMapper, UserMapper userMapper) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.folderRepository = folderRepository;
         this.postViewRepository = postViewRepository;
+        this.postMapper = postMapper;
+        this.commentMapper = commentMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -104,7 +117,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post create(Post post) {
+    public Post create(PostCreationDto postCreationDto, int userId) {
+        Post post = postMapper.toEntity(postCreationDto);
+        post.setFolder(folderRepository.findById(postCreationDto.getFolderId()));
+        post.setUser(userRepository.findById(userId));
         return postRepository.save(post);
     }
 
@@ -214,6 +230,13 @@ public class PostServiceImpl implements PostService {
         return postRepository.getPostsCount();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PostResponseDto buildPostResponseDto(Post post) {
+        Post persistent = findByIdIncludeDeleted(post.getId(), post.getUser().getId());
+        return postMapper.toResponseDto(persistent, buildPostCalculatedStatsDto(persistent));
+    }
+
     private void verifyModeratorOrOwner(Post post, User requester, RuntimeException error) {
         // Owner can edit/delete their own posts
         if (post.getUser().getId() == requester.getId()) {
@@ -262,5 +285,26 @@ public class PostServiceImpl implements PostService {
         } catch (IllegalArgumentException e) {
             return SortDirection.DESC;
         }
+    }
+
+    private PostCalculatedStatsDto buildPostCalculatedStatsDto(Post post) {
+        return PostCalculatedStatsDto.builder()
+                .creator(post.getUser().getUsername())
+                .userId(post.getUser().getId())
+                .commentsCount(post.getComments().size())
+                .views(getPostViews(post.getId()))
+                .comments(post.getComments().stream()
+                        .filter(c -> !c.isDeleted()).map(commentMapper::convertToDto).toList()
+                )
+                .createdAtString(TimeAgo.toTimeAgo(post.getCreatedAt()))
+                .updatedAtString(TimeAgo.toTimeAgo(post.getUpdatedAt()))
+                .deletedAtString(TimeAgo.toTimeAgo(post.getDeletedAt()))
+                .folderName(post.getFolder().getName())
+                .likedBy(post.getLikedBy().stream().map(userMapper::toResponseDto).toList())
+                .tags(post.getTags().stream()
+                        .map(tag -> TagResponseDto.builder().id(tag.getId()).name(tag.getName()).build())
+                        .toList()
+                )
+                .build();
     }
 }

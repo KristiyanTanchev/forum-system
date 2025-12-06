@@ -5,21 +5,10 @@ import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentResponseDto;
-import com.team3.forum.repositories.PostRepository;
-import com.team3.forum.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CommentMapper {
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
-
-    @Autowired
-    public CommentMapper(PostRepository postRepository, UserRepository userRepository) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-    }
 
     public Comment toEntity(CommentCreationDto dto, int postId, int userId) {
         Comment comment = new Comment();
@@ -36,7 +25,7 @@ public class CommentMapper {
         return comment;
     }
 
-    private CommentResponseDto convertToDto(Comment comment) {
+    public CommentResponseDto convertToDto(Comment comment) {
         return CommentResponseDto.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())

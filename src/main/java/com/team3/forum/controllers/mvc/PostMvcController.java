@@ -67,7 +67,7 @@ public class PostMvcController {
         PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, search, orderBy, direction, tagId);
         model.addAttribute("pageInfo", pageInfo);
         List<PostResponseDto> posts = pageInfo.getItems().stream()
-                .map(postMapper::toResponseDto).toList();
+                .map(postService::buildPostResponseDto).toList();
 
         model.addAttribute("posts", posts);
 
@@ -126,7 +126,7 @@ public class PostMvcController {
                         .toList()
         );
 
-        model.addAttribute("post", postMapper.toResponseDto(post));
+        model.addAttribute("post", postService.buildPostResponseDto(post));
         User currentUser = principal != null ? userService.findById(principal.getId()) : null;
 
         List<Comment> comments;
@@ -189,8 +189,8 @@ public class PostMvcController {
         if (principal == null) {
             return "redirect:/auth/login?error=You must be logged in to create a post!";
         }
-        Post post = postMapper.toEntity(postCreationDto, principal.getId());
-        post = postService.create(post);
+
+        Post post = postService.create(postCreationDto, principal.getId());
         return "redirect:/forum/posts/" + post.getId();
     }
 

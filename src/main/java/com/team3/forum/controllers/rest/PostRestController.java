@@ -8,7 +8,6 @@ import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.services.PostService;
-import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +33,7 @@ public class PostRestController {
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> getAll() {
         List<PostResponseDto> response = postService.findAll().stream()
-                .map(postMapper::toResponseDto)
+                .map(postService::buildPostResponseDto)
                 .toList();
         return ResponseEntity.ok(response);
     }
@@ -43,16 +42,15 @@ public class PostRestController {
     public ResponseEntity<PostResponseDto> create(
             @RequestBody @Valid PostCreationDto postCreationDto,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Post post = postMapper.toEntity(postCreationDto, userDetails.getId());
-        Post detached = postService.create(post);
-        PostResponseDto response = postMapper.toResponseDto(detached);
+        Post detached = postService.create(postCreationDto, userDetails.getId());
+        PostResponseDto response = postService.buildPostResponseDto(detached);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable int postId) {
         Post detached = postService.findById(postId);
-        PostResponseDto response = postMapper.toResponseDto(detached);
+        PostResponseDto response = postService.buildPostResponseDto(detached);
         return ResponseEntity.ok(response);
     }
 
@@ -62,7 +60,7 @@ public class PostRestController {
             @PathVariable int postId,
             @AuthenticationPrincipal CustomUserDetails principal) {
         Post detached = postService.update(postId, postUpdateDto, principal.getId());
-        PostResponseDto response = postMapper.toResponseDto(detached);
+        PostResponseDto response = postService.buildPostResponseDto(detached);
         return ResponseEntity.ok(response);
     }
 
@@ -79,7 +77,7 @@ public class PostRestController {
             @PathVariable int postId,
             @AuthenticationPrincipal CustomUserDetails principal) {
         Post detached = postService.restoreById(postId, principal.getId());
-        PostResponseDto response = postMapper.toResponseDto(detached);
+        PostResponseDto response = postService.buildPostResponseDto(detached);
         return ResponseEntity.ok(response);
     }
 

@@ -5,7 +5,6 @@ import com.team3.forum.models.tagDtos.TagResponseDto;
 import com.team3.forum.models.userDtos.UserResponseDto;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -15,14 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostResponseDto {
-
-    private int id;
-
-    private String title;
-
-    private String content;
-
+public class PostCalculatedStatsDto {
     private String creator;
 
     private int userId;
@@ -30,10 +22,6 @@ public class PostResponseDto {
     private int commentsCount;
 
     private long views;
-
-    private LocalDateTime updatedAt;
-
-    private LocalDateTime createdAt;
 
     private List<CommentResponseDto> comments;
 
@@ -48,7 +36,4 @@ public class PostResponseDto {
     private String updatedAtString;
 
     private String deletedAtString;
-
-    private boolean isDeleted;
-
 }

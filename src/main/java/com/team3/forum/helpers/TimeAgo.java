@@ -47,6 +47,7 @@ public class TimeAgo {
 
     // Convenience overload using system default zone
     public static String toTimeAgo(LocalDateTime time) {
+        if (time == null) return null;
         return toTimeAgo(time, ZoneId.systemDefault());
     }
 }
