@@ -1,11 +1,13 @@
 package com.team3.forum.controllers.mvc;
 
 import com.team3.forum.exceptions.AuthorizationException;
+import com.team3.forum.helpers.CommentMapper;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.FolderPageHelper;
 import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.*;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
+import com.team3.forum.models.commentDtos.CommentResponseDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostPage;
@@ -36,7 +38,7 @@ public class PostMvcController {
     private final TagService tagService;
     private final CommentService commentService;
     private final UserService userService;
-
+    private final CommentMapper commentMapper;
     private final FolderPageHelper folderPageHelper;
 
     @Autowired
@@ -44,7 +46,7 @@ public class PostMvcController {
                              FolderService folderService, FolderMapper folderMapper,
                              TagService tagService, CommentService commentService,
                              UserService userService,
-                             FolderPageHelper folderPageHelper) {
+                             FolderPageHelper folderPageHelper, CommentMapper commentMapper) {
         this.postService = postService;
         this.postMapper = postMapper;
         this.folderService = folderService;
@@ -53,6 +55,7 @@ public class PostMvcController {
         this.commentService = commentService;
         this.userService = userService;
         this.folderPageHelper = folderPageHelper;
+        this.commentMapper = commentMapper;
     }
 
     @GetMapping
@@ -136,11 +139,17 @@ public class PostMvcController {
             comments = commentService.findAllByPostId(postId);
         }
 
+        // Initialize lazy collections
         comments.forEach(comment -> {
-            comment.getLikedBy().size();
+            comment.getLikedBy().size(); // Force initialization
         });
 
-        model.addAttribute("comments", comments);
+        // Convert to DTOs using the mapper
+        List<CommentResponseDto> commentDtos = comments.stream()
+                .map(comment -> commentMapper.toResponseDto(comment, currentUser))
+                .toList();
+
+        model.addAttribute("comments", commentDtos); // Use DTOs instead of entities
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("commentCreationDto", new CommentCreationDto());
 

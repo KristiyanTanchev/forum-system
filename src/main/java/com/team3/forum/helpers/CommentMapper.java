@@ -10,6 +10,8 @@ import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CommentMapper {
     private final PostRepository postRepository;
@@ -36,7 +38,23 @@ public class CommentMapper {
         return comment;
     }
 
-    private CommentResponseDto convertToDto(Comment comment) {
+    public CommentResponseDto toResponseDto(Comment comment, User currentUser) {
+        // Calculate time ago strings
+        String createdAtString = TimeAgo.toTimeAgo(comment.getCreatedAt());
+
+        String editedAtString = null;
+        LocalDateTime updatedAt = comment.getUpdatedAt();
+        if (updatedAt != null && !comment.getCreatedAt().isEqual(updatedAt)) {
+            editedAtString = "Edited · " + TimeAgo.toTimeAgo(updatedAt);
+        }
+
+        // Check if current user liked this comment
+        boolean likedByCurrentUser = false;
+        if (currentUser != null) {
+            likedByCurrentUser = comment.getLikedBy().stream()
+                    .anyMatch(user -> user.getId() == currentUser.getId());
+        }
+
         return CommentResponseDto.builder()
                 .id(comment.getId())
                 .postId(comment.getPost().getId())
@@ -47,6 +65,12 @@ public class CommentMapper {
                 .isDeleted(comment.isDeleted())
                 .deletedAt(comment.getDeletedAt())
                 .likesCount(comment.getLikedBy().size())
+                .likedByCurrentUser(likedByCurrentUser)
+                .createdAtString(createdAtString)
+                .editedAtString(editedAtString)
+                .user(comment.getUser())
+                .username(comment.getUser().getUsername())
+                .likedBy(comment.getLikedBy())
                 .build();
     }
 }

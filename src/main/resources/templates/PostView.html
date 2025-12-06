@@ -125,7 +125,7 @@
                         <!-- Comment Template -->
                         <article class="comment" th:each="comment : ${comments}">
                             <header class="comment-header">
-                                <div class="comment-avatar" th:text="${#strings.substring(comment.user.firstName, 0, 1).toUpperCase()}">A</div>
+                                <div class="comment-avatar" th:text="${#strings.substring(comment.user.username, 0, 1)}">A</div>
                                 <div class="comment-header-main">
                                     <div class="comment-author-row">
                                         <span class="comment-author" th:text="${comment.user.username}">ana</span>
@@ -133,9 +133,10 @@
                                         <span class="comment-badge comment-badge-mod" th:if="${comment.user.role.name() == 'MODERATOR'}">Moderator</span>
                                     </div>
                                     <div class="comment-meta">
-                                        <span>1 hour ago (TODO)</span>
-                                        <span th:if="${comment.createdAt != comment.updatedAt}">·</span>
-                                        <span th:if="${comment.createdAt != comment.updatedAt}">Edited (TODO)</span>
+                                        <span th:text="${comment.createdAtString}"></span>
+                                        <span th:if="${comment.editedAtString != null}"> · </span>
+                                        <span th:if="${comment.editedAtString != null}"
+                                              th:text="${comment.editedAtString}"></span>
                                     </div>
                                 </div>
                             </header>
