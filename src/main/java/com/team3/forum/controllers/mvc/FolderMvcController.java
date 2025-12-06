@@ -61,9 +61,7 @@ public class FolderMvcController {
 
         folderPageHelper.populateSidebar(folder, siblingPage, childPage, model);
 
-        List<PostResponseDto> mappedPosts = pageInfo.getItems().stream()
-                .map(postService::buildPostResponseDto)
-                .toList();
+        List<PostResponseDto> mappedPosts = pageInfo.getItems();
         model.addAttribute("posts", mappedPosts);
 
         return "FolderView";

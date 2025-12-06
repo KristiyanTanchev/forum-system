@@ -66,8 +66,7 @@ public class PostMvcController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, search, orderBy, direction, tagId);
         model.addAttribute("pageInfo", pageInfo);
-        List<PostResponseDto> posts = pageInfo.getItems().stream()
-                .map(postService::buildPostResponseDto).toList();
+        List<PostResponseDto> posts = pageInfo.getItems();
 
         model.addAttribute("posts", posts);
 

@@ -1,13 +1,16 @@
 package com.team3.forum.controllers.rest;
 
-import com.team3.forum.helpers.PostMapper;
+import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.models.Post;
+import com.team3.forum.models.User;
 import com.team3.forum.models.likeDtos.LikeCountDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
+import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.services.PostService;
+import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,13 +24,13 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostRestController {
     private final PostService postService;
-    private final PostMapper postMapper;
+    private final UserService userService;
 
     @Autowired
     public PostRestController(PostService postService,
-                              PostMapper postMapper) {
+                              UserService userService) {
         this.postService = postService;
-        this.postMapper = postMapper;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -35,6 +38,24 @@ public class PostRestController {
         List<PostResponseDto> response = postService.findAll().stream()
                 .map(postService::buildPostResponseDto)
                 .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<PostPage> getAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(defaultValue = "date") String orderBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int tagId
+    ) {
+        PostPage response = postService.getPostsInFolderPaginated(
+                null,
+                1,
+                searchQuery,
+                orderBy,
+                direction,
+                tagId);
         return ResponseEntity.ok(response);
     }
 
@@ -110,4 +131,18 @@ public class PostRestController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<PostResponseDto>> getOwnPosts(
+            @RequestParam int userId,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        if (principal == null) {
+            throw new AuthorizationException("You must be logged in to view user's posts!");
+        }
+        if (principal.getId() != userId && !principal.isModerator()) {
+            throw new AuthorizationException("You are not allowed to view other users' posts!");
+        }
+        User user = userService.findById(userId);
+        List<PostResponseDto> response = user.getPosts().stream().map(postService::buildPostResponseDto).toList();
+        return ResponseEntity.ok(response);
+    }
 }

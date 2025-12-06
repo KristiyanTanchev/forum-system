@@ -201,13 +201,15 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = postRepository.findPostsInFolderWithTagPaginated(
                 searchPage, POSTS_PAGE_SIZE, searchQuery, folder, sortField, sortDirection, tagId);
 
+        List<PostResponseDto> postResponseDtos = posts.stream().map(this::buildPostResponseDto).toList();
+
         int totalPages = ((totalPosts - 1) / POSTS_PAGE_SIZE) + 1;
         page = Math.min(page, totalPages);
         int fromItem = Math.min((page - 1) * POSTS_PAGE_SIZE + 1, totalPosts);
         int toItem = Math.min(totalPosts, page * POSTS_PAGE_SIZE);
 
         return PostPage.builder()
-                .items(posts)
+                .items(postResponseDtos)
                 .fromItem(fromItem)
                 .toItem(toItem)
                 .page(page)
