@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
     <title>CineTalk – Login</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
 </head>
-<body>
-<div class="page">
-    <!-- NAVBAR -->
-    <header th:replace="Header::navigation-bar"></header>
 
+<section layout:fragment="content">
     <!-- MAIN -->
     <main class="auth-page">
         <div class="container">
@@ -78,9 +75,7 @@
             </section>
         </div>
     </main>
-
-    <!-- FOOTER -->
-    <footer th:replace="Footer::footer"></footer>
-</div>
-</body>
+</section>
 </html>
+</html>
+

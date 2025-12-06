@@ -9,18 +9,6 @@
 </head>
 
 <section layout:fragment="content">
-    <!-- Success/Error Messages -->
-    <div th:if="${successMessage}" class="container" style="margin-top: 1rem;">
-        <div class="alert alert-success">
-            <span th:text="${successMessage}"></span>
-        </div>
-    </div>
-    <div th:if="${errorMessage}" class="container" style="margin-top: 1rem;">
-        <div class="alert alert-error">
-            <span th:text="${errorMessage}"></span>
-        </div>
-    </div>
-
     <!-- MAIN CONTENT -->
     <main class="post-page">
         <div class="container">
