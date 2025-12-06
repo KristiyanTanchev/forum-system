@@ -27,6 +27,8 @@ public interface UserService {
 
     User promoteToAdmin(int id);
 
+    User demoteUser(int userId);
+
     User promoteToModerator(int userId);
 
     public List<User> searchUsers(String query);

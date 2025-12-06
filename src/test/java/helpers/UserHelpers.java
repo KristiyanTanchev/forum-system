@@ -3,6 +3,7 @@ package helpers;
 import com.team3.forum.models.User;
 import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.userDtos.UserCreateDto;
+import com.team3.forum.models.userDtos.UserStatsDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 
 import java.time.LocalDateTime;
@@ -56,6 +57,14 @@ public class UserHelpers {
         dto.setEmail("updated@example.com");
         dto.setAvatarUrl("https://example.com/avatar.jpg");
         return dto;
+    }
+
+    public static UserStatsDto createMockUserStatsDto(){
+        UserStatsDto dto = new UserStatsDto();
+        dto.setTopicCount(50);
+        dto.setReplyCount(70);
+        dto.setLikesCount(100);
+       return dto;
     }
 
 }

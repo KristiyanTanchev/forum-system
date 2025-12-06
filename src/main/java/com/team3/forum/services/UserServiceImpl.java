@@ -23,11 +23,12 @@ import java.util.List;
 @Transactional
 public class UserServiceImpl implements UserService {
     public static final String UPDATE_AUTHORIZATION_ERROR = "You are not authorized to update this user.";
+    public static final String DEMOTE_ADMINISTRATOR_ERROR = "You are not allowed to demote administrator.";
     public static final String ALREADY_BLOCKED_ERROR = "User is already blocked.";
     public static final String NOT_BLOCKED_ERROR = "User is not blocked.";
     public static final String ALREADY_ADMIN_ERROR = "User is already an admin.";
     public static final String ALREADY_MODERATOR_ERROR = "User is already a moderator.";
-    public static final String ADMIN_ONLY_ERROR = "Only administrators can perform this action.";
+    public static final String ALREADY_USER_ERROR = "User is already demoted.";
     public static final String BLOCKED_USER_ERROR = "Cannot perform this action on a blocked user.";
     public static final String DELETED_USER_ERROR = "Cannot perform this action on a deleted user.";
     public static final String CANNOT_BLOCK_SELF_ERROR = "You cannot block yourself.";
@@ -190,6 +191,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User demoteUser(int userId) {
+        User user = userRepository.findById(userId);
+        if (user.isAdmin()) {
+            throw  new EntityUpdateConflictException(DEMOTE_ADMINISTRATOR_ERROR);
+        }
+        if (user.isBlocked()) {
+            throw new EntityUpdateConflictException(BLOCKED_USER_ERROR);
+        }
+        if (user.isDeleted()) {
+            throw new EntityUpdateConflictException(DELETED_USER_ERROR);
+        }
+
+        if (user.getRole()==Role.USER) {
+            throw new EntityUpdateConflictException(ALREADY_USER_ERROR);
+        }
+
+        user.setRole(Role.USER);
+        return userRepository.save(user);
+    }
+
+    @Override
     public User promoteToModerator(int userId) {
         User user = userRepository.findById(userId);
 
@@ -262,6 +284,5 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public int getBlockedUsersCount() {
         return userRepository.getBlockedUsersCount();
-
     }
 }

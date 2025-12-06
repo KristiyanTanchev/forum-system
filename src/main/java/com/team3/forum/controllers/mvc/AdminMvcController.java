@@ -77,5 +77,11 @@ public class AdminMvcController {
         userService.promoteToModerator(id);
         return "redirect:/admin";
     }
+
+    @PostMapping("/users/{id}/demote-moderator")
+    public String demoteModerator(@PathVariable int id) {
+        userService.demoteUser(id);
+        return "redirect:/admin";
+    }
 }
 

@@ -68,6 +68,8 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/admin/users/*/promote").hasRole("ADMIN")
                         .requestMatchers("/api/admin/users/*/promote-admin").hasRole("ADMIN")
+                        .requestMatchers("/admin/users/*/demote-moderator").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/users/*/demote-moderator").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("MODERATOR")
                         .requestMatchers("/api/admin/**").hasRole("MODERATOR")
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()

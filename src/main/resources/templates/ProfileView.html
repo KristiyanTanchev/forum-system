@@ -14,27 +14,27 @@
     <!-- MAIN -->
     <main class="profile-page">
         <div class="container">
-            <!-- Success message -->
+
             <div th:if="${param.updated}" class="alert alert-success">
                 ✓ Profile updated successfully!
             </div>
 
             <div class="profile-layout">
-                <!-- LEFT: summary -->
+
                 <section class="card profile-summary-card">
                     <div class="profile-header">
                         <div class="profile-avatar" th:if="${user.avatarUrl == null or user.avatarUrl.isEmpty()}"
-                             th:text="${#strings.substring(user.firstName, 0, 1)}">U</div>
+                             th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">U</div>
                         <img class="profile-avatar" th:if="${user.avatarUrl != null and !user.avatarUrl.isEmpty()}"
                              th:src="${user.avatarUrl}" th:alt="${user.username} + ' avatar'"
                              style="object-fit: cover;"/>
                         <div>
                             <div class="profile-username" th:text="${user.username}">username</div>
                             <div class="profile-role-badges">
-                                <!-- shown based on user role -->
+
                                 <span class="profile-badge profile-badge-admin" th:if="${user.role == 'ADMIN'}">Admin</span>
                                 <span class="profile-badge profile-badge-mod" th:if="${user.role == 'MODERATOR'}">Moderator</span>
-                                <!-- shown if this is your own profile -->
+
                                 <span class="profile-badge profile-badge-owner" th:if="${isOwnProfile}">You</span>
                             </div>
                         </div>
