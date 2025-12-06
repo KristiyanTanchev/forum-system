@@ -348,6 +348,46 @@ public class PostMvcController {
     }
 
 
+    @PostMapping("/{postId}/like")
+    public String likePost(
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to like comments!";
+        }
+
+        try {
+            postService.likePost(postId, principal.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Post liked!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to like post: " + e.getMessage());
+        }
+
+        return "redirect:/forum/posts/" + postId;
+    }
+
+    @PostMapping("/{postId}/unlike")
+    public String unlikePost(
+            @PathVariable int postId,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            RedirectAttributes redirectAttributes) {
+
+        if (principal == null) {
+            return "redirect:/auth/login?error=You must be logged in to unlike comments!";
+        }
+
+        try {
+            postService.unlikePost(postId, principal.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Post unliked!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to unlike post: " + e.getMessage());
+        }
+
+        return "redirect:/forum/posts/" + postId;
+    }
+
     @PostMapping("/{postId}/comments")
     public String createComment(
             @PathVariable int postId,

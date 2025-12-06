@@ -1457,6 +1457,7 @@ a {
 .remember-me-checkbox {
     accent-color: #3b82f6;
 }
+
 /* ========================================
    ADMIN PAGE STYLES - ENHANCED
    ======================================== */
@@ -1707,12 +1708,28 @@ a {
     .admin-user-actions-compact {
         justify-content: flex-start;
     }
-.topic-folder {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.55rem;
-    border-radius: 999px;
-    background: rgba(59, 130, 246, 0.12); /* soft blue-ish */
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    font-weight: 500;
+
+    .topic-folder {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.12); /* soft blue-ish */
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        font-weight: 500;
+    }
 }
+
+.liked {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Make <button> and <a> with .btn behave identically */
+button.btn,
+a.btn {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.95rem;
 }
