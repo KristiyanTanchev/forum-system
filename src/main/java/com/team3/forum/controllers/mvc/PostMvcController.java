@@ -139,12 +139,10 @@ public class PostMvcController {
             comments = commentService.findAllByPostId(postId);
         }
 
-        // Initialize lazy collections
         comments.forEach(comment -> {
-            comment.getLikedBy().size(); // Force initialization
+            comment.getLikedBy().size();
         });
 
-        // Convert to DTOs using the mapper
         List<CommentResponseDto> commentDtos = comments.stream()
                 .map(comment -> commentMapper.toResponseDto(comment, currentUser))
                 .toList();
@@ -252,7 +250,6 @@ public class PostMvcController {
 
         Post existing = postService.findById(postId);
 
-        // Authorization: only owner or admin
         if (!principal.isAdmin() && existing.getUser().getId() != principal.getId()) {
             return "redirect:/forum/posts/" + postId + "?error=You are not allowed to edit this post.";
         }

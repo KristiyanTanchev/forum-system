@@ -39,7 +39,6 @@ public class CommentMapper {
     }
 
     public CommentResponseDto toResponseDto(Comment comment, User currentUser) {
-        // Calculate time ago strings
         String createdAtString = TimeAgo.toTimeAgo(comment.getCreatedAt());
 
         String editedAtString = null;
@@ -48,7 +47,6 @@ public class CommentMapper {
             editedAtString = "Edited · " + TimeAgo.toTimeAgo(updatedAt);
         }
 
-        // Check if current user liked this comment
         boolean likedByCurrentUser = false;
         if (currentUser != null) {
             likedByCurrentUser = comment.getLikedBy().stream()

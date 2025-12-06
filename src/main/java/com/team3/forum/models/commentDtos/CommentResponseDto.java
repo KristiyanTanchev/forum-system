@@ -22,9 +22,9 @@ public class CommentResponseDto {
     private LocalDateTime deletedAt;
     private int likesCount;
     private boolean likedByCurrentUser;
-    private String createdAtString;  // Add this
-    private String editedAtString;   // Add this
-    private User user;              // Add this
-    private String username;        // Add this
-    private Set<User> likedBy;      // Add this
+    private String createdAtString;
+    private String editedAtString;
+    private User user;
+    private String username;
+    private Set<User> likedBy;
 }
