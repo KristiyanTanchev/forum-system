@@ -103,6 +103,8 @@ public class PostMvcController {
             Model model,
             @PathVariable int postId,
             @RequestParam(defaultValue = "date") String sortCommentsBy,
+            @RequestParam(defaultValue = "0") int commentPage,
+            @RequestParam(defaultValue = "10") int commentSize,
             @RequestParam(required = false) Integer editCommentId,
             @AuthenticationPrincipal CustomUserDetails principal) {
 
@@ -139,15 +141,39 @@ public class PostMvcController {
             comments = commentService.findAllByPostId(postId);
         }
 
-        comments.forEach(comment -> {
-            comment.getLikedBy().size();
+        // ADD PAGINATION LOGIC HERE:
+        int totalComments = comments.size();
+        int totalPages = (int) Math.ceil((double) totalComments / commentSize);
+        int start = commentPage * commentSize;
+        int end = Math.min(start + commentSize, totalComments);
+
+        // Get paginated comments
+        List<Comment> paginatedComments;
+        if (start >= totalComments) {
+            paginatedComments = List.of();
+        } else {
+            paginatedComments = comments.subList(start, end);
+        }
+
+        // Initialize lazy collections on paginated comments only
+        paginatedComments.forEach(comment -> {
+            comment.getLikedBy().size(); // Force initialization
         });
 
-        List<CommentResponseDto> commentDtos = comments.stream()
+        // Convert paginated comments to DTOs
+        List<CommentResponseDto> commentDtos = paginatedComments.stream()
                 .map(comment -> commentMapper.toResponseDto(comment, currentUser))
                 .toList();
 
-        model.addAttribute("comments", commentDtos); // Use DTOs instead of entities
+        // ADD THESE 5 LINES - minimal model attributes for pagination:
+        model.addAttribute("comments", commentDtos);
+        model.addAttribute("commentPage", commentPage);
+        model.addAttribute("commentTotalPages", totalPages);
+        model.addAttribute("commentFromItem", start + 1); // 1-based for display
+        model.addAttribute("commentToItem", end);
+        model.addAttribute("commentTotalItems", totalComments);
+
+        // KEEP THE REST OF YOUR EXISTING CODE EXACTLY AS IS
         model.addAttribute("currentUser", currentUser);
         model.addAttribute("commentCreationDto", new CommentCreationDto());
 
