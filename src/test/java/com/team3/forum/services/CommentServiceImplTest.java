@@ -73,7 +73,7 @@ public class CommentServiceImplTest {
         Mockito.when(mockPostRepository.findById(1)).thenReturn(post);
         Mockito.when(mockCommentRepository.save(Mockito.any(Comment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         //Act
-        Comment result = commentService.createComment(dto, 1, user);
+        Comment result = commentService.createComment(dto, 1, user.getId());
         //Assert
         Mockito.verify(mockCommentRepository, Mockito.times(1)).save(Mockito.any(Comment.class));
         Assertions.assertEquals("Test comment", result.getContent());
@@ -90,7 +90,7 @@ public class CommentServiceImplTest {
         Mockito.when(mockCommentRepository.findById(1)).thenReturn(existingComment);
         Mockito.when(mockCommentRepository.save(existingComment)).thenReturn(existingComment);
         //Act
-        Comment result = commentService.updateComment(1, dto, commentOwner);
+        Comment result = commentService.updateComment(1, dto, commentOwner.getId());
         //Assert
         Mockito.verify(mockCommentRepository, Mockito.times(1)).save(existingComment);
         Assertions.assertEquals("Updated content", result.getContent());
@@ -104,7 +104,7 @@ public class CommentServiceImplTest {
 
         Mockito.when(mockCommentRepository.findById(1)).thenReturn(comment);
         //Act
-        commentService.deleteById(1, commentOwner);
+        commentService.deleteById(1, commentOwner.getId());
         //Assert
         Mockito.verify(mockCommentRepository, Mockito.times(1)).delete(comment);
     }
