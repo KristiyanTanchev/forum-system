@@ -21,9 +21,9 @@ public interface UserService {
 
     User findByUsername(String username);
 
-    User blockUser(int id);
+    User blockUser(int id, int requesterId);
 
-    User unblockUser(int id);
+    User unblockUser(int id, int requesterId);
 
     User promoteToAdmin(int id);
 

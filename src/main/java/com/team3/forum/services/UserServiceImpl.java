@@ -30,6 +30,9 @@ public class UserServiceImpl implements UserService {
     public static final String ADMIN_ONLY_ERROR = "Only administrators can perform this action.";
     public static final String BLOCKED_USER_ERROR = "Cannot perform this action on a blocked user.";
     public static final String DELETED_USER_ERROR = "Cannot perform this action on a deleted user.";
+    public static final String CANNOT_BLOCK_SELF_ERROR = "You cannot block yourself.";
+    public static final String CANNOT_BLOCK_ADMIN_ERROR = "Moderators cannot block administrators.";
+    public static final String CANNOT_BLOCK_MODERATOR_ERROR = "Moderators cannot block other moderators.";
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -114,8 +117,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User blockUser(int id) {
+    public User blockUser(int id, int requesterId) {
         User user = userRepository.findById(id);
+        User requester = userRepository.findById(requesterId);
+
+        if (id == requesterId) {
+            throw new AuthorizationException(CANNOT_BLOCK_SELF_ERROR);
+        }
+
+        if (requester.isModerator() && !requester.isAdmin()) {
+            if (user.isAdmin()) {
+                throw new AuthorizationException(CANNOT_BLOCK_ADMIN_ERROR);
+            }
+            if (user.isModerator()) {
+                throw new AuthorizationException(CANNOT_BLOCK_MODERATOR_ERROR);
+            }
+        }
 
         if (user.isBlocked()) {
             throw new EntityUpdateConflictException(ALREADY_BLOCKED_ERROR);
@@ -128,8 +145,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User unblockUser(int id) {
+    public User unblockUser(int id, int requesterId) {
         User user = userRepository.findById(id);
+        User requester = userRepository.findById(requesterId);
+
+        if (id == requesterId) {
+            throw new AuthorizationException(CANNOT_BLOCK_SELF_ERROR);
+        }
+
+        if (requester.isModerator() && !requester.isAdmin()) {
+            if (user.isAdmin()) {
+                throw new AuthorizationException(CANNOT_BLOCK_ADMIN_ERROR);
+            }
+            if (user.isModerator()) {
+                throw new AuthorizationException(CANNOT_BLOCK_MODERATOR_ERROR);
+            }
+        }
 
         if (!user.isBlocked()) {
             throw new EntityUpdateConflictException(NOT_BLOCKED_ERROR);

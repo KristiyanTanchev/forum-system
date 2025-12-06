@@ -3,9 +3,11 @@ package com.team3.forum.controllers.rest;
 import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
 import com.team3.forum.models.userDtos.UserResponseDto;
+import com.team3.forum.security.CustomUserDetails;
 import com.team3.forum.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,14 +32,16 @@ public class AdminRestController {
     }
 
     @PostMapping("/users/{id}/block")
-    public ResponseEntity<UserResponseDto> blockUser(@PathVariable int id) {
-        User user = userService.blockUser(id);
+    public ResponseEntity<UserResponseDto> blockUser(@PathVariable int id,
+                                                      @AuthenticationPrincipal CustomUserDetails requester) {
+        User user = userService.blockUser(id, requester.getId());
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 
     @PostMapping("/users/{id}/unblock")
-    public ResponseEntity<UserResponseDto> unblockUser(@PathVariable int id) {
-        User user = userService.unblockUser(id);
+    public ResponseEntity<UserResponseDto> unblockUser(@PathVariable int id,
+                                                        @AuthenticationPrincipal CustomUserDetails requester) {
+        User user = userService.unblockUser(id, requester.getId());
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 
