@@ -8,6 +8,8 @@ import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.User;
 import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.userDtos.UserCreateDto;
+import com.team3.forum.models.userDtos.UserPage;
+import com.team3.forum.models.userDtos.UserStatsDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 import com.team3.forum.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +20,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.thymeleaf.expression.Arrays;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static helpers.UserHelpers.*;
@@ -124,10 +128,12 @@ public class UserServiceImplTest {
     public void blockUser_Should_BlockUser_Successfully() {
         //Arrange
         var mockUser = createMockUser();
+        var mockAdmin = createMockAdmin();
         Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         Mockito.when(mockUserRepository.save(mockUser)).thenReturn(mockUser);
         //Act
-        User result = userService.blockUser(mockUser.getId());
+        User result = userService.blockUser(mockUser.getId(), mockAdmin.getId());
         //Assert
         Assertions.assertTrue(result.isBlocked());
         Mockito.verify(mockUserRepository, Mockito.times(1)).save(mockUser);
@@ -136,41 +142,83 @@ public class UserServiceImplTest {
     @Test
     public void blockUser_Should_Throw_When_UserNotFound() {
         //Arrange
+        var mockAdmin = createMockAdmin();
+        mockAdmin.setId(999);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         Mockito.when(mockUserRepository.findById(999))
                 .thenThrow(new EntityNotFoundException("User", 999));
         //Act, Assert
-        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.blockUser(999));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.blockUser(999, mockAdmin.getId()));
     }
 
     @Test
     public void blockUser_Should_Throw_When_UserIsAlreadyBlocked() {
         //Arrange
         var mockUser = createMockUser();
+        var mockAdmin = createMockAdmin();
         mockUser.setBlocked(true);
-        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         //Act, Assert
-        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.blockUser(1));
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.blockUser(mockUser.getId(), mockAdmin.getId()));
     }
 
     @Test
     public void blockUser_Should_Throw_When_UserIsAlreadyDeleted() {
         //Arrange
         var mockUser = createMockUser();
+        var mockAdmin = createMockAdmin();
         mockUser.setDeleted(true);
-        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         //Act, Assert
-        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.blockUser(1));
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.blockUser(mockUser.getId(), mockAdmin.getId()));
+    }
+
+    @Test
+    public void blockUser_Should_Throw_When_TryingToBlockSelf() {
+        //Arrange
+        var mockAdmin = createMockAdmin();
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
+        //Act, Assert
+        Assertions.assertThrows(AuthorizationException.class, () -> userService.blockUser(mockAdmin.getId(), mockAdmin.getId()));
+    }
+
+    @Test
+    public void blockUser_Should_Throw_When_ModeratorTriesToBlockAdmin() {
+        //Arrange
+        var mockAdmin = createMockAdmin();
+        var mockModerator = createMockModerator();
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
+        Mockito.when(mockUserRepository.findById(mockModerator.getId())).thenReturn(mockModerator);
+        //Act, Assert
+        Assertions.assertThrows(AuthorizationException.class, () -> userService.blockUser(mockAdmin.getId(), mockModerator.getId()));
+    }
+
+    @Test
+    public void blockUser_Should_Throw_When_ModeratorTriesToBlockAnotherModerator() {
+        //Arrange
+        var mockModerator1 = createMockModerator();
+        var mockModerator2 = createMockModerator();
+        mockModerator2.setId(4);
+        mockModerator2.setUsername("moderator_user_2");
+        Mockito.when(mockUserRepository.findById(mockModerator1.getId())).thenReturn(mockModerator1);
+        Mockito.when(mockUserRepository.findById(mockModerator2.getId())).thenReturn(mockModerator2);
+        //Act, Assert
+        Assertions.assertThrows(AuthorizationException.class, () -> userService.blockUser(mockModerator1.getId(), mockModerator2.getId()));
     }
 
     @Test
     public void unblockUser_Should_UnblockUser_Successfully() {
         //Arrange
         var mockUser = createMockUser();
+        var mockAdmin = createMockAdmin();
         mockUser.setBlocked(true);
         Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         Mockito.when(mockUserRepository.save(mockUser)).thenReturn(mockUser);
         //Act
-        User result = userService.unblockUser(mockUser.getId());
+        User result = userService.unblockUser(mockUser.getId(), mockAdmin.getId());
         //Assert
         Assertions.assertFalse(result.isBlocked());
         Mockito.verify(mockUserRepository, Mockito.times(1)).save(mockUser);
@@ -179,31 +227,72 @@ public class UserServiceImplTest {
     @Test
     public void unblockUser_Should_Throw_When_UserNotFound() {
         //Arrange
+        var mockAdmin = createMockAdmin();
+        mockAdmin.setId(999);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         Mockito.when(mockUserRepository.findById(999))
                 .thenThrow(new EntityNotFoundException("User", 999));
         //Act, Assert
-        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.unblockUser(999));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.unblockUser(999, mockAdmin.getId()));
+    }
+
+    @Test
+    public void unblockUser_Should_Throw_When_TryingToUnBlockSelf() {
+        //Arrange
+        var mockAdmin = createMockAdmin();
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
+        //Act, Assert
+        Assertions.assertThrows(AuthorizationException.class, () -> userService.unblockUser(mockAdmin.getId(), mockAdmin.getId()));
+    }
+
+    @Test
+    public void unblockUser_Should_Throw_When_RequesterIsModerator_And_TryingToBlockAnotherAdmin() {
+        //Arrange
+        var requester = createMockModerator();
+        var mockAdmin = createMockAdmin();
+
+        Mockito.when(mockUserRepository.findById(requester.getId())).thenReturn(requester);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
+        //Act, Assert
+        Assertions.assertThrows(AuthorizationException.class, () -> userService.unblockUser(mockAdmin.getId(), requester.getId()));
+    }
+
+    @Test
+    public void unblockUser_Should_Throw_When_RequesterIsModerator_And_TryingToBlockAnotherModerator() {
+        //Arrange
+        var requester = createMockModerator();
+        var mockModerator = createMockModerator();
+        mockModerator.setId(5);
+
+        Mockito.when(mockUserRepository.findById(requester.getId())).thenReturn(requester);
+        Mockito.when(mockUserRepository.findById(mockModerator.getId())).thenReturn(mockModerator);
+        //Act, Assert
+        Assertions.assertThrows(AuthorizationException.class, () -> userService.unblockUser(mockModerator.getId(), requester.getId()));
     }
 
     @Test
     public void unblockUser_Should_Throw_When_UserIsNotBlocked() {
         //Arrange
         var mockUser = createMockUser();
+        var mockAdmin = createMockAdmin();
         mockUser.setBlocked(false);
-        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         //Act, Assert
-        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.unblockUser(1));
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.unblockUser(mockUser.getId(), mockAdmin.getId()));
     }
 
     @Test
     public void unblockUser_Should_Throw_When_UserIsAlreadyDeleted() {
         //Arrange
         var mockUser = createMockUser();
+        var mockAdmin = createMockAdmin();
         mockUser.setBlocked(true);
         mockUser.setDeleted(true);
-        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.findById(mockAdmin.getId())).thenReturn(mockAdmin);
         //Act, Assert
-        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.unblockUser(1));
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.unblockUser(mockUser.getId(), mockAdmin.getId()));
     }
 
     @Test
@@ -316,6 +405,66 @@ public class UserServiceImplTest {
         Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
         //Act, Assert
         Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.promoteToModerator(1));
+    }
+
+    @Test
+    public void demoteUser_Should_Demote_User_Successfully() {
+        //Arrange
+        var mockUser = createMockModerator();
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        Mockito.when(mockUserRepository.save(mockUser)).thenReturn(mockUser);
+        //Act
+        User result = userService.demoteUser(mockUser.getId());
+        //Assert
+        Assertions.assertEquals(Role.USER, result.getRole());
+        Mockito.verify(mockUserRepository, Mockito.times(1)).save(mockUser);
+    }
+
+    @Test
+    public void demoteUser_Should_Throw_When_UserNotFound() {
+        //Arrange
+        Mockito.when(mockUserRepository.findById(999))
+                .thenThrow(new EntityNotFoundException("User", 999));
+        //Act, Assert
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.demoteUser(999));
+    }
+
+    @Test
+    public void demoteUser_Should_Throw_When_UserIsAdmin() {
+        var mockUser = createMockAdmin();
+        Mockito.when(mockUserRepository.findById(mockUser.getId())).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.demoteUser(mockUser.getId()));
+    }
+
+    @Test
+    public void demoteUser_Should_Throw_When_UserIsBlocked() {
+        //Arrange
+        var mockUser = createMockUser();
+        mockUser.setBlocked(true);
+        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.demoteUser(1));
+    }
+
+    @Test
+    public void demoteUser_Should_Throw_When_UserIsDeleted() {
+        //Arrange
+        var mockUser = createMockUser();
+        mockUser.setDeleted(true);
+        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.demoteUser(1));
+    }
+
+    @Test
+    public void demoteUser_Should_Throw_When_UserIsAlreadyUser() {
+        //Arrange
+        var mockUser = createMockUser();
+        mockUser.setRole(Role.USER);
+        Mockito.when(mockUserRepository.findById(1)).thenReturn(mockUser);
+        //Act, Assert
+        Assertions.assertThrows(EntityUpdateConflictException.class, () -> userService.demoteUser(1));
     }
 
     @Test
@@ -536,6 +685,7 @@ public class UserServiceImplTest {
         Assertions.assertThrows(DuplicateEntityException.class, () ->
                 userService.updateUser(1, dto, 1));
     }
+
     @Test
     public void updateUser_Should_Not_Check_Email_When_EmailUnchanged() {
         // Arrange
@@ -551,6 +701,81 @@ public class UserServiceImplTest {
         // Assert
         Mockito.verify(mockUserRepository, Mockito.never()).existsByEmail(Mockito.anyString());
     }
+
+    @Test
+    public void getUserStats_Should_Call_Repository() {
+        // Arrange
+        User user = createMockUser();
+        UserStatsDto dto = createMockUserStatsDto();
+
+        Mockito.when(mockUserRepository.findById(user.getId())).thenReturn(user);
+        Mockito.when(userMapper.toStatsDto(user)).thenReturn(dto);
+        // Act
+        UserStatsDto result = userService.getUserStats(user.getId());
+        // Assert
+        Assertions.assertEquals(result, dto);
+        Mockito.verify(mockUserRepository, Mockito.times(1)).findById(user.getId());
+        Mockito.verify(userMapper, Mockito.times(1)).toStatsDto(user);
+    }
+
+    @Test
+    public void getUsersCount_Should_Call_Repository() {
+        // Arrange
+        int expectedCount = 30;
+        Mockito.when(mockUserRepository.getUsersCount()).thenReturn(expectedCount);
+        // Act
+        int result = userService.getUsersCount();
+        // Assert
+        Assertions.assertEquals(expectedCount, result);
+        Mockito.verify(mockUserRepository, Mockito.times(1)).getUsersCount();
+    }
+
+    @Test
+    public void getBlockedUsersCount_Should_Call_Repository() {
+        // Arrange
+        int expectedCount = 30;
+        Mockito.when(mockUserRepository.getBlockedUsersCount()).thenReturn(expectedCount);
+        // Act
+        int result = userService.getBlockedUsersCount();
+        // Assert
+        Assertions.assertEquals(expectedCount, result);
+        Mockito.verify(mockUserRepository, Mockito.times(1)).getBlockedUsersCount();
+    }
+
+    @Test
+    public void getUsersWithFiltersPaginated_Should_ReturnUserPage_Successfully() {
+        int page = 1;
+        int size = 10;
+        String searchQuery = "john";
+        String statusFilter = "active";
+        String sortBy = "username";
+        String direction = "asc";
+        var mockUser1 = createMockUser();
+        var mockUser2 = createMockUser();
+        List<User> mockUsers = new ArrayList<>();
+        mockUsers.add(mockUser1);
+        mockUsers.add(mockUser2);
+        int totalItems = 15;
+        Mockito.when(mockUserRepository.findAllWithFilterPaginated(page, size, searchQuery, statusFilter, sortBy, direction))
+                .thenReturn(mockUsers);
+        Mockito.when(mockUserRepository.countUsersWithFilters(searchQuery, statusFilter)).thenReturn(totalItems);
+
+        UserPage result = userService.getUsersWithFiltersPaginated(page, size, searchQuery, statusFilter, sortBy, direction);
+
+        Assertions.assertEquals(mockUsers, result.getItems());
+        Assertions.assertEquals(page, result.getPage());
+        Assertions.assertEquals(size, result.getSize());
+        Assertions.assertEquals(totalItems, result.getTotalItems());
+        Assertions.assertEquals(2, result.getTotalPages());
+        Assertions.assertEquals(1, result.getFromItem());
+        Assertions.assertEquals(10, result.getToItem());
+
+        Mockito.verify(mockUserRepository,Mockito.times(1))
+                .findAllWithFilterPaginated(page, size, searchQuery, statusFilter, sortBy, direction);
+        Mockito.verify(mockUserRepository,Mockito.times(1))
+                .countUsersWithFilters(searchQuery,statusFilter);
+    }
+
 }
 
 

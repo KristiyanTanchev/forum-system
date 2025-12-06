@@ -125,7 +125,7 @@
                         <!-- Comment Template -->
                         <article class="comment" th:each="comment : ${comments}">
                             <header class="comment-header">
-                                <div class="comment-avatar" th:text="${#strings.substring(comment.user.username, 0, 1)}">A</div>
+                                <div class="comment-avatar" th:text="${#strings.substring(comment.user.firstName, 0, 1).toUpperCase()}">A</div>
                                 <div class="comment-header-main">
                                     <div class="comment-author-row">
                                         <span class="comment-author" th:text="${comment.user.username}">ana</span>

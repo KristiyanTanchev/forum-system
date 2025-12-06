@@ -5,6 +5,7 @@ import com.team3.forum.exceptions.DuplicateEntityException;
 import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 import com.team3.forum.repositories.PostRepository;
 import com.team3.forum.repositories.UserRepository;
@@ -72,7 +73,7 @@ public class PostServiceImplTests {
         int requesterId = 10;
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(true);
+        requester.setRole(Role.ADMIN);
 
         Mockito.when(userRepository.findById(requesterId)).thenReturn(requester);
         Mockito.when(postRepository.findById(postId)).thenReturn(null);
@@ -96,7 +97,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Post post = new Post();
         post.setId(postId);
@@ -122,7 +123,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(true);
+        requester.setRole(Role.ADMIN);
 
         Post post = new Post();
         post.setId(postId);
@@ -149,7 +150,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Post post = new Post();
         post.setId(postId);
@@ -176,7 +177,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(true);
+        requester.setRole(Role.ADMIN);
 
         Mockito.when(userRepository.findById(requesterId)).thenReturn(requester);
         Mockito.when(postRepository.findByAndIsDeleted(postId)).thenReturn(null);
@@ -200,7 +201,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Post post = new Post();
         post.setId(postId);
@@ -226,7 +227,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(true);
+        requester.setRole(Role.ADMIN);
 
         Post post = new Post();
         post.setId(postId);
@@ -257,7 +258,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Post post = new Post();
         post.setId(postId);
@@ -307,7 +308,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Post post = new Post();
         post.setId(postId);
@@ -336,7 +337,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(true);
+        requester.setRole(Role.ADMIN);
 
         Post post = new Post();
         post.setId(postId);
@@ -371,7 +372,7 @@ public class PostServiceImplTests {
 
         User requester = new User();
         requester.setId(requesterId);
-        requester.setAdmin(false);
+        requester.setRole(Role.USER);
 
         Post post = new Post();
         post.setId(postId);

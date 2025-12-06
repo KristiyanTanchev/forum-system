@@ -3,6 +3,7 @@ package com.team3.forum.services;
 import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.models.Tag;
 import com.team3.forum.models.User;
+import com.team3.forum.models.enums.Role;
 import com.team3.forum.repositories.TagRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ public class TagServiceImplTest {
         Mockito.when(mockTagRepository.findAll()).thenReturn(List.of());
         Mockito.when(mockTagRepository.save(Mockito.any(Tag.class))).thenReturn(tag);
         //Act
-        Tag result = tagService.createTag(tag, adminUser);
+        Tag result = tagService.createTag(tag.getName(), adminUser.getId());
         //Assert
         Mockito.verify(mockTagRepository, Mockito.times(1)).save(tag);
         Assertions.assertEquals("crypto", result.getName());
@@ -72,7 +73,7 @@ public class TagServiceImplTest {
         Tag tag = new Tag();
         //Act & Assert
         Assertions.assertThrows(AuthorizationException.class, () ->
-                tagService.createTag(tag, regularUser));
+                tagService.createTag(tag.getName(), regularUser.getId()));
     }
 
     @Test
@@ -89,7 +90,7 @@ public class TagServiceImplTest {
         Mockito.when(mockTagRepository.findById(1)).thenReturn(existingTag);
         Mockito.when(mockTagRepository.save(existingTag)).thenReturn(existingTag);
         //Act
-        Tag result = tagService.updateTag(1, updatedTag, adminUser);
+        Tag result = tagService.updateTag(1, updatedTag.getName(), adminUser.getId());
         //Assert
         Mockito.verify(mockTagRepository, Mockito.times(1)).save(existingTag);
         Assertions.assertEquals("newname", result.getName());
@@ -101,14 +102,14 @@ public class TagServiceImplTest {
         User adminUser = createMockAdminUser();
         Mockito.when(mockTagRepository.existsById(1)).thenReturn(true);
         //Act
-        tagService.deleteById(1, adminUser);
+        tagService.deleteById(1, adminUser.getId());
         //Assert
         Mockito.verify(mockTagRepository, Mockito.times(1)).deleteById(1);
     }
 
     private User createMockAdminUser() {
         User user = createMockUser();
-        user.setAdmin(true);
+        user.setRole(Role.ADMIN);
         return user;
     }
 }

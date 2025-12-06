@@ -57,8 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-                // If account is blocked/disabled, simply don't set authentication
-                // This allows unauthenticated access to public endpoints like /auth/login
             }
         } catch (Exception ex) {
             System.err.println("Could not set user authentication: " + ex.getMessage());
