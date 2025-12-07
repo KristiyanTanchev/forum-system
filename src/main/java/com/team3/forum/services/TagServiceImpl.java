@@ -84,4 +84,11 @@ public class TagServiceImpl implements TagService {
     public List<Tag> findTopByOrderByPostsCountDesc(int limit) {
         return tagRepository.findTopByOrderByPostsCountDesc(limit);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> findAllWithPostsCount() {
+        return tagRepository.findAllWithPostsCount();
+    }
+
 }

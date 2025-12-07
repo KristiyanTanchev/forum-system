@@ -95,10 +95,7 @@ public class PostMvcController {
 
         model.addAttribute("direction", direction);
 
-        model.addAttribute("tags",
-                tagService.findAll().stream()
-                        .sorted((t1, t2) -> t1.getName().compareToIgnoreCase(t2.getName()))
-        );
+        model.addAttribute("tags", tagService.findAllWithPostsCount());
         return "AllPostsView";
     }
 

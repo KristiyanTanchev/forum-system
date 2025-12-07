@@ -17,4 +17,6 @@ public interface TagRepository {
     Tag findByName(String name);
 
     boolean existsByName(String name);
+
+    List<Tag> findAllWithPostsCount();
 }
