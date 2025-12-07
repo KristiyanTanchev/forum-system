@@ -166,8 +166,13 @@ public class PostMvcController {
         model.addAttribute("comments", commentDtos);
         model.addAttribute("commentPage", commentPage);
         model.addAttribute("commentTotalPages", totalPages);
-        model.addAttribute("commentFromItem", start + 1); // 1-based for display
-        model.addAttribute("commentToItem", end);
+        if (totalComments == 0) {
+            model.addAttribute("commentFromItem", 0);
+            model.addAttribute("commentToItem", 0);
+        } else {
+            model.addAttribute("commentFromItem", start + 1);
+            model.addAttribute("commentToItem", end);
+        }
         model.addAttribute("commentTotalItems", totalComments);
 
         model.addAttribute("currentUser", currentUser);
