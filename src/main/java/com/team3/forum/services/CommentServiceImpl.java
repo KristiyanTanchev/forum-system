@@ -4,10 +4,12 @@ import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.DuplicateEntityException;
 import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.exceptions.EntityUpdateConflictException;
+import com.team3.forum.helpers.CommentMapper;
 import com.team3.forum.models.Comment;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
+import com.team3.forum.models.commentDtos.CommentResponseDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
 import com.team3.forum.models.enums.Role;
 import com.team3.forum.repositories.CommentRepository;
@@ -33,14 +35,17 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentMapper commentMapper;
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository,
                               PostRepository postRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository,
+                              CommentMapper commentMapper) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.commentMapper = commentMapper;
     }
 
     @Override
@@ -207,6 +212,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public int getCommentCount() {
         return commentRepository.getCommentCount();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CommentResponseDto buildCommentResponseDto(Comment comment) {
+        return commentMapper.toResponseDto(comment, null);
     }
 
     private void verifyModeratorOrOwner(Comment comment, User requester, RuntimeException error) {

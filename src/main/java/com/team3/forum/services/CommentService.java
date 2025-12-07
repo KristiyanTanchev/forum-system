@@ -2,6 +2,7 @@ package com.team3.forum.services;
 
 import com.team3.forum.models.Comment;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
+import com.team3.forum.models.commentDtos.CommentResponseDto;
 import com.team3.forum.models.commentDtos.CommentUpdateDto;
 
 import java.util.List;
@@ -20,4 +21,5 @@ public interface CommentService {
     void unlikeComment(int commentId, int userId);
     List<Comment> findAllByPostIdWithOrdering(int postId, String orderBy, String direction);
     int getCommentCount();
+    CommentResponseDto buildCommentResponseDto(Comment comment);
 }
