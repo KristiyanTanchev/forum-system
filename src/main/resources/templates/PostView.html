@@ -111,7 +111,13 @@
                     <!-- COMMENT FORM (visible when logged in) -->
                     <div class="comment-form" sec:authorize="isAuthenticated()">
                         <div class="comment-form-header">
-                        <span class="comment-form-avatar" th:text="${#strings.substring(currentUser.firstName, 0, 1)}">M</span>
+                            <div class="comment-form-avatar">
+                                <img th:if="${currentUser != null && currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()}"
+                                     th:src="${currentUser.avatarUrl}"
+                                     alt="Avatar">
+                                <span th:if="${currentUser == null || currentUser.avatarUrl == null || currentUser.avatarUrl.isEmpty()}"
+                                      th:text="${currentUser != null ? #strings.substring(currentUser.firstName, 0, 1) : 'M'}"></span>
+                            </div>
                             <div class="comment-form-meta">
                                 <div class="comment-form-user" sec:authentication="name">You</div>
                                 <div class="comment-form-hint">Share your thoughts about this discussion.</div>
@@ -141,7 +147,13 @@
                         <!-- Comment Template -->
                         <article class="comment" th:each="comment : ${comments}">
                             <header class="comment-header">
-                                <div class="comment-avatar" th:text="${comment.user.firstName != null ? #strings.substring(comment.user.firstName, 0, 1) : #strings.substring(comment.user.username, 0, 1)}">A</div>
+                                <div class="comment-avatar">
+                                    <img th:if="${comment.user.avatarUrl != null && !comment.user.avatarUrl.isEmpty()}"
+                                         th:src="${comment.user.avatarUrl}"
+                                         alt="Avatar">
+                                    <span th:if="${comment.user.avatarUrl == null || comment.user.avatarUrl.isEmpty()}"
+                                          th:text="${comment.user.firstName != null ? #strings.substring(comment.user.firstName, 0, 1) : #strings.substring(comment.user.username, 0, 1)}">A</span>
+                                </div>
                                 <div class="comment-header-main">
                                     <div class="comment-author-row">
                                         <span class="comment-author" th:text="${comment.user.username}">ana</span>

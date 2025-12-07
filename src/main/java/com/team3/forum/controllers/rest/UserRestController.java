@@ -16,8 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -98,6 +101,34 @@ public class UserRestController {
         User user = userService.findById(userDetails.getId());
         List<CommentResponseDto> response = user.getComments().stream()
                 .map(commentService::buildCommentResponseDto).toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/avatar")
+    public ResponseEntity<Map<String, String>> uploadAvatar(
+            @PathVariable int id,
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        String avatarUrl = userService.uploadAvatar(id, file, userDetails.getId());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("avatarUrl", avatarUrl);
+        response.put("message", "Avatar uploaded successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}/avatar")
+    public ResponseEntity<Map<String, String>> deleteAvatar(
+            @PathVariable int id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        userService.deleteAvatar(id, userDetails.getId());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Avatar deleted successfully");
+
         return ResponseEntity.ok(response);
     }
 }

@@ -43,9 +43,8 @@ public class UserMapper {
         if (dto.getEmail() != null) {
             user.setEmail(dto.getEmail());
         }
-        if (dto.getAvatarUrl() != null) {
-            user.setAvatarUrl(dto.getAvatarUrl());
-        }
+
+        user.setAvatarUrl(dto.getAvatarUrl());
     }
 
     public UserSummaryDto toSummaryDto(User user) {

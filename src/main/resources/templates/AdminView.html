@@ -127,8 +127,12 @@
                         <div class="admin-user-info-section">
                             <div class="admin-user-header">
 
-                                <div class="admin-user-avatar"
-                                     th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">J
+                                <div class="admin-user-avatar">
+                                    <img th:if="${user.avatarUrl != null && !user.avatarUrl.isEmpty()}"
+                                         th:src="${user.avatarUrl}"
+                                         alt="Avatar">
+                                    <span th:if="${user.avatarUrl == null || user.avatarUrl.isEmpty()}"
+                                          th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">J</span>
                                 </div>
                                 <div class="admin-user-details">
 

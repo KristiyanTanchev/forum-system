@@ -22,7 +22,7 @@
                     </p>
                 </div>
 
-                <form th:action="@{/profile/edit}" th:object="${userUpdateDto}" method="post">
+                <form th:action="@{/profile/edit}" th:object="${userUpdateDto}" method="post" enctype="multipart/form-data">
                     <div class="form-row-split">
                         <div class="form-field">
                             <label class="form-label" for="edit-first-name">First name</label>
@@ -60,37 +60,14 @@
                     </div>
 
                     <div class="form-field">
-                        <label class="form-label" for="edit-avatar-url">Avatar URL <span>(optional)</span></label>
+                        <label class="form-label" for="edit-avatar-file">Profile Picture <span>(optional)</span></label>
                         <input class="form-input"
-                               id="edit-avatar-url"
-                               th:field="*{avatarUrl}"
-                               type="url"
-                               placeholder="https://example.com/avatar.jpg"/>
-                        <p class="form-help">Provide a URL to an image for your avatar.</p>
+                               id="edit-avatar-file"
+                               name="avatarFile"
+                               type="file"
+                               accept="image/jpeg,image/png,image/gif,image/webp"/>
+                        <p class="form-help">Upload an image for your avatar (max 5MB, JPG/PNG/GIF/WebP).</p>
                     </div>
-
-                    <!-- Future features: Bio, Location, Password change -->
-                    <!-- <div class="form-field">
-                        <label class="form-label" for="edit-bio">Bio <span>(optional)</span></label>
-                        <textarea class="form-textarea" id="edit-bio" name="bio"
-                                  placeholder="Tell people what kind of movies / shows you love."></textarea>
-                    </div>
-
-                    <hr style="border:none;border-top:1px solid rgba(148,163,184,0.25);margin:1rem 0;">
-
-                    <div class="form-row-split">
-                        <div class="form-field">
-                            <label class="form-label" for="edit-password">New password <span>(optional)</span></label>
-                            <input class="form-input" id="edit-password" name="newPassword" type="password"/>
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label" for="edit-password2">Confirm password</label>
-                            <input class="form-input" id="edit-password2" name="confirmPassword" type="password"/>
-                        </div>
-                    </div>
-                    <p class="form-help">
-                        Leave password fields empty if you don't want to change it.
-                    </p> -->
 
                     <div class="form-actions">
                         <button class="btn btn-primary" type="submit">Save profile</button>

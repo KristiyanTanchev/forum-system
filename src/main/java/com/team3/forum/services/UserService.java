@@ -44,4 +44,8 @@ public interface UserService {
     UserPage getUsersWithFiltersPaginated(int page, int size, String searchQuery, String statusFilter, String sortBy, String direction);
 
     int getBlockedUsersCount();
+
+    String uploadAvatar(int userId, org.springframework.web.multipart.MultipartFile file, int requesterId);
+
+    void deleteAvatar(int userId, int requesterId);
 }

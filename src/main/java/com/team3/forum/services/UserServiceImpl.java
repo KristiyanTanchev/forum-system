@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,16 +35,20 @@ public class UserServiceImpl implements UserService {
     public static final String CANNOT_BLOCK_SELF_ERROR = "You cannot block yourself.";
     public static final String CANNOT_BLOCK_ADMIN_ERROR = "Moderators cannot block administrators.";
     public static final String CANNOT_BLOCK_MODERATOR_ERROR = "Moderators cannot block other moderators.";
+    public static final String AVATAR_UPDATE_AUTHORIZATION_ERROR = "You are not authorized to update this user's avatar.";
+    public static final String AVATAR_DELETE_AUTHORIZATION_ERROR = "You are not authorized to delete this user's avatar.";
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.fileStorageService = fileStorageService;
     }
 
 
@@ -284,5 +289,58 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public int getBlockedUsersCount() {
         return userRepository.getBlockedUsersCount();
+    }
+
+    @Override
+    public String uploadAvatar(int userId, MultipartFile file, int requesterId) {
+        User requester = userRepository.findById(requesterId);
+
+        if (requester.getId() != userId && !requester.isAdmin()) {
+            throw new AuthorizationException(AVATAR_UPDATE_AUTHORIZATION_ERROR);
+        }
+
+        User user = userRepository.findById(userId);
+
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            fileStorageService.deleteFile(user.getAvatarUrl());
+        }
+
+        String avatarUrl = fileStorageService.storeFile(file, userId);
+
+        UserUpdateDto updateDto = UserUpdateDto.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .avatarUrl(avatarUrl)
+                .build();
+
+        userMapper.updateEntityFromDto(updateDto, user);
+        userRepository.save(user);
+        return avatarUrl;
+    }
+
+    @Override
+    public void deleteAvatar(int userId, int requesterId) {
+        User requester = userRepository.findById(requesterId);
+
+        if (requester.getId() != userId && !requester.isAdmin()) {
+            throw new AuthorizationException(AVATAR_DELETE_AUTHORIZATION_ERROR);
+        }
+
+        User user = userRepository.findById(userId);
+
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            fileStorageService.deleteFile(user.getAvatarUrl());
+        }
+
+        UserUpdateDto updateDto = UserUpdateDto.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .avatarUrl(null)
+                .build();
+
+        userMapper.updateEntityFromDto(updateDto, user);
+        userRepository.save(user);
     }
 }

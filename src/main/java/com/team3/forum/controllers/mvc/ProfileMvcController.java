@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -79,6 +80,7 @@ public class ProfileMvcController {
     public String updateProfile(
             @Valid @ModelAttribute("userUpdateDto") UserUpdateDto userUpdateDto,
             BindingResult bindingResult,
+            @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
 
@@ -87,6 +89,12 @@ public class ProfileMvcController {
             model.addAttribute("user", userMapper.toResponseDto(user));
             return "EditProfileView";
         }
+
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String avatarUrl = userService.uploadAvatar(userDetails.getId(), avatarFile, userDetails.getId());
+            userUpdateDto.setAvatarUrl(avatarUrl);
+        }
+
         userService.updateUser(userDetails.getId(), userUpdateDto, userDetails.getId());
         return "redirect:/profile/" + userDetails.getUsername() + "?updated=true";
     }

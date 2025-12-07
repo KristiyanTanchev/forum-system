@@ -56,6 +56,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Forbidden", e.getMessage());
     }
 
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<Map<String, Object>> handleFileStorageException(FileStorageException e) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", e.getMessage());
+    }
+
     private ResponseEntity<Map<String, Object>> buildErrorResponse(
             HttpStatus status, String error, String message) {
         Map<String, Object> errorResponse = new HashMap<>();

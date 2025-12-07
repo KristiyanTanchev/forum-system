@@ -23,11 +23,13 @@
 
                 <section class="card profile-summary-card">
                     <div class="profile-header">
-                        <div class="profile-avatar" th:if="${user.avatarUrl == null or user.avatarUrl.isEmpty()}"
-                             th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">U</div>
-                        <img class="profile-avatar" th:if="${user.avatarUrl != null and !user.avatarUrl.isEmpty()}"
-                             th:src="${user.avatarUrl}" th:alt="${user.username} + ' avatar'"
-                             style="object-fit: cover;"/>
+                        <div class="profile-avatar">
+                            <img th:if="${user.avatarUrl != null && !user.avatarUrl.isEmpty()}"
+                                 th:src="${user.avatarUrl}"
+                                 th:alt="${user.username} + ' avatar'">
+                            <span th:if="${user.avatarUrl == null || user.avatarUrl.isEmpty()}"
+                                  th:text="${#strings.substring(user.firstName, 0, 1).toUpperCase()}">U</span>
+                        </div>
                         <div>
                             <div class="profile-username" th:text="${user.username}">username</div>
                             <div class="profile-role-badges">
