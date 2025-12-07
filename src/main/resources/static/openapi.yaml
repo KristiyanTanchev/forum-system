@@ -1,0 +1,1985 @@
+openapi: 3.0.3
+info:
+  title: CineTalk Forum API
+  version: 1.0.0
+  description: |
+    REST API for the CineTalk forum application.
+    This specification is maintained manually (design-first) and describes the main public endpoints.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: User registration and login
+  - name: Users
+    description: User profiles, summaries and personal activity
+  - name: Posts
+    description: Forum topics (posts)
+  - name: Comments
+    description: Comments on posts and reactions
+  - name: Folders
+    description: Forum folder hierarchy and navigation
+  - name: Tags
+    description: Post tags management
+  - name: Admin
+    description: Administrative and moderation operations
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ========== AUTH ==========
+    LoginRequestDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        rememberMe:
+          type: boolean
+
+    LoginResponseDto:
+      type: object
+      properties:
+        token:
+          type: string
+        type:
+          type: string
+          description: Token type, usually "Bearer".
+          default: Bearer
+        userId:
+          type: integer
+          format: int32
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        isAdmin:
+          type: boolean
+
+    # ========== USERS ==========
+    UserCreateDto:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - username
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+          minLength: 4
+          maxLength: 32
+        lastName:
+          type: string
+          minLength: 4
+          maxLength: 32
+        username:
+          type: string
+          minLength: 4
+          maxLength: 50
+          pattern: '^[A-Za-z][A-Za-z0-9._-]{3,49}$'
+          description: Must start with a letter; allowed characters are letters, digits, ., _, -.
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    UserUpdateDto:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+      properties:
+        firstName:
+          type: string
+          minLength: 4
+          maxLength: 32
+        lastName:
+          type: string
+          minLength: 4
+          maxLength: 32
+        email:
+          type: string
+          format: email
+        avatarUrl:
+          type: string
+
+    UserResponseDto:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        avatarUrl:
+          type: string
+        role:
+          type: string
+          description: Effective role (e.g. USER, MODERATOR, ADMIN).
+        createdAt:
+          type: string
+          format: date-time
+
+    UserSummaryDto:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        username:
+          type: string
+
+    UserPage:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Page items; mapped from List<User> but exposed as UserResponseDto.
+          items:
+            $ref: '#/components/schemas/UserResponseDto'
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        fromItem:
+          type: integer
+          format: int32
+        toItem:
+          type: integer
+          format: int32
+
+    # ========== POSTS ==========
+    PostCreationDto:
+      type: object
+      required:
+        - title
+        - content
+        - folderId
+      properties:
+        title:
+          type: string
+          minLength: 16
+          maxLength: 64
+        content:
+          type: string
+          minLength: 32
+          maxLength: 8192
+        folderId:
+          type: integer
+          format: int32
+          minimum: 1
+        tag1:
+          type: string
+          maxLength: 50
+          pattern: '[a-z0-9-]{0,50}'
+          description: One word, lowercase letters, digits and dash.
+        tag2:
+          type: string
+          maxLength: 50
+          pattern: '[a-z0-9-]{0,50}'
+        tag3:
+          type: string
+          maxLength: 50
+          pattern: '[a-z0-9-]{0,50}'
+
+    PostUpdateDto:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          minLength: 16
+          maxLength: 64
+        content:
+          type: string
+          minLength: 32
+          maxLength: 8192
+        tag1:
+          type: string
+          maxLength: 50
+          pattern: '[a-z0-9-]{0,50}'
+        tag2:
+          type: string
+          maxLength: 50
+          pattern: '[a-z0-9-]{0,50}'
+        tag3:
+          type: string
+          maxLength: 50
+          pattern: '[a-z0-9-]{0,50}'
+
+    PostResponseDto:
+      type: object
+      description: |
+        Representation of a post (topic). Some internal fields are omitted; extend if needed.
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        content:
+          type: string
+        creator:
+          type: string
+          description: Username or display name of the creator.
+        userId:
+          type: integer
+          format: int32
+        commentsCount:
+          type: integer
+          format: int32
+        views:
+          type: integer
+          format: int64
+        folderName:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagResponseDto'
+        createdAtString:
+          type: string
+        updatedAtString:
+          type: string
+        deletedAtString:
+          type: string
+        isDeleted:
+          type: boolean
+
+
+    # ========== POSTS: PAGE WRAPPER ==========
+    PostPage:
+      type: object
+      description: Paginated result for posts.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponseDto'
+        size:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        fromItem:
+          type: integer
+          format: int32
+        toItem:
+          type: integer
+          format: int32
+        tagId:
+          type: integer
+          format: int32
+          description: Tag id used for filtering, if any.
+        searchQuery:
+          type: string
+          nullable: true
+
+    # ========== COMMENTS ==========
+    CommentCreationDto:
+      type: object
+      description: Payload used to create a new comment.
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 2
+          maxLength: 50
+
+    CommentUpdateDto:
+      type: object
+      description: Payload used to update an existing comment.
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 2
+          maxLength: 50
+
+    CommentResponseDto:
+      type: object
+      description: Full representation of a comment as returned by the API.
+      properties:
+        id:
+          type: integer
+          format: int32
+        postId:
+          type: integer
+          format: int32
+        userId:
+          type: integer
+          format: int32
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        isDeleted:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        likesCount:
+          type: integer
+          format: int32
+        likedByCurrentUser:
+          type: boolean
+        createdAtString:
+          type: string
+          description: Human-readable created timestamp.
+        editedAtString:
+          type: string
+          description: Human-readable edited timestamp.
+          nullable: true
+        user:
+          type: object
+          description: Internal user representation for this comment.
+          additionalProperties: true
+        username:
+          type: string
+        likedBy:
+          type: array
+          description: Users who liked this comment (internal representation).
+          items:
+            type: object
+            additionalProperties: true
+        contentHtml:
+          type: string
+          description: Comment content rendered as HTML.
+
+    # ========== FOLDERS ==========
+    FolderCreateDto:
+      type: object
+      description: Payload used to create a new folder.
+      required:
+        - parentFolderId
+        - name
+        - slug
+      properties:
+        parentFolderId:
+          type: integer
+          format: int32
+        name:
+          type: string
+          minLength: 1
+          maxLength: 32
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 32
+        description:
+          type: string
+          minLength: 0
+          maxLength: 255
+          nullable: true
+
+    FolderUpdateDto:
+      type: object
+      description: Payload used to update an existing folder.
+      required:
+        - id
+        - name
+        - slug
+      properties:
+        id:
+          type: integer
+          format: int32
+          minimum: 0
+        name:
+          type: string
+          minLength: 1
+          maxLength: 32
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 32
+        description:
+          type: string
+          minLength: 0
+          maxLength: 255
+          nullable: true
+
+    FolderPathDto:
+      type: object
+      description: One element in the breadcrumb path to a folder.
+      additionalProperties: true
+
+    FolderResponseDto:
+      type: object
+      description: Representation of a folder and its basic metadata.
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        postCount:
+          type: integer
+          format: int32
+          description: Number of posts directly in this folder.
+        path:
+          type: string
+          description: Path string made of slugs.
+        folderCount:
+          type: integer
+          format: int32
+          description: Number of direct child folders.
+        pathFolders:
+          type: array
+          description: Breadcrumb path from root to this folder.
+          items:
+            $ref: '#/components/schemas/FolderPathDto'
+        postCountWithSubfolders:
+          type: integer
+          format: int32
+          description: Number of posts including subfolders.
+        lastActivity:
+          type: string
+          description: Human-readable last activity timestamp.
+
+    FolderContentsDto:
+      type: object
+      description: A folder together with its child folders and posts.
+      properties:
+        folder:
+          $ref: '#/components/schemas/FolderResponseDto'
+        subFolders:
+          type: array
+          items:
+            $ref: '#/components/schemas/FolderResponseDto'
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponseDto'
+
+    # ========== TAGS ==========
+    TagCreationDto:
+      type: object
+      description: Payload used to create a new tag.
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Tag name.
+
+    TagUpdateDto:
+      type: object
+      description: Payload used to update an existing tag.
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: New tag name.
+
+    TagResponseDto:
+      type: object
+      description: Representation of a tag.
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+
+    # ========== LIKE COUNT ==========
+    LikeCountDto:
+      type: object
+      description: Like count for a post or comment.
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: ID of the post or comment this like count refers to.
+        likes:
+          type: integer
+          format: int32
+          description: Number of likes.
+
+    # ========== ERROR RESPONSE ==========
+    ErrorResponse:
+      type: object
+      description: Standard error response returned by the API.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Time at which the error occurred.
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code.
+          example: 400
+        error:
+          type: string
+          description: HTTP reason phrase or error type.
+          example: "Bad Request"
+        message:
+          type: string
+          description: Human-readable error message.
+          example: "Invalid username or password."
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  # =========================
+  # AUTHENTICATION
+  # =========================
+  /api/auth/register:
+    post:
+      tags: [ Authentication ]
+      summary: Register a new user
+      description: Create a new user account.
+      security: [ ]   # public
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateDto'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/login:
+    post:
+      tags: [ Authentication ]
+      summary: Login
+      description: Authenticate using username and password to obtain a JWT token.
+      security: [ ]   # public
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDto'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseDto'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # =========================
+  # USERS
+  # =========================
+  /api/users:
+    get:
+      tags: [ Users ]
+      summary: Get all users (summary)
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSummaryDto'
+
+  /api/users/{id}:
+    get:
+      tags: [ Users ]
+      summary: Get user by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [ Users ]
+      summary: Update user
+      description: Update user profile. Requires proper authorization.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateDto'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/me:
+    get:
+      tags: [ Users ]
+      summary: Get current user profile
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{id}/posts:
+    get:
+      tags: [ Users ]
+      summary: Get posts for a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Posts for the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponseDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{id}/comments:
+    get:
+      tags: [ Users ]
+      summary: Get comments for a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comments for the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponseDto'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/me/posts:
+    get:
+      tags: [ Users ]
+      summary: Get posts for the current user
+      responses:
+        '200':
+          description: Posts for current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponseDto'
+
+  /api/users/me/comments:
+    get:
+      tags: [ Users ]
+      summary: Get comments for the current user
+      responses:
+        '200':
+          description: Comments for current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponseDto'
+
+  # =========================
+  # POSTS
+  # =========================
+  /api/posts:
+    get:
+      tags: [ Posts ]
+      summary: Get all posts
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponseDto'
+    post:
+      tags: [ Posts ]
+      summary: Create a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreationDto'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/paginated:
+    get:
+      tags: [ Posts ]
+      summary: Get posts (paginated)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: searchQuery
+          in: query
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            default: date
+        - name: direction
+          in: query
+          schema:
+            type: string
+            default: desc
+        - name: tagId
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Paginated posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostPage'
+
+  /api/posts/{postId}:
+    get:
+      tags: [ Posts ]
+      summary: Get a post by id
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponseDto'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [ Posts ]
+      summary: Update a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUpdateDto'
+      responses:
+        '200':
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [ Posts ]
+      summary: Delete a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Post deleted (soft delete)
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/{postId}/restore:
+    post:
+      tags: [ Posts ]
+      summary: Restore a deleted post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post restored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponseDto'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/{postId}/likes:
+    get:
+      tags: [ Posts ]
+      summary: Get like count for a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Like count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeCountDto'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [ Posts ]
+      summary: Like a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Post liked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeCountDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [ Posts ]
+      summary: Unlike a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Like removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeCountDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/user:
+    get:
+      tags: [ Posts ]
+      summary: Get posts of a user (with authorization)
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Posts for the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponseDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # =========================
+  # COMMENTS
+  # =========================
+  /api/posts/{postId}/comments:
+    get:
+      tags: [ Comments ]
+      summary: Get comments for a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            default: created_at
+        - name: direction
+          in: query
+          schema:
+            type: string
+            default: desc
+      responses:
+        '200':
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponseDto'
+    post:
+      tags: [ Comments ]
+      summary: Create a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreationDto'
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/{postId}/comments/{commentId}:
+    put:
+      tags: [ Comments ]
+      summary: Update a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdateDto'
+      responses:
+        '200':
+          description: Comment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [ Comments ]
+      summary: Delete a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Comment deleted
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/{postId}/comments/{commentId}/restore:
+    post:
+      tags: [ Comments ]
+      summary: Restore a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment restored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponseDto'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/{postId}/comments/{commentId}/likes:
+    get:
+      tags: [ Comments ]
+      summary: Get like count for a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Like count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeCountDto'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [ Comments ]
+      summary: Like a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Comment liked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeCountDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [ Comments ]
+      summary: Unlike a comment
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Like removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeCountDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # =========================
+  # FOLDERS
+  # =========================
+  /api/forum:
+    get:
+      tags: [ Folders ]
+      summary: Get home folders
+      responses:
+        '200':
+          description: List of top-level folders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FolderResponseDto'
+    post:
+      tags: [ Folders ]
+      summary: Create a root folder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolderCreateDto'
+      responses:
+        '201':
+          description: Folder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/forum/path/{path}:
+    get:
+      tags: [ Folders ]
+      summary: Get folder contents by path
+      description: |
+        Path is a slash-separated list of slugs.
+        Example: /api/forum/path//movies/action
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Folder, its subfolders and posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderContentsDto'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [ Folders ]
+      summary: Create a child folder under a given path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolderCreateDto'
+      responses:
+        '201':
+          description: Folder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderResponseDto'
+    put:
+      tags: [ Folders ]
+      summary: Update a folder by path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolderUpdateDto'
+      responses:
+        '200':
+          description: Folder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderResponseDto'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [ Folders ]
+      summary: Delete a folder by path
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Folder deleted
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/forum/path/posts/{path}:
+    get:
+      tags: [ Folders ]
+      summary: Get posts in a folder by path (paginated)
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            default: CREATED_AT
+        - name: direction
+          in: query
+          schema:
+            type: string
+            default: desc
+      responses:
+        '200':
+          description: Posts in folder
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponseDto'
+
+  # =========================
+  # TAGS
+  # =========================
+  /api/tags:
+    get:
+      tags: [ Tags ]
+      summary: Get all tags
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagResponseDto'
+    post:
+      tags: [ Tags ]
+      summary: Create a tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagCreationDto'
+      responses:
+        '201':
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponseDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/tags/{id}:
+    get:
+      tags: [ Tags ]
+      summary: Get a tag by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tag found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponseDto'
+        '404':
+          description: Tag not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [ Tags ]
+      summary: Update a tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagUpdateDto'
+      responses:
+        '200':
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponseDto'
+        '404':
+          description: Tag not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags: [ Tags ]
+      summary: Delete a tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Tag deleted
+        '404':
+          description: Tag not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # =========================
+  # ADMIN
+  # =========================
+  /api/admin:
+    get:
+      tags: [ Admin ]
+      summary: Get admin statistics
+      description: Returns global metrics such as user/post/comment counts.
+      responses:
+        '200':
+          description: Admin statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  totalPosts:
+                    type: integer
+                  totalComments:
+                    type: integer
+                  blockedUsers:
+                    type: integer
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users:
+    get:
+      tags: [ Admin ]
+      summary: Get users with filters (paginated)
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            default: username
+        - name: direction
+          in: query
+          schema:
+            type: string
+            default: asc
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Paginated users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/search:
+    get:
+      tags: [ Admin ]
+      summary: Search users
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matching users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponseDto'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}/block:
+    post:
+      tags: [ Admin ]
+      summary: Block user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}/unblock:
+    post:
+      tags: [ Admin ]
+      summary: Unblock user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User unblocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}/promote-admin:
+    post:
+      tags: [ Admin ]
+      summary: Promote user to admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User promoted to admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}/promote-moderator:
+    post:
+      tags: [ Admin ]
+      summary: Promote user to moderator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User promoted to moderator
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}/demote-moderator:
+    post:
+      tags: [ Admin ]
+      summary: Demote moderator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User demoted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}:
+    delete:
+      tags: [ Admin ]
+      summary: Soft-delete user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: User soft-deleted
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/users/{id}/restore:
+    post:
+      tags: [ Admin ]
+      summary: Restore soft-deleted user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: User restored
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
