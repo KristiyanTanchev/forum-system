@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>API Documentation</title>
+</head>
+
+<section layout:fragment="content">
+    <main class="editor-page">
+        <div class="container">
+            <section class="card editor-card-wide">
+                <div class="form-header">
+                    <h1 class="form-title">CineTalk REST API</h1>
+                    <p class="form-subtitle">
+                        Technical overview of the CineTalk forum API, including authentication and available endpoints.
+                    </p>
+                </div>
+
+                <section class="card folder-posts">
+
+                    <!-- OVERVIEW -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">1. Overview</div>
+                        <p class="card-subtitle">
+                            All endpoints are relative to the application base URL:
+                        </p>
+                        <pre><code>http://localhost:8080</code></pre>
+                        <p class="card-subtitle">
+                            Responses are JSON encoded. Validation errors and failures follow standard HTTP status
+                            codes (400, 401, 403, 404, 409, 500).
+                        </p>
+                    </div>
+
+                    <hr>
+
+                    <!-- AUTHENTICATION -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">2. Authentication</div>
+                        <p class="card-subtitle">
+                            The API uses JWT-based Bearer authentication. Obtain a token via login and include it in
+                            the <code>Authorization</code> header for protected endpoints.
+                        </p>
+
+                        <pre><code>Authorization: Bearer &lt;jwt-token&gt;</code></pre>
+
+                        <div class="api-section">
+                            <h2 class="section-title">2.1. Auth endpoints</h2>
+                            <table class="api-table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 120px;">Method</th>
+                                    <th>Path</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><code>POST</code></td>
+                                    <td><code>/api/auth/register</code></td>
+                                    <td>
+                                        Create a new user account.
+                                        Request body: <code>UserCreateDto</code>
+                                        Response: <code>UserResponseDto</code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><code>POST</code></td>
+                                    <td><code>/api/auth/login</code></td>
+                                    <td>
+                                        Authenticate with username and password.
+                                        Request body: <code>LoginRequestDto</code>
+                                        Response: <code>LoginResponseDto</code> containing JWT token and user info.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- USERS -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">3. Users</div>
+                        <p class="card-subtitle">
+                            Endpoints related to user accounts and profiles.
+                        </p>
+
+                        <table class="api-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users</code></td>
+                                <td>Get all users (summary DTO).</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users/{id}</code></td>
+                                <td>Get user details by id. Response: <code>UserResponseDto</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><code>PUT</code></td>
+                                <td><code>/api/users/{id}</code></td>
+                                <td>Update user profile. Body: <code>UserUpdateDto</code>. Requires authentication.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users/me</code></td>
+                                <td>Get the profile of the currently authenticated user.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users/{id}/posts</code></td>
+                                <td>Get posts created by the specified user.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users/{id}/comments</code></td>
+                                <td>Get comments created by the specified user.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users/me/posts</code></td>
+                                <td>Get posts created by the currently authenticated user.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/users/me/comments</code></td>
+                                <td>Get comments created by the currently authenticated user.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- POSTS -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">4. Posts</div>
+                        <p class="card-subtitle">
+                            Endpoints for working with forum topics (posts).
+                        </p>
+
+                        <table class="api-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/posts</code></td>
+                                <td>Get all posts.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/posts/paginated</code></td>
+                                <td>
+                                    Get posts with pagination and optional filters.
+                                    Query parameters: <code>page</code>, <code>searchQuery</code>, <code>orderBy</code>,
+                                    <code>direction</code>, <code>tagId</code>.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/posts/{postId}</code></td>
+                                <td>Get a single post by id.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/posts</code></td>
+                                <td>Create a new post. Body: <code>PostCreationDto</code>. Requires authentication.</td>
+                            </tr>
+                            <tr>
+                                <td><code>PUT</code></td>
+                                <td><code>/api/posts/{postId}</code></td>
+                                <td>Update an existing post. Body: <code>PostUpdateDto</code>. Requires author or
+                                    moderator.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/posts/{postId}</code></td>
+                                <td>Soft-delete a post. Requires appropriate permissions.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/posts/{postId}/restore</code></td>
+                                <td>Restore a previously deleted post.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/posts/{postId}/likes</code></td>
+                                <td>Get the current like count for a post.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/posts/{postId}/likes</code></td>
+                                <td>Like a post. Requires authentication.</td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/posts/{postId}/likes</code></td>
+                                <td>Remove a like from a post. Requires authentication.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- COMMENTS -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">5. Comments</div>
+                        <p class="card-subtitle">
+                            Endpoints for managing comments under posts.
+                        </p>
+
+                        <table class="api-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/posts/{postId}/comments</code></td>
+                                <td>
+                                    Get comments for a post.
+                                    Parameters: <code>orderBy</code> (default <code>created_at</code>),
+                                    <code>direction</code> (default <code>desc</code>).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/posts/{postId}/comments</code></td>
+                                <td>Create a comment. Body: <code>CommentCreationDto</code>. Requires authentication.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>PUT</code></td>
+                                <td><code>/api/posts/{postId}/comments/{commentId}</code></td>
+                                <td>Update a comment. Body: <code>CommentUpdateDto</code>. Requires author or moderator.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/posts/{postId}/comments/{commentId}</code></td>
+                                <td>Soft-delete a comment.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/posts/{postId}/comments/{commentId}/restore</code></td>
+                                <td>Restore a previously deleted comment.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/posts/{postId}/comments/{commentId}/likes</code></td>
+                                <td>Get like count for a comment.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/posts/{postId}/comments/{commentId}/likes</code></td>
+                                <td>Like a comment. Requires authentication.</td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/posts/{postId}/comments/{commentId}/likes</code></td>
+                                <td>Remove like from a comment. Requires authentication.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- FOLDERS -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">6. Folders</div>
+                        <p class="card-subtitle">
+                            Endpoints for navigating and managing the folder hierarchy.
+                        </p>
+
+                        <table class="api-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/forum</code></td>
+                                <td>Get top-level (home) folders.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/forum/path/{*path}</code></td>
+                                <td>Get folder details, subfolders, and posts by hierarchical path.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/forum</code></td>
+                                <td>Create a new root folder. Body: <code>FolderCreateDto</code>. Requires
+                                    authentication.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/forum/path/{*path}</code></td>
+                                <td>Create a child folder under the specified path.</td>
+                            </tr>
+                            <tr>
+                                <td><code>PUT</code></td>
+                                <td><code>/api/forum/path/{*path}</code></td>
+                                <td>Update folder by path. Body: <code>FolderUpdateDto</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/forum/path/{*path}</code></td>
+                                <td>Delete folder by path.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/forum/path/posts/{*path}</code></td>
+                                <td>
+                                    Get posts in a folder by path with pagination and sorting.
+                                    Query parameters: <code>page</code>, <code>orderBy</code>, <code>direction</code>.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- TAGS -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">7. Tags</div>
+                        <p class="card-subtitle">
+                            Endpoints for managing tags associated with posts.
+                        </p>
+
+                        <table class="api-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/tags</code></td>
+                                <td>Get all tags.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/tags/{id}</code></td>
+                                <td>Get a tag by id.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/tags</code></td>
+                                <td>Create a new tag. Body: <code>TagCreationDto</code>. Requires authentication.</td>
+                            </tr>
+                            <tr>
+                                <td><code>PUT</code></td>
+                                <td><code>/api/tags/{id}</code></td>
+                                <td>Update an existing tag. Body: <code>TagUpdateDto</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/tags/{id}</code></td>
+                                <td>Delete a tag by id.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- ADMIN -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">8. Admin</div>
+                        <p class="card-subtitle">
+                            Administrative endpoints. These require users with administrative privileges.
+                        </p>
+
+                        <table class="api-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 120px;">Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/admin</code></td>
+                                <td>Get global statistics: total users, posts, comments, blocked users.</td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/admin/users</code></td>
+                                <td>
+                                    Get paginated users with filters.
+                                    Parameters: <code>search</code>, <code>status</code>, <code>sort</code>, <code>direction</code>,
+                                    <code>page</code>, <code>size</code>.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code>GET</code></td>
+                                <td><code>/api/admin/users/search?query=...</code></td>
+                                <td>Search users by query string.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/admin/users/{id}/block</code></td>
+                                <td>Block a user account.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/admin/users/{id}/unblock</code></td>
+                                <td>Unblock a user account.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/admin/users/{id}/promote-admin</code></td>
+                                <td>Promote user to admin.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/admin/users/{id}/promote-moderator</code></td>
+                                <td>Promote user to moderator.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/admin/users/{id}/demote-moderator</code></td>
+                                <td>Demote user (remove moderator role).</td>
+                            </tr>
+                            <tr>
+                                <td><code>DELETE</code></td>
+                                <td><code>/api/admin/users/{id}</code></td>
+                                <td>Soft-delete a user.</td>
+                            </tr>
+                            <tr>
+                                <td><code>POST</code></td>
+                                <td><code>/api/admin/users/{id}/restore</code></td>
+                                <td>Restore a previously deleted user.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- SWAGGER -->
+                    <div class="folder-sidebar-section">
+                        <div class="card-title">9. Interactive documentation (Swagger)</div>
+                        <p class="card-subtitle">
+                            Swagger UI and OpenAPI specification are available at:
+                        </p>
+                        <ul>
+                            <li><code>/swagger-ui.html</code> – interactive documentation and request tester</li>
+                            <li><code>/v3/api-docs</code> – OpenAPI JSON</li>
+                            <li><code>/v3/api-docs.yaml</code> – OpenAPI YAML (if enabled)</li>
+                        </ul>
+                        <p class="card-subtitle">
+                            Use the "Authorize" button in Swagger UI to provide a JWT Bearer token and test secured
+                            endpoints.
+                        </p>
+                    </div>
+
+                </section>
+            </section>
+        </div>
+    </main>
+</section>
+
+</html>

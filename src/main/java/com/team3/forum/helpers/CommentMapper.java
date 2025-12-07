@@ -16,11 +16,13 @@ import java.time.LocalDateTime;
 public class CommentMapper {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final MarkdownService markdownService;
 
     @Autowired
-    public CommentMapper(PostRepository postRepository, UserRepository userRepository) {
+    public CommentMapper(PostRepository postRepository, UserRepository userRepository, MarkdownService markdownService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.markdownService = markdownService;
     }
 
     public Comment toEntity(CommentCreationDto dto, int postId, int userId) {
@@ -58,6 +60,7 @@ public class CommentMapper {
                 .postId(comment.getPost().getId())
                 .userId(comment.getUser().getId())
                 .content(comment.getContent())
+                .contentHtml(markdownService.toHtml(comment.getContent()))
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .isDeleted(comment.isDeleted())

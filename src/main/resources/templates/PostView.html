@@ -164,7 +164,7 @@
                             <div class="comment-body">
                                 <!-- Display existing comment content -->
                                 <div th:if="${editingCommentId != comment.id}">
-                                    <p th:text="${comment.content}"></p>
+                                    <p th:utext="${comment.contentHtml}"></p>
                                 </div>
 
                                 <!-- Edit form (when editing THIS comment) -->
@@ -176,7 +176,7 @@
                                                 name="content"
                                                 rows="3"
                                                 style="min-height: 80px; margin-bottom: 0.5rem;"
-                                                th:text="${comment.content}"></textarea>
+                                                th:utext="${comment.content}"></textarea>
                                         <div class="comment-form-actions" style="margin-top: 0.5rem;">
                                             <button class="btn btn-primary btn-sm" type="submit">Save</button>
                                             <button class="btn btn-ghost btn-sm" type="button"

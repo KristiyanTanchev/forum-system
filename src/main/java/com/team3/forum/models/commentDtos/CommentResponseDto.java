@@ -27,4 +27,5 @@ public class CommentResponseDto {
     private User user;
     private String username;
     private Set<User> likedBy;
+    private String contentHtml;
 }

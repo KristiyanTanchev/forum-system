@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"
+      layout:decorate="~{Layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>About CineTalk Forum</title>
+</head>
+
+<section layout:fragment="content">
+    <main class="editor-page">
+        <div class="container">
+            <section class="card editor-card-wide">
+                <div class="form-header">
+                    <h1 class="form-title">About CineTalk Forum</h1>
+                    <p class="form-subtitle">
+                        Learn more about the project and the people behind it.
+                    </p>
+                </div>
+                <section class="card folder-posts">
+                    <div class="card-title">What is this project?</div>
+                    <p class="card-subtitle">
+                        CineTalk is a discussion forum focused on movies and series. It is built as a
+                        full-stack Spring Boot application with a custom forum engine, folder hierarchy,
+                        tags, likes, comments, and a clean, modern UI.
+                    </p>
+
+                    <div class="about-section">
+                        <h2 class="section-title">Goals</h2>
+                        <ul class="bulleted-list">
+                            <li>Provide a structured place to discuss movies and TV series.</li>
+                            <li>Practice clean layering with controllers, services, repositories, and DTOs.</li>
+                            <li>Explore modern Spring Security, validation, and pagination patterns.</li>
+                            <li>Offer a solid base for future features like notifications and search.</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-section">
+                        <h2 class="section-title">Tech stack</h2>
+                        <ul class="bulleted-list">
+                            <li>Java &amp; Spring Boot</li>
+                            <li>Thymeleaf templates with a shared layout system</li>
+                            <li>REST APIs, DTO mapping, and validation</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+</section>
+
+</html>

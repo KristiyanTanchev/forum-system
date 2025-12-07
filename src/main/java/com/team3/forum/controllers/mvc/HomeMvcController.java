@@ -57,4 +57,19 @@ public class HomeMvcController {
 
         return "HomeView";
     }
+
+    @GetMapping("/about")
+    public String getAboutPage() {
+        return "AboutView";
+    }
+
+    @GetMapping("/contact")
+    public String getContactPage() {
+        return "ContactView";
+    }
+
+    @GetMapping("/api-info")
+    public String apiInfoPage() {
+        return "ApiInfoView";
+    }
 }
