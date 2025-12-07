@@ -21,7 +21,9 @@
                         </div>
                         <h1 class="post-title" th:text="${post.title}"></h1>
                         <div class="post-meta">
-                            <span>Started by <strong th:text="${post.creator}"></strong></span>
+                            <span>Started by <a th:href="@{/profile/{username}(username=${post.creator})}">
+                                <strong th:text="${post.creator}"></strong>
+                            </a></span>
                             <span>·</span>
                             <span>Posted <span th:text="${post.createdAtString}"></span></span>
                             <span>·</span>
@@ -34,7 +36,7 @@
                     </header>
 
                     <article class="post-body">
-                        <p th:text="${post.content}"></p>
+                        <p th:utext="${post.content}"></p>
                     </article>
 
                     <div class="post-actions" sec:authorize="isAuthenticated()">
@@ -53,7 +55,7 @@
                         <form method="post"
                               style="display: inline;"
                               th:action="@{/forum/posts/{postId}/unlike(postId=${post.id})}"
-                              th:if="${currentUser != null && post.likedBy.contains(currentUser)}">
+                              th:if="${currentUser != null && post.likedBy.contains(currentUserDto)}">
                             <button class="btn btn-ghost liked" type="submit">
                                 Unlike · <span th:text="${post.likedBy.size()}"></span>
                             </button>
@@ -61,7 +63,7 @@
                         <form method="post"
                               style="display: inline;"
                               th:action="@{/forum/posts/{postId}/like(postId=${post.id})}"
-                              th:if="${currentUser != null && !post.likedBy.contains(currentUser)}">
+                              th:if="${currentUser != null && !post.likedBy.contains(currentUserDto)}">
                             <button class="btn btn-ghost" type="submit">
                                 Like · <span th:text="${post.likedBy.size()}"></span>
                             </button>
@@ -92,9 +94,10 @@
                                 <form method="get" th:action="@{/forum/posts/{id}(id=${post.id})}">
                                     <select class="comment-order-by folder-select"
                                             name="sortCommentsBy"
+                                            th:value="${sortCommentsBy}"
                                             onchange="this.form.submit()">
-                                        <option value="date" th:selected="${sortCommentsBy == 'date'}">Sort by newest</option>
-                                        <option value="likes" th:selected="${sortCommentsBy == 'likes'}">Sort by most likes</option>
+                                        <option value="date">Sort by newest</option>
+                                        <option value="likes">Sort by most likes</option>
                                     </select>
                                     <input type="hidden" name="commentPage" th:value="${commentPage}" id="comment-page-input"/>
                                     <input type="hidden" name="commentSize" value="10"/>
@@ -106,7 +109,7 @@
                     <!-- COMMENT FORM (visible when logged in) -->
                     <div class="comment-form" sec:authorize="isAuthenticated()">
                         <div class="comment-form-header">
-                            <span class="comment-form-avatar" th:text="${#strings.substring(currentUser.username, 0, 1)}">M</span>
+                            <span class="comment-form-avatar" th:text="${#strings.substring(currentUser.firstName, 0, 1)}">M</span>
                             <div class="comment-form-meta">
                                 <div class="comment-form-user" sec:authentication="name">You</div>
                                 <div class="comment-form-hint">Share your thoughts about this discussion.</div>
@@ -121,8 +124,9 @@
                                     th:field="*{commentCreationDto.content}"></textarea>
                             <div class="comment-form-actions">
                                 <button class="btn btn-primary" type="submit">Post comment</button>
-                                <span class="comment-form-note">Markdown supported. Add spoilers with >!
-                                    text, **bold** for emphasis, *italic* for emphasis, [text](url) for links.</span>
+                                <span class="comment-form-note">
+                                    Markdown supported. **bold** for emphasis, *italic* for emphasis, [text](url) for links.
+                                </span>
                             </div>
                         </form>
                         <div th:if="${commentError}" class="alert alert-error" style="margin-top: 0.5rem;">
@@ -135,7 +139,7 @@
                         <!-- Comment Template -->
                         <article class="comment" th:each="comment : ${comments}">
                             <header class="comment-header">
-                                <div class="comment-avatar" th:text="${#strings.substring(comment.user.username, 0, 1)}">A</div>
+                                <div class="comment-avatar" th:text="${comment.user.firstName != null ? #strings.substring(comment.user.firstName, 0, 1) : #strings.substring(comment.user.username, 0, 1)}">A</div>
                                 <div class="comment-header-main">
                                     <div class="comment-author-row">
                                         <span class="comment-author" th:text="${comment.user.username}">ana</span>
@@ -175,11 +179,6 @@
                                 </div>
                             </div>
                             <footer class="comment-footer">
-                                <!-- Reply -->
-                                <button class="comment-action" type="button">Reply</button>
-
-                                <!-- Report -->
-                                <button class="comment-action" type="button">Report</button>
 
                                 <!-- Like/Unlike buttons -->
                                 <div style="display: inline;">
@@ -270,11 +269,6 @@
                     $('#comment-page-input').val(currentPage + 1);
                     form.submit();
                 }
-            });
-
-            // When changing sort order, reset to first page
-            $('select[name="sortCommentsBy"]').on('change', function() {
-                $('#comment-page-input').val(0);
             });
         }
     });
