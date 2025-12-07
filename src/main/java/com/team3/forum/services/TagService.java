@@ -12,4 +12,6 @@ public interface TagService {
     void deleteById(int id, int userId);
 
     List<Tag> findTopByOrderByPostsCountDesc(int limit);
+
+    List<Tag> findAllWithPostsCount();
 }

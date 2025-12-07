@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("/path/**").permitAll()
                         .requestMatchers("/testMvc/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("**.ico").permitAll()
                         .requestMatchers("/admin/users/*/promote").hasRole("ADMIN")
                         .requestMatchers("/api/admin/users/*/promote-admin").hasRole("ADMIN")
                         .requestMatchers("/admin/users/*/demote-moderator").hasRole("ADMIN")

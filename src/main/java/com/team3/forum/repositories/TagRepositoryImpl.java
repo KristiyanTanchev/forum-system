@@ -76,4 +76,17 @@ public class TagRepositoryImpl implements TagRepository {
                 .setParameter("name", name)
                 .getSingleResult() > 0;
     }
+
+    @Override
+    public List<Tag> findAllWithPostsCount() {
+        return em.createQuery("""
+                        from Tag t
+                            join fetch t.posts p 
+                            where p.isDeleted = false
+                            and size(t.posts) > 0 
+                        order by t.name
+                        
+                        """
+                , Tag.class).getResultList();
+    }
 }
