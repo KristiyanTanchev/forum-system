@@ -6,12 +6,20 @@ import com.team3.forum.models.postDtos.PostCalculatedStatsDto;
 import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.postDtos.PostUpdateDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class PostMapper {
+
+    private final MarkdownService markdownService;
+
+    @Autowired
+    public PostMapper(MarkdownService markdownService) {
+        this.markdownService = markdownService;
+    }
 
     public Post toEntity(PostCreationDto dto) {
         return Post.builder()
@@ -21,10 +29,11 @@ public class PostMapper {
     }
 
     public PostResponseDto toResponseDto(Post post, PostCalculatedStatsDto postCalculatedStatsDto) {
+
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
-                .content(post.getContent())
+                .content(markdownService.toHtml(post.getContent()))
                 .isDeleted(post.isDeleted())
                 .updatedAt(post.getUpdatedAt())
                 .createdAt(post.getCreatedAt())

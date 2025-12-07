@@ -174,8 +174,9 @@ public class PostMvcController {
         model.addAttribute("commentTotalItems", totalComments);
 
         model.addAttribute("currentUser", currentUser);
-        assert currentUser != null;
-        model.addAttribute("currentUserDto", userMapper.toResponseDto(currentUser));
+        if (currentUser != null) {
+            model.addAttribute("currentUserDto", userMapper.toResponseDto(currentUser));
+        }
         model.addAttribute("commentCreationDto", new CommentCreationDto());
 
         if (editCommentId != null) {

@@ -21,7 +21,9 @@
                         </div>
                         <h1 class="post-title" th:text="${post.title}"></h1>
                         <div class="post-meta">
-                            <span>Started by <strong th:text="${post.creator}"></strong></span>
+                            <span>Started by <a th:href="@{/profile/{username}(username=${post.creator})}">
+                                <strong th:text="${post.creator}"></strong>
+                            </a></span>
                             <span>·</span>
                             <span>Posted <span th:text="${post.createdAtString}"></span></span>
                             <span>·</span>
@@ -34,7 +36,7 @@
                     </header>
 
                     <article class="post-body">
-                        <p th:text="${post.content}"></p>
+                        <p th:utext="${post.content}"></p>
                     </article>
 
                     <div class="post-actions" sec:authorize="isAuthenticated()">
@@ -122,8 +124,9 @@
                                     th:field="*{commentCreationDto.content}"></textarea>
                             <div class="comment-form-actions">
                                 <button class="btn btn-primary" type="submit">Post comment</button>
-                                <span class="comment-form-note">Markdown supported. Add spoilers with >!
-                                    text, **bold** for emphasis, *italic* for emphasis, [text](url) for links.</span>
+                                <span class="comment-form-note">
+                                    Markdown supported. **bold** for emphasis, *italic* for emphasis, [text](url) for links.
+                                </span>
                             </div>
                         </form>
                         <div th:if="${commentError}" class="alert alert-error" style="margin-top: 0.5rem;">
