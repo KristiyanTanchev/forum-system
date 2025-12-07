@@ -62,7 +62,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             Path targetLocation = this.fileStorageLocation.resolve(newFilename);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return "/images/avatars/" + newFilename;
+            return "/avatars/" + newFilename;
         } catch (IOException ex) {
             throw new FileStorageException(FILE_STORE_ERROR + " " + newFilename, ex);
         }

@@ -59,7 +59,7 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void deleteById(int id, int requesterId) {
         User requester = userRepository.findById(requesterId);
-        if (!requester.isAdmin()) {
+        if (!requester.isModerator()) {
             throw new AuthorizationException(DELETE_AUTHORIZATION_ERROR);
         }
         Folder persistent = folderRepository.findById(id);
@@ -128,7 +128,7 @@ public class FolderServiceImpl implements FolderService {
         }
         User requester = userRepository.findById(requesterId);
 
-        if (!requester.isAdmin()) {
+        if (!requester.isModerator()) {
             throw new AuthorizationException(EDIT_AUTHORIZATION_ERROR);
         }
 

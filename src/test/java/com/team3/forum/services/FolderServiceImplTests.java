@@ -95,7 +95,7 @@ public class FolderServiceImplTests {
         int requesterId = 10;
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(false);
+        when(requester.isModerator()).thenReturn(false);
         when(userRepository.findById(requesterId)).thenReturn(requester);
 
         AuthorizationException ex = Assertions.assertThrows(
@@ -113,7 +113,7 @@ public class FolderServiceImplTests {
         int requesterId = 10;
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(true);
+        when(requester.isModerator()).thenReturn(true);
         when(userRepository.findById(requesterId)).thenReturn(requester);
 
         Folder folder = new Folder();
@@ -138,7 +138,7 @@ public class FolderServiceImplTests {
         int requesterId = 10;
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(true);
+        when(requester.isModerator()).thenReturn(true);
         when(userRepository.findById(requesterId)).thenReturn(requester);
 
         Folder folder = new Folder();
@@ -165,7 +165,7 @@ public class FolderServiceImplTests {
         int requesterId = 10;
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(true);
+        when(requester.isModerator()).thenReturn(true);
         when(userRepository.findById(requesterId)).thenReturn(requester);
 
         Folder folder = new Folder();
@@ -380,7 +380,7 @@ public class FolderServiceImplTests {
         dto.setDescription("desc");
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(true);
+        when(requester.isModerator()).thenReturn(true);
         when(userRepository.findById(10)).thenReturn(requester);
 
         when(folderRepository.findById(2)).thenReturn(target);
@@ -434,7 +434,7 @@ public class FolderServiceImplTests {
         when(folderRepository.findById(2)).thenReturn(child);
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(false);
+        when(requester.isModerator()).thenReturn(false);
         when(userRepository.findById(10)).thenReturn(requester);
 
         AuthorizationException ex = Assertions.assertThrows(
@@ -470,7 +470,7 @@ public class FolderServiceImplTests {
         when(folderRepository.findById(2)).thenReturn(child);
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(true);
+        when(requester.isModerator()).thenReturn(true);
         when(userRepository.findById(10)).thenReturn(requester);
 
         EntityUpdateConflictException ex = Assertions.assertThrows(
@@ -503,7 +503,7 @@ public class FolderServiceImplTests {
         when(folderRepository.findById(2)).thenReturn(child);
 
         User requester = mock(User.class);
-        when(requester.isAdmin()).thenReturn(true);
+        when(requester.isModerator()).thenReturn(true);
         when(userRepository.findById(10)).thenReturn(requester);
 
         when(folderRepository.save(any(Folder.class)))
