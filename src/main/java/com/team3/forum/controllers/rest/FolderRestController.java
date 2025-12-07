@@ -1,7 +1,5 @@
 package com.team3.forum.controllers.rest;
 
-import com.team3.forum.helpers.FolderMapper;
-import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.folderDtos.FolderContentsDto;
 import com.team3.forum.models.folderDtos.FolderCreateDto;
@@ -25,14 +23,10 @@ import java.util.List;
 public class FolderRestController {
     private final FolderService folderService;
     private final PostService postService;
-    private final FolderMapper folderMapper;
-    private final PostMapper postMapper;
 
-    public FolderRestController(FolderService folderService, PostService postService, FolderMapper folderMapper, PostMapper postMapper) {
+    public FolderRestController(FolderService folderService, PostService postService) {
         this.folderService = folderService;
         this.postService = postService;
-        this.folderMapper = folderMapper;
-        this.postMapper = postMapper;
     }
 
     @GetMapping
@@ -67,7 +61,7 @@ public class FolderRestController {
                 .toList();
 
         List<PostResponseDto> posts = folderService.getPostsInFolder(folder).stream()
-                .map(postMapper::toResponseDto)
+                .map(postService::buildPostResponseDto)
                 .toList();
 
         FolderContentsDto response = new FolderContentsDto(folderDto, subFolders, posts);
@@ -128,7 +122,7 @@ public class FolderRestController {
         Folder folder = folderService.getFolderByPath(slugs);
 
         List<PostResponseDto> posts = postService.getPostsInFolderPaginated(folder, page, orderBy, direction).stream()
-                .map(postMapper::toResponseDto)
+                .map(postService::buildPostResponseDto)
                 .toList();
 
         return ResponseEntity.ok(posts);

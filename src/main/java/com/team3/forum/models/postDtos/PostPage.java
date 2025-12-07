@@ -1,6 +1,5 @@
 package com.team3.forum.models.postDtos;
 
-import com.team3.forum.models.Post;
 import lombok.*;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 @Builder
 public class PostPage {
 
-    List<Post> items;
+    List<PostResponseDto> items;
 
     int page;
 

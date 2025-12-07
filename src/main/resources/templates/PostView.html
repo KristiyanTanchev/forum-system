@@ -53,7 +53,7 @@
                         <form method="post"
                               style="display: inline;"
                               th:action="@{/forum/posts/{postId}/unlike(postId=${post.id})}"
-                              th:if="${currentUser != null && post.likedBy.contains(currentUser)}">
+                              th:if="${currentUser != null && post.likedBy.contains(currentUserDto)}">
                             <button class="btn btn-ghost liked" type="submit">
                                 Unlike · <span th:text="${post.likedBy.size()}"></span>
                             </button>
@@ -61,7 +61,7 @@
                         <form method="post"
                               style="display: inline;"
                               th:action="@{/forum/posts/{postId}/like(postId=${post.id})}"
-                              th:if="${currentUser != null && !post.likedBy.contains(currentUser)}">
+                              th:if="${currentUser != null && !post.likedBy.contains(currentUserDto)}">
                             <button class="btn btn-ghost" type="submit">
                                 Like · <span th:text="${post.likedBy.size()}"></span>
                             </button>

@@ -71,4 +71,18 @@ public class CommentMapper {
                 .likedBy(comment.getLikedBy())
                 .build();
     }
+
+    public CommentResponseDto convertToDto(Comment comment) {
+        return CommentResponseDto.builder()
+                .id(comment.getId())
+                .postId(comment.getPost().getId())
+                .userId(comment.getUser().getId())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .isDeleted(comment.isDeleted())
+                .deletedAt(comment.getDeletedAt())
+                .likesCount(comment.getLikedBy().size())
+                .build();
+    }
 }

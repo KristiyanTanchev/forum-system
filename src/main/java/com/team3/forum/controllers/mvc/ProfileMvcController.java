@@ -1,12 +1,11 @@
 package com.team3.forum.controllers.mvc;
 
-import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.helpers.UserMapper;
-import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.userDtos.UserUpdateDto;
 import com.team3.forum.security.CustomUserDetails;
+import com.team3.forum.services.PostService;
 import com.team3.forum.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +22,15 @@ import java.util.List;
 public class ProfileMvcController {
     private final UserService userService;
     private final UserMapper userMapper;
-    private final PostMapper postMapper;
+    private final PostService postService;
 
     @Autowired
     public ProfileMvcController(UserService userService,
                                 UserMapper userMapper,
-                                PostMapper postMapper) {
+                                PostService postService) {
         this.userService = userService;
         this.userMapper = userMapper;
-        this.postMapper = postMapper;
+        this.postService = postService;
     }
 
     @GetMapping
@@ -51,7 +50,7 @@ public class ProfileMvcController {
         User user = userService.findByUsername(username);
 
         List<PostResponseDto> postDtos = user.getPosts().stream()
-                .map(postMapper::toResponseDto)
+                .map(postService::buildPostResponseDto)
                 .toList();
 
         model.addAttribute("user", userMapper.toResponseDto(user));

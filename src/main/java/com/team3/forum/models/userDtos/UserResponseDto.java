@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 public class UserResponseDto {
+    @EqualsAndHashCode.Include
     private int userId;
     private String firstName;
     private String lastName;

@@ -2,7 +2,9 @@ package com.team3.forum.services;
 
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
+import com.team3.forum.models.postDtos.PostCreationDto;
 import com.team3.forum.models.postDtos.PostPage;
+import com.team3.forum.models.postDtos.PostResponseDto;
 import com.team3.forum.models.postDtos.PostUpdateDto;
 
 import java.util.List;
@@ -18,7 +20,7 @@ public interface PostService {
 
     Post restoreById(int id, int requesterId);
 
-    Post create(Post post);
+    Post create(PostCreationDto postCreationDto, int requesterId);
 
     Post update(int postId, PostUpdateDto postUpdateDto, int requesterId);
 
@@ -39,4 +41,6 @@ public interface PostService {
     List<Post> getTrendingPosts();
 
     int getPostsCount();
+
+    PostResponseDto buildPostResponseDto(Post post);
 }

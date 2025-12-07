@@ -1,6 +1,5 @@
 package com.team3.forum.controllers.mvc;
 
-import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.folderDtos.FolderResponseDto;
@@ -23,15 +22,13 @@ import java.util.List;
 public class HomeMvcController {
 
     private final PostService postService;
-    private final PostMapper postMapper;
     private final FolderService folderService;
     private final TagService tagService;
     private final UserService userService;
 
     @Autowired
-    public HomeMvcController(PostService postService, PostMapper postMapper, FolderService folderService, TagService tagService, UserService userService) {
+    public HomeMvcController(PostService postService, FolderService folderService, TagService tagService, UserService userService) {
         this.postService = postService;
-        this.postMapper = postMapper;
         this.folderService = folderService;
         this.tagService = tagService;
         this.userService = userService;
@@ -46,7 +43,7 @@ public class HomeMvcController {
 
         List<Post> posts = postService.getTrendingPosts();
         List<PostResponseDto> mappedPosts = posts.stream()
-                .map(postMapper::toResponseDto)
+                .map(postService::buildPostResponseDto)
                 .toList();
         model.addAttribute("posts", mappedPosts);
 

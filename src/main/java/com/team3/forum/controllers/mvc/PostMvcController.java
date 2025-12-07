@@ -4,7 +4,7 @@ import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.helpers.CommentMapper;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.FolderPageHelper;
-import com.team3.forum.helpers.PostMapper;
+import com.team3.forum.helpers.UserMapper;
 import com.team3.forum.models.*;
 import com.team3.forum.models.commentDtos.CommentCreationDto;
 import com.team3.forum.models.commentDtos.CommentResponseDto;
@@ -32,7 +32,6 @@ import java.util.List;
 public class PostMvcController {
 
     private final PostService postService;
-    private final PostMapper postMapper;
     private final FolderService folderService;
     private final FolderMapper folderMapper;
     private final TagService tagService;
@@ -40,15 +39,19 @@ public class PostMvcController {
     private final UserService userService;
     private final CommentMapper commentMapper;
     private final FolderPageHelper folderPageHelper;
+    private final UserMapper userMapper;
 
     @Autowired
-    public PostMvcController(PostService postService, PostMapper postMapper,
-                             FolderService folderService, FolderMapper folderMapper,
-                             TagService tagService, CommentService commentService,
+    public PostMvcController(PostService postService,
+                             FolderService folderService,
+                             FolderMapper folderMapper,
+                             TagService tagService,
+                             CommentService commentService,
                              UserService userService,
-                             FolderPageHelper folderPageHelper, CommentMapper commentMapper) {
+                             FolderPageHelper folderPageHelper,
+                             CommentMapper commentMapper,
+                             UserMapper userMapper) {
         this.postService = postService;
-        this.postMapper = postMapper;
         this.folderService = folderService;
         this.folderMapper = folderMapper;
         this.tagService = tagService;
@@ -56,6 +59,7 @@ public class PostMvcController {
         this.userService = userService;
         this.folderPageHelper = folderPageHelper;
         this.commentMapper = commentMapper;
+        this.userMapper = userMapper;
     }
 
     @GetMapping
@@ -69,8 +73,7 @@ public class PostMvcController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         PostPage pageInfo = postService.getPostsInFolderPaginated(null, page, search, orderBy, direction, tagId);
         model.addAttribute("pageInfo", pageInfo);
-        List<PostResponseDto> posts = pageInfo.getItems().stream()
-                .map(postMapper::toResponseDto).toList();
+        List<PostResponseDto> posts = pageInfo.getItems();
 
         model.addAttribute("posts", posts);
 
@@ -131,7 +134,7 @@ public class PostMvcController {
                         .toList()
         );
 
-        model.addAttribute("post", postMapper.toResponseDto(post));
+        model.addAttribute("post", postService.buildPostResponseDto(post));
         User currentUser = principal != null ? userService.findById(principal.getId()) : null;
 
         List<Comment> comments;
@@ -170,6 +173,8 @@ public class PostMvcController {
         model.addAttribute("commentTotalItems", totalComments);
 
         model.addAttribute("currentUser", currentUser);
+        assert currentUser != null;
+        model.addAttribute("currentUserDto", userMapper.toResponseDto(currentUser));
         model.addAttribute("commentCreationDto", new CommentCreationDto());
 
         if (editCommentId != null) {
@@ -217,8 +222,8 @@ public class PostMvcController {
         if (principal == null) {
             return "redirect:/auth/login?error=You must be logged in to create a post!";
         }
-        Post post = postMapper.toEntity(postCreationDto, principal.getId());
-        post = postService.create(post);
+
+        Post post = postService.create(postCreationDto, principal.getId());
         return "redirect:/forum/posts/" + post.getId();
     }
 

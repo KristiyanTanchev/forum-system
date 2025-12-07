@@ -1,7 +1,6 @@
 package com.team3.forum.controllers.mvc;
 
 import com.team3.forum.helpers.FolderPageHelper;
-import com.team3.forum.helpers.PostMapper;
 import com.team3.forum.models.Folder;
 import com.team3.forum.models.postDtos.PostPage;
 import com.team3.forum.models.postDtos.PostResponseDto;
@@ -22,17 +21,14 @@ import java.util.List;
 public class FolderMvcController {
     private final FolderService folderService;
     private final FolderPageHelper folderPageHelper;
-    private final PostMapper postMapper;
     private final PostService postService;
 
     @Autowired
     public FolderMvcController(FolderService folderService,
                                FolderPageHelper folderPageHelper,
-                               PostMapper postMapper,
                                PostService postService) {
         this.folderService = folderService;
         this.folderPageHelper = folderPageHelper;
-        this.postMapper = postMapper;
         this.postService = postService;
     }
 
@@ -65,9 +61,7 @@ public class FolderMvcController {
 
         folderPageHelper.populateSidebar(folder, siblingPage, childPage, model);
 
-        List<PostResponseDto> mappedPosts = pageInfo.getItems().stream()
-                .map(postMapper::toResponseDto)
-                .toList();
+        List<PostResponseDto> mappedPosts = pageInfo.getItems();
         model.addAttribute("posts", mappedPosts);
 
         return "FolderView";
