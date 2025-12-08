@@ -23,11 +23,7 @@ A comprehensive movie and series discussion forum built with Spring Boot, featur
 - [Project Structure](#project-structure)
 - [Performance & Limits](#performance--limits)
 - [Testing](#testing)
-- [Deployment](#deployment)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [Team](#team)
-
+- [Contributors](#contributors)
 ---
 
 ## What This Project Does
@@ -764,3 +760,45 @@ The project includes unit tests for:
 
 Tests use Mockito for mocking dependencies and JUnit 5 for assertions.
 
+---
+
+## Contributors
+
+This project was developed by Team 3 as part of the Telerik Academy A72 Web Development Program.
+
+### Team Members
+
+
+**Kristiyan Tanchev**
+- Markdown rendering system for posts and comments using flexmark-all library
+- Folder management with hierarchical structure and slug-based navigation
+- Tag functionality for creating, editing, and filtering posts by tags
+- Post like/unlike features and social interactions
+- OpenAPI/Swagger documentation setup and interactive API testing interface
+- Frontend views (About, Contact, API Info pages)
+- Service layer unit tests for folder and post services
+- Error handling and flash message system
+- Bug fixes and permissions system improvements
+
+**Teodora Gencheva**
+- User management and JWT-based authentication system
+- Role-based access control (Admin/Moderator/User roles) implementation
+- Moderator role functionality with content moderation capabilities
+- Admin dashboard for user management (block, delete, promote users)
+- Avatar upload functionality with file storage and validation
+- Service layer unit tests for user service
+- REST API endpoints for viewing user posts and comments
+- Admin statistics and user filtering features
+- Project documentation, README, and database seeding
+- Project logo and branding
+
+**Ivan Georgiev**
+- Comment system frontend implementation
+- Comment pagination with page navigation
+- Comment timestamps and edit tracking display
+- Service layer unit tests for comments and tags services
+- User interface improvements and refinements
+- Avatar display formatting and uppercase fixes
+- Frontend bug fixes for better user experience
+- Comment ordering and sorting functionality
+- User interface improvements and bug fixes
