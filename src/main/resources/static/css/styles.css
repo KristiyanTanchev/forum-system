@@ -1795,3 +1795,54 @@ a.btn {
     color: var(--muted);
     margin-top: 0.1rem;
 }
+
+
+.media-meta {
+    margin-top: .6rem;
+}
+
+.media-meta-top {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+}
+
+.media-meta-poster {
+    width: 56px;
+    height: 84px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex: 0 0 auto;
+}
+
+.media-meta-title {
+    font-weight: 700;
+    margin-bottom: .25rem;
+}
+
+.media-meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin-bottom: .35rem;
+}
+
+.badge {
+    display: inline-flex;
+    padding: .12rem .45rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.media-meta-line {
+    font-size: .85rem;
+    opacity: .9;
+    margin-top: .15rem;
+}
+
+.media-meta-plot {
+    margin-top: .6rem;
+    font-size: .85rem;
+    opacity: .9;
+}

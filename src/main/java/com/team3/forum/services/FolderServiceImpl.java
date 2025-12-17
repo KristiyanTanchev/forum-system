@@ -4,13 +4,16 @@ import com.team3.forum.exceptions.AuthorizationException;
 import com.team3.forum.exceptions.EntityNotFoundException;
 import com.team3.forum.exceptions.EntityUpdateConflictException;
 import com.team3.forum.exceptions.FolderNotEmptyException;
+import com.team3.forum.external.client.ExternalMetaDataClient;
 import com.team3.forum.helpers.FolderMapper;
 import com.team3.forum.helpers.TimeAgo;
 import com.team3.forum.models.Folder;
+import com.team3.forum.models.MediaMetaData;
 import com.team3.forum.models.Post;
 import com.team3.forum.models.User;
 import com.team3.forum.models.folderDtos.*;
 import com.team3.forum.repositories.FolderRepository;
+import com.team3.forum.repositories.MediaMetaDataRepository;
 import com.team3.forum.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,12 +39,16 @@ public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
     private final UserRepository userRepository;
     private final FolderMapper folderMapper;
+    private final ExternalMetaDataClient externalMetaDataClient;
+    private final MediaMetaDataRepository mediaMetaDataRepository;
 
     @Autowired
-    public FolderServiceImpl(FolderRepository folderRepository, UserRepository userRepository, FolderMapper folderMapper) {
+    public FolderServiceImpl(FolderRepository folderRepository, UserRepository userRepository, FolderMapper folderMapper, ExternalMetaDataClient externalMetaDataClient, MediaMetaDataRepository mediaMetaDataRepository) {
         this.folderRepository = folderRepository;
         this.userRepository = userRepository;
         this.folderMapper = folderMapper;
+        this.externalMetaDataClient = externalMetaDataClient;
+        this.mediaMetaDataRepository = mediaMetaDataRepository;
     }
 
     @Override
@@ -85,6 +92,10 @@ public class FolderServiceImpl implements FolderService {
 
         validateUniqueSlug(parent, folder);
 
+        if (folder.getImdbId() != null) {
+            externalMetaDataClient.syncMetaData(folder);
+        }
+
         return folderRepository.save(folder);
     }
 
@@ -105,6 +116,10 @@ public class FolderServiceImpl implements FolderService {
         folder.setParentFolder(parent);
 
         validateUniqueSlug(parent, folder);
+
+        if (folder.getImdbId() != null) {
+            externalMetaDataClient.syncMetaData(folder);
+        }
 
         return folderRepository.save(folder);
     }
@@ -137,6 +152,10 @@ public class FolderServiceImpl implements FolderService {
         folder.setDescription(folderUpdateDto.getDescription());
 
         validateUniqueSlug(folder.getParentFolder(), folder);
+
+        if (folder.getImdbId() != null) {
+            externalMetaDataClient.syncMetaData(folder);
+        }
 
         return folderRepository.save(folder);
     }
@@ -218,7 +237,12 @@ public class FolderServiceImpl implements FolderService {
     @Transactional(readOnly = true)
     public FolderResponseDto buildFolderResponseDto(Folder folder) {
         Folder persistent = folderRepository.findById(folder.getId());
-        return folderMapper.toResponseDto(folder, buildFolderCalculatedStatsDto(persistent));
+        MediaMetaData metaData = null;
+        if (folder.getImdbId() != null) {
+            metaData = mediaMetaDataRepository.findById(folder.getImdbId())
+                    .orElse(null);
+        }
+        return folderMapper.toResponseDto(folder, buildFolderCalculatedStatsDto(persistent), metaData);
     }
 
     private void validateUniqueSlug(Folder parent, Folder child) {

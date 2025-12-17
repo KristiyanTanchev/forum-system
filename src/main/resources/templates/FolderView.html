@@ -54,6 +54,51 @@
                         <div class="card-title">Folder details</div>
                         <div class="card-subtitle" th:text="${folder.description}">
                         </div>
+                        <!-- Media metadata (only if present) -->
+                        <div class="media-meta" th:if="${folder.metaData != null}">
+                            <div class="media-meta-top">
+                                <img class="media-meta-poster"
+                                     th:alt="${folder.metaData.title}"
+                                     th:if="${folder.metaData.poster != null and folder.metaData.poster != 'N/A'}"
+                                     th:src="${folder.metaData.poster}"/>
+
+                                <div class="media-meta-text">
+                                    <div class="media-meta-title" th:text="${folder.metaData.title}">Title</div>
+
+                                    <div class="media-meta-badges">
+                                        <span class="badge" th:if="${folder.metaData.year != null}"
+                                              th:text="${folder.metaData.year}">2020</span>
+                                        <span class="badge" th:if="${folder.metaData.type != null}"
+                                              th:text="${folder.metaData.type}">series</span>
+                                    </div>
+
+                                    <div class="media-meta-line"
+                                         th:if="${folder.metaData.imdbRating != null}">
+                                        ⭐ <span th:text="${folder.metaData.imdbRating}">8.7</span>/10
+                                    </div>
+
+                                    <div class="media-meta-line"
+                                         th:if="${folder.metaData.genres != null}">
+                                        <span th:text="${folder.metaData.genres}">Drama, Sci-Fi</span>
+                                    </div>
+
+                                    <div class="media-meta-line"
+                                         th:if="${folder.metaData.country != null or folder.metaData.language != null}">
+                                        <span th:if="${folder.metaData.country != null}"
+                                              th:text="${folder.metaData.country}">USA</span>
+                                        <span th:if="${folder.metaData.country != null and folder.metaData.language != null}"> · </span>
+                                        <span th:if="${folder.metaData.language != null}"
+                                              th:text="${folder.metaData.language}">English</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="media-meta-plot"
+                                 th:if="${folder.metaData.plot != null and folder.metaData.plot != 'N/A'}"
+                                 th:text="${folder.metaData.plot}">
+                                Plot…
+                            </div>
+                        </div>
 
                         <div class="folder-stats">
                             <div class="folder-stat-item" th:if="${folder.folderCount > 0}">

@@ -1,5 +1,6 @@
 package com.team3.forum.models.folderDtos;
 
+import com.team3.forum.models.MediaMetaData;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -24,4 +25,5 @@ public class FolderResponseDto {
     private List<FolderPathDto> pathFolders;
     private int postCountWithSubfolders;
     private String lastActivity;
+    private MediaMetaData metaData;
 }

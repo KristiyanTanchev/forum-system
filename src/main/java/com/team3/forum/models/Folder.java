@@ -49,4 +49,7 @@ public class Folder {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "imdb_id")
+    private String imdbId;
 }
